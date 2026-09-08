@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "account": "nihat",
+  "source": "D:/Yeni klasör/0907.mp4",
+  "duration": 153.2,
+  "cuts": [],
+  "splits": [],
+  "words": [],
+  "layout": {
+    "banner": {"x": 76, "y": 220, "w": 928, "h": 120},
+    "caption": {"x": 20, "y": 1208, "w": 1060, "h": 320, "fontSize": 62}
+  },
+  "captions": [
+    {
+      "start": 0.4,
+      "end": 2.1,
+      "text": "örnek",
+      "top": "",
+      "bottom": "ÖRNEK",
+      "tone": "yumusak",
+      "format": "B"
+    }
+  ],
+  "events": []
+}

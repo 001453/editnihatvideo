@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nihat Editör</title>
+<style>
+  :root{
+    --bg:#121214; --panel:#1b1b1e; --panel-2:#202024; --line:#2c2c31;
+    --text:#ececef; --muted:#8b8b93; --cut:#e5484d; --keep:#45b08c;
+    --accent:#d9a441; --cap:#5ab0ff;
+    --mono: ui-monospace, "SF Mono", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+  }
+  @font-face{font-family:Anton;font-style:normal;font-weight:400;font-display:swap;src:url("videos/0907/public/fonts/Anton-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA;}
+  @font-face{font-family:Anton;font-style:normal;font-weight:400;font-display:swap;src:url("videos/0907/public/fonts/Anton-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  .app{display:grid;grid-template-columns:360px 1fr 360px;height:100%;}
+  @media (max-width:1100px){.app{grid-template-columns:1fr;height:auto;}}
+  .col{display:flex;flex-direction:column;min-width:0;min-height:0;}
+  .left,.right{background:var(--panel);overflow:auto;padding:16px;gap:12px;}
+  .left{border-right:1px solid var(--line);}
+  .right{border-left:1px solid var(--line);}
+  h1{font-size:15px;margin:0 0 4px;}
+  h2{font-size:12.5px;margin:0 0 8px;color:var(--muted);font-weight:600;}
+  .sub{color:var(--muted);font-size:12.5px;line-height:1.45;margin:0 0 8px;}
+  .filebox,.stats,.readout{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;}
+  label{font-size:12px;color:var(--muted);}
+  input[type=file],input[type=text],input[type=number],select,textarea{
+    background:#0e0e10;color:var(--text);border:1px solid var(--line);border-radius:7px;
+    padding:7px 8px;font-size:12.5px;width:100%;
+  }
+  textarea{min-height:72px;font-family:var(--mono);font-size:11.5px;}
+  .ok{color:var(--keep);font-size:12px;}
+  button{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12.5px;}
+  button:hover{border-color:var(--accent);}
+  button.primary{border-color:var(--keep);color:var(--keep);}
+  button.danger{border-color:var(--cut);color:var(--cut);}
+  .row{display:flex;gap:8px;flex-wrap:wrap;}
+  .modebar{display:flex;gap:6px;flex-wrap:wrap;}
+  .modebtn{flex:1;text-align:center;padding:8px;border-radius:8px;cursor:pointer;font-size:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);}
+  .modebtn.active{border-color:var(--accent);color:var(--accent);background:rgba(217,164,65,.08);}
+  .stage-wrap{
+    position:relative;width:min(100%, 248px);aspect-ratio:9/16;margin:0 auto;
+    background:#000;border-radius:10px;overflow:hidden;border:1px solid var(--line);
+    flex-shrink:0;isolation:isolate;contain:layout paint;
+  }
+  #videoArea{position:absolute;inset:0;overflow:hidden;}
+  .stage-wrap video{
+    width:100%;height:100%;object-fit:cover;object-position:center top;
+    display:block;max-height:none;max-width:none;
+  }
+  .box{position:absolute;border:2px solid var(--accent);background:rgba(217,164,65,.12);cursor:move;touch-action:none;overflow:hidden;z-index:2;}
+  .box.caption{border-color:var(--cap);background:rgba(90,176,255,.12);}
+  .box .label{position:absolute;top:2px;left:2px;z-index:2;font-size:10px;background:var(--accent);color:#1a1206;padding:1px 6px;border-radius:4px;font-weight:600;}
+  .box.caption .label{background:var(--cap);color:#031824;}
+  .handle{position:absolute;width:14px;height:14px;right:2px;bottom:2px;border-radius:50%;background:var(--accent);cursor:nwse-resize;z-index:3;}
+  .box .preview{
+    position:absolute;inset:18px 6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    pointer-events:none;text-align:center;font-family:Anton,"Arial Black",sans-serif;font-weight:400;line-height:.88;
+    letter-spacing:-.045em;overflow:visible;gap:2px;
+  }
+  .box .preview .l1,.box .preview .l2{
+    white-space:nowrap;overflow:visible;max-width:100%;width:100%;
+    flex:0 0 auto;min-height:0;letter-spacing:-.045em;line-height:.9;text-transform:uppercase;
+  }
+  .box .preview .l1{
+    font-size:1.28em;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .box .preview .l2{font-size:.78em;-webkit-text-fill-color:unset;background:none;}
+  .box .preview.yumusak .l1{
+    background:linear-gradient(180deg,#ffffff 0%,#fff6d8 40%,#f0c45a 100%);
+    filter:drop-shadow(0 1px 0 #d4a84a) drop-shadow(0 2px 0 #a07820) drop-shadow(0 4px 6px rgba(0,0,0,.55));
+  }
+  .box .preview.yumusak .l2{color:#ffe14a;filter:drop-shadow(0 1px 0 #d4a84a) drop-shadow(0 2px 0 #a07820) drop-shadow(0 4px 6px rgba(0,0,0,.5));}
+  .box .preview.sert .l1{
+    background:linear-gradient(180deg,#ffffff 0%,#ffe4dc 42%,#e88878 100%);
+    filter:drop-shadow(0 1px 0 #d46858) drop-shadow(0 2px 0 #9a2820) drop-shadow(0 4px 6px rgba(0,0,0,.55));
+  }
+  .box .preview.sert .l2{color:#ff2a2a;filter:drop-shadow(0 1px 0 #d46858) drop-shadow(0 2px 0 #9a2820) drop-shadow(0 4px 6px rgba(0,0,0,.5));}
+  .box .preview.yukselis .l1{
+    background:linear-gradient(180deg,#ffffff 0%,#e8ffe8 42%,#7ad48a 100%);
+    filter:drop-shadow(0 1px 0 #5aaa62) drop-shadow(0 2px 0 #2a6a32) drop-shadow(0 4px 6px rgba(0,0,0,.55));
+  }
+  .box .preview.yukselis .l2{color:#5dff8a;filter:drop-shadow(0 1px 0 #5aaa62) drop-shadow(0 2px 0 #2a6a32) drop-shadow(0 4px 6px rgba(0,0,0,.5));}
+  .box .preview.fixed .l1{
+    background:linear-gradient(180deg,#ffffff 0%,#fff6d8 40%,#e8d4a8 100%);
+    filter:drop-shadow(0 1px 0 #c9a36a) drop-shadow(0 2px 0 #8a6230) drop-shadow(0 4px 6px rgba(0,0,0,.55));
+  }
+  .box .preview.fixed .l2{color:#fff6d8;filter:drop-shadow(0 1px 0 #c9a36a) drop-shadow(0 2px 0 #8a6230) drop-shadow(0 4px 6px rgba(0,0,0,.5));}
+  .safe{position:absolute;inset:0;pointer-events:none;border:0;box-shadow:inset 0 200px 0 rgba(229,72,77,.12), inset 0 -400px 0 rgba(229,72,77,.12), inset -150px 0 0 rgba(229,72,77,.08);}
+  .transport{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .time{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .markbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .markbar .io{font-family:var(--mono);font-size:11.5px;color:var(--accent);}
+  .timeline{
+    position:relative;height:64px;background:#0a0a0c;border:1px solid var(--line);
+    border-radius:10px;cursor:pointer;overflow:hidden;user-select:none;
+  }
+  .tl-clip{
+    position:absolute;top:10px;bottom:10px;background:linear-gradient(180deg,#3d8f6e,#2d6b52);
+    border-radius:6px;border:1px solid #5ec49a;cursor:pointer;overflow:hidden;
+  }
+  .tl-clip.sel{outline:2px solid #fff;outline-offset:1px;background:linear-gradient(180deg,#4caf7a,#2d6b52);}
+  .tl-clip span{display:block;padding:6px 8px;font-size:10px;color:#e8fff4;font-family:var(--mono);white-space:nowrap;overflow:hidden;}
+  .tl-edge{position:absolute;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:2;}
+  .tl-edge.l{left:0;} .tl-edge.r{right:0;}
+  .tl-cut{position:absolute;top:0;bottom:0;background:rgba(229,72,77,.12);pointer-events:none;}
+  .tl-range{position:absolute;top:0;bottom:0;background:rgba(217,164,65,.35);pointer-events:none;}
+  .tl-play{position:absolute;top:0;bottom:0;width:2px;background:#fff;z-index:5;pointer-events:none;box-shadow:0 0 0 1px #000;}
+  .tl-in,.tl-out{position:absolute;top:0;bottom:0;width:3px;pointer-events:none;z-index:4;}
+  .tl-in{background:var(--keep);}
+  .tl-out{background:var(--cut);}
+  .cutbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .cutbar button.big{font-weight:600;padding:10px 14px;}
+  .vid-badge{
+    position:absolute;left:8px;bottom:8px;z-index:4;background:rgba(18,18,20,.88);
+    border:1px solid var(--accent);border-radius:8px;padding:6px 8px;font-size:11.5px;
+    font-family:var(--mono);color:var(--accent);pointer-events:none;
+  }
+  .stats .line{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);}
+  .stats b{color:var(--text);font-family:var(--mono);}
+  .mid{overflow:auto;padding:20px 28px;line-height:2.1;font-size:16px;}
+  .hint{color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.5;}
+  .w{cursor:pointer;padding:2px 1px;border-radius:4px;}
+  .w:hover{background:#2a2a30;}
+  .w.active{background:var(--accent);color:#1a1206;}
+  .w.pending{outline:2px solid var(--accent);}
+  .w.cut{color:var(--cut);text-decoration:line-through;opacity:.6;}
+  .gapchip{display:inline-block;cursor:pointer;padding:2px 8px;margin:0 4px;border-radius:12px;font-family:var(--mono);font-size:12px;color:var(--accent);background:rgba(217,164,65,.1);border:1px solid rgba(217,164,65,.35);}
+  .gapchip.cut{color:var(--cut);background:rgba(229,72,77,.16);border-color:var(--cut);text-decoration:line-through;}
+  .confirmbar{position:sticky;bottom:12px;background:var(--panel-2);border:1px solid var(--accent);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;}
+  .list{display:flex;flex-direction:column;gap:6px;}
+  .item{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px;font-size:12.5px;}
+  .item .meta{font-family:var(--mono);color:var(--accent);cursor:pointer;}
+  .item .txt{color:var(--muted);margin-top:4px;}
+  .empty{color:var(--muted);font-size:12.5px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="col left">
+    <div>
+      <h1>Nihat / Mehmet editör</h1>
+      <p class="sub">CapCut gibi: playhead’de <b>Böl</b>, klibi tıkla, <b>Sil</b>. Ctrl+Z geri alır.</p>
+    </div>
+    <div class="filebox">
+      <label>Video</label>
+      <input type="file" id="videoInput" accept="video/*" />
+      <span class="ok" id="videoOk"></span>
+      <label>Video yolu (EDL için, tam yol)</label>
+      <input type="text" id="sourcePath" placeholder="D:\Downloads\Adsız tasarım.mp4" />
+    </div>
+    <div class="filebox">
+      <label>Transkript JSON</label>
+      <input type="file" id="transcriptInput" accept=".json,.txt" />
+      <span class="ok" id="transcriptOk"></span>
+      <label>Kayıtlı proje</label>
+      <input type="file" id="projectInput" accept=".json" />
+    </div>
+    <div class="stage-wrap" id="stageWrap">
+      <div id="videoArea"><div class="sub" style="padding:40px;text-align:center;">Video seç</div></div>
+    </div>
+    <div class="transport" id="transport" style="display:none;">
+      <button id="playBtn">▶</button>
+      <button id="back5">-5</button>
+      <button id="fwd5">+5</button>
+      <span class="time" id="timeLabel">00:00</span>
+      <label class="sub" style="margin:0;display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="skipCuts" checked /> kesimleri atla
+      </label>
+    </div>
+    <div class="cutbar" id="cutbar" style="display:none;">
+      <button id="splitBtn" class="big primary">Böl (S)</button>
+      <button id="deleteClip" class="big danger">Klibi sil (Del)</button>
+      <button id="undoBtn">Geri al</button>
+      <span class="time" id="editTime">düzen: 00:00</span>
+    </div>
+    <div id="timeline" class="timeline" style="display:none;" title="Klibe tıkla · kenardan kısalt · boşluğa tıkla: git"></div>
+    <div class="markbar" id="markbar" style="display:none;">
+      <button id="markIn">Giriş I</button>
+      <button id="markOut">Çıkış O</button>
+      <span class="io" id="ioLabel">I – / O –</span>
+      <button id="cutRange" class="danger">Aralığı sil</button>
+      <button id="cutToHere">Baştan buraya</button>
+      <button id="cutFromHere">Buradan sona</button>
+      <button id="clearMarks">İşareti sil</button>
+    </div>
+    <div class="modebar">
+      <div class="modebtn active" id="modeSeek">Gezin</div>
+      <div class="modebtn" id="modeCut">Kes</div>
+      <div class="modebtn" id="modeEdit">Düzelt</div>
+      <div class="modebtn" id="modeCaption">Altyazı</div>
+    </div>
+    <div class="modebar">
+      <div class="modebtn active" id="acctNihat">Nihat</div>
+      <div class="modebtn" id="acctMehmet">Mehmet</div>
+    </div>
+    <div class="stats">
+      <div class="line"><span>Süre</span><b id="statOrig">–</b></div>
+      <div class="line"><span>Kesilen</span><b id="statCut" style="color:var(--cut);">–</b></div>
+      <div class="line"><span>Kalan</span><b id="statRemain" style="color:var(--keep);">–</b></div>
+    </div>
+    <div class="readout">
+      <h2>Yerleşim (sürükle / köşeden boyutlandır)</h2>
+      <div>Banner x <b id="bx">76</b> y <b id="by">220</b> · <b id="bw">928</b>×<b id="bh">120</b></div>
+      <div>Altyazı x <b id="cx">80</b> y <b id="cy">1280</b> · <b id="cw">920</b>×<b id="ch">200</b></div>
+      <label>Altyazı yazı boyutu: <b id="cfs">48</b> <span class="sub" style="margin:0">(kutu içinde 2 satır kalır)</span></label>
+      <input type="range" id="capFont" min="40" max="78" value="58" step="2" />
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="mid" id="transcriptWrap">
+      <div class="hint">Video ve transkript seç. Mevcut transkript: Downloads\edit\transcripts\Adsız tasarım.json</div>
+    </div>
+    <div id="confirmSlot"></div>
+  </div>
+
+  <div class="col right">
+    <h2>Olaylar</h2>
+    <div class="row">
+      <select id="evType">
+        <option value="hook">Kanca</option>
+        <option value="banner">Banner</option>
+        <option value="broll">B-roll / PIP</option>
+        <option value="zoom">Zoom-punch</option>
+        <option value="statcard">İstatistik kartı</option>
+        <option value="linegraph">Çizgi grafik</option>
+      </select>
+      <button id="evNow">Şu an</button>
+      <button id="evAdd" class="primary">Ekle</button>
+    </div>
+    <input type="text" id="evExtra" placeholder="Kanca satır1 | satır2  —  veya b-roll araması" />
+    <div class="list" id="eventList"><div class="empty">Henüz olay yok. Banner için 20sn ve bitişe 20sn kala varsayılan ekleyebilirsin.</div></div>
+    <button id="evDefaults">Varsayılan banner + boş kanca</button>
+
+    <h2>Kesimler</h2>
+    <div class="list" id="cutlist"><div class="empty">Yok</div></div>
+    <h2>Altyazılar</h2>
+    <div class="list" id="captionlist"><div class="empty">Yok</div></div>
+
+    <h2>Kaydet</h2>
+    <div class="row">
+      <button id="saveProject" class="primary">project.json indir</button>
+    </div>
+    <p class="sub">Dosyayı <code>videos/ID/project.json</code> olarak koy. B-roll/punch saatleri <code>timeline.json</code>. Sonra <code>python videos/ID/build_composition.py</code></p>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const GAP_THRESHOLD = 0.8;
+const VW = 1080, VH = 1920;
+
+let words = [];
+let gaps = [];
+let cuts = [];
+let captions = [];
+let events = [];
+let account = 'nihat';
+let pendingStart = null;
+let markInT = null;
+let markOutT = null;
+let splits = [];
+let selectedClip = null;
+let undoStack = [];
+let mode = 'seek';
+let videoEl = null;
+let fileLabel = '';
+let duration = 0;
+let layout = {
+  banner: {x:76, y:220, w:928, h:120},
+  caption: {x:80, y:1280, w:920, h:200, fontSize:58}
+};
+
+function fmt(s){
+  if(s==null || isNaN(s)) return '00:00';
+  const m = Math.floor(s/60), sec = (s%60).toFixed(2);
+  return String(m).padStart(2,'0')+':'+String(sec).padStart(5,'0');
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function computeGaps(){
+  gaps = [];
+  for(let i=0;i<words.length-1;i++){
+    const dur = words[i+1].start - words[i].end;
+    if(dur >= GAP_THRESHOLD) gaps.push({id:'g'+i, start:words[i].end, end:words[i+1].start, dur});
+  }
+  if(words.length && words[0].start >= GAP_THRESHOLD){
+    gaps.unshift({id:'g-lead', start:0, end:words[0].start, dur:words[0].start});
+  }
+  if(duration && words.length){
+    const last = words[words.length-1];
+    const tail = duration - last.end;
+    if(tail >= GAP_THRESHOLD) gaps.push({id:'g-tail', start:last.end, end:duration, dur:tail});
+  }
+}
+
+function parseTranscript(raw, filename){
+  if(filename.toLowerCase().endsWith('.json')){
+    const data = JSON.parse(raw);
+    const arr = Array.isArray(data) ? data : (data.words || data.segments || data.items || []);
+    return arr.map(w => ({
+      start: Number(w.start ?? w.from ?? w.s),
+      end: Number(w.end ?? w.to ?? w.e),
+      text: String(w.word ?? w.text ?? w.content ?? '').trim(),
+      type: w.type
+    })).filter(w => w.text && !isNaN(w.start) && !isNaN(w.end) && w.type !== 'spacing')
+      .map((w,i) => ({...w, idx:i}));
+  }
+  const out = [];
+  const re = /(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*[\t|]?\s*(.+)/;
+  raw.split('\n').forEach(line => {
+    const m = line.trim().match(re);
+    if(m) out.push({idx:out.length, start:parseFloat(m[1]), end:parseFloat(m[2]), text:m[3].trim()});
+  });
+  return out;
+}
+
+function attachVideo(el){
+  videoEl = el;
+  $('transport').style.display = 'flex';
+  $('timeline').style.display = 'block';
+  $('markbar').style.display = 'flex';
+  $('cutbar').style.display = 'flex';
+  videoEl.addEventListener('loadedmetadata', () => {
+    duration = videoEl.duration;
+    $('statOrig').textContent = fmt(duration);
+    computeGaps(); renderTranscript(); updateStats(); mountBoxes(); drawTimeline();
+    requestAnimationFrame(positionBoxes);
+  });
+  videoEl.addEventListener('timeupdate', onTimeUpdate);
+  videoEl.addEventListener('play', () => $('playBtn').textContent = '⏸');
+  videoEl.addEventListener('pause', () => $('playBtn').textContent = '▶');
+}
+
+$('videoInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  fileLabel = f.name;
+  if(!$('sourcePath').value) $('sourcePath').value = f.name;
+  $('videoArea').innerHTML = '<video id="videoEl" playsinline></video>';
+  const el = $('videoEl');
+  el.src = URL.createObjectURL(f);
+  $('videoOk').textContent = '✓ ' + f.name;
+  attachVideo(el);
+});
+
+$('transcriptInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      words = parseTranscript(reader.result, f.name);
+      $('transcriptOk').textContent = '✓ ' + words.length + ' kelime';
+      computeGaps(); renderTranscript(); persist();
+    }catch(err){ $('transcriptOk').textContent = 'Okunamadı: ' + err.message; }
+  };
+  reader.readAsText(f);
+});
+
+$('projectInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{ loadProject(JSON.parse(reader.result)); }
+    catch(err){ alert('Proje okunamadı: ' + err.message); }
+  };
+  reader.readAsText(f);
+});
+
+function loadProject(p){
+  account = p.account || 'nihat';
+  setAccount(account);
+  if(p.source) $('sourcePath').value = p.source;
+  if(p.layout){
+    layout = p.layout;
+    if(!layout.caption) layout.caption = {x:80, y:1280, w:920, h:200, fontSize:58};
+    if(!layout.caption.fontSize) layout.caption.fontSize = 58;
+    clampBox(layout.banner, 'banner');
+    clampBox(layout.caption, 'caption');
+  }
+  cuts = p.cuts || [];
+  splits = p.splits || [];
+  selectedClip = null;
+  captions = (p.captions || []).map(normalizeCaption);
+  events = p.events || [];
+  if(p.words && p.words.length){
+    words = p.words.map((w,i) => ({idx:i, start:w.start, end:w.end, text:w.text}));
+  }
+  if(p.duration) duration = p.duration;
+  computeGaps(); renderTranscript(); renderCutlist(); renderCaptionList(); renderEvents(); updateStats(); mountBoxes(); drawTimeline(); persist();
+}
+
+function renderTranscript(){
+  const wrap = $('transcriptWrap');
+  wrap.innerHTML = '';
+  const hint = document.createElement('div');
+  hint.className = 'hint';
+  hint.textContent = mode==='seek' ? 'Gezin: kelimeye tıkla. Videoda I/O veya sarı çubuğu sürükle.'
+    : mode==='edit' ? 'Düzelt: kelimeye tıkla.'
+    : mode==='caption' ? 'Altyazı: ilk ve son kelimeye tıkla.'
+    : 'Kes: playhead’de Böl (S), klibi tıkla, Sil (Del). Veya kelime/boşluk.';
+  wrap.appendChild(hint);
+  const timeline = [
+    ...words.map(w=>({type:'word', t:w.start, data:w})),
+    ...gaps.map(g=>({type:'gap', t:g.start, data:g}))
+  ].sort((a,b)=>a.t-b.t);
+  timeline.forEach(item => {
+    if(item.type==='word'){
+      const w = item.data;
+      const span = document.createElement('span');
+      span.className = 'w';
+      span.textContent = w.text + ' ';
+      span.dataset.idx = w.idx;
+      if(cuts.some(c => w.start < c.end && w.end > c.start)) span.classList.add('cut');
+      span.onclick = () => onWordClick(w);
+      wrap.appendChild(span);
+    } else {
+      const g = item.data;
+      const chip = document.createElement('span');
+      chip.className = 'gapchip' + (cuts.some(c=>c.gapId===g.id) ? ' cut' : '');
+      chip.textContent = '⎵ ' + g.dur.toFixed(2) + 'sn';
+      chip.onclick = () => onGapClick(g);
+      wrap.appendChild(chip);
+    }
+  });
+}
+
+function onWordClick(w){
+  if(mode==='seek'){ if(videoEl) videoEl.currentTime = w.start; return; }
+  if(mode==='edit'){
+    const next = prompt('Kelimeyi düzelt:', w.text);
+    if(next==null || !next.trim()) return;
+    w.text = next.trim(); renderTranscript(); persist(); return;
+  }
+  if(pendingStart===null){ pendingStart = w.idx; markPending(); return; }
+  const lo = Math.min(pendingStart, w.idx), hi = Math.max(pendingStart, w.idx);
+  if(mode==='caption') showCaptionConfirm(lo, hi);
+  else showCutConfirm(lo, hi);
+}
+
+function onGapClick(g){
+  if(mode==='seek'){ if(videoEl) videoEl.currentTime = g.start; return; }
+  if(mode!=='cut' || cuts.some(c=>c.gapId===g.id)) return;
+  cuts.push({start:g.start, end:g.end, gapId:g.id});
+  cuts.sort((a,b)=>a.start-b.start);
+  renderTranscript(); renderCutlist(); updateStats(); drawTimeline(); persist();
+}
+
+function markPending(){
+  document.querySelectorAll('.w').forEach(el => el.classList.toggle('pending', Number(el.dataset.idx)===pendingStart));
+}
+
+function showCutConfirm(lo, hi){
+  const text = words.slice(lo, hi+1).map(w=>w.text).join(' ');
+  const start = words[lo].start, end = words[hi].end;
+  $('confirmSlot').innerHTML = `<div class="confirmbar"><div>${fmt(start)}–${fmt(end)} · "${escapeHtml(text)}"</div>
+    <div><button id="cancelCut">Vazgeç</button> <button class="danger" id="confirmCut">Kes</button></div></div>`;
+  $('confirmCut').onclick = () => {
+    cuts.push({start, end, text, wordStart:lo, wordEnd:hi});
+    cuts.sort((a,b)=>a.start-b.start);
+    pendingStart=null; $('confirmSlot').innerHTML='';
+    renderTranscript(); renderCutlist(); updateStats(); drawTimeline(); persist();
+  };
+  $('cancelCut').onclick = () => { pendingStart=null; $('confirmSlot').innerHTML=''; markPending(); };
+}
+
+function showCaptionConfirm(lo, hi){
+  const text = words.slice(lo, hi+1).map(w=>w.text).join(' ');
+  const start = words[lo].start, end = words[hi].end;
+  const tone = account==='nihat'
+    ? `<select id="capTone"><option value="yumusak">sarı</option><option value="sert">kırmızı</option><option value="yukselis">yeşil</option></select>`
+    : `<span class="sub">Mehmet — beyaz</span>`;
+  $('confirmSlot').innerHTML = `<div class="confirmbar"><div>${fmt(start)}–${fmt(end)} · "${escapeHtml(text)}"</div>
+    <div class="row"><select id="capFormat"><option value="A">uzun</option><option value="B">tek kelime</option></select>
+    ${tone}<button id="cancelCap">Vazgeç</button><button class="primary" id="confirmCap">Ekle</button></div></div>`;
+  $('confirmCap').onclick = () => {
+    const lines = splitTwoLines(text.toUpperCase());
+    captions.push(normalizeCaption({
+      start, end, text, top: lines.top, bottom: lines.bottom, account,
+      format:$('capFormat').value, tone: account==='nihat' ? $('capTone').value : 'fixed',
+      wordStart:lo, wordEnd:hi
+    }));
+    captions.sort((a,b)=>a.start-b.start);
+    pendingStart=null; $('confirmSlot').innerHTML='';
+    renderCaptionList(); persist();
+  };
+  $('cancelCap').onclick = () => { pendingStart=null; $('confirmSlot').innerHTML=''; markPending(); };
+}
+
+function cutText(c){
+  if(c.gapId) return '[boşluk]';
+  if(c.source==='video' && (!c.text || c.text==='[video aralığı]')) return '[video] ' + fmt(c.start)+'–'+fmt(c.end);
+  if(c.text) return c.text;
+  if(c.wordStart!=null) return words.slice(c.wordStart, c.wordEnd+1).map(w=>w.text).join(' ');
+  return '[video] ' + fmt(c.start)+'–'+fmt(c.end);
+}
+
+function renderCutlist(){
+  const el = $('cutlist');
+  if(!cuts.length){ el.innerHTML = '<div class="empty">Yok</div>'; return; }
+  el.innerHTML = '';
+  cuts.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `<span class="meta">${fmt(c.start)}–${fmt(c.end)}</span>
+      <div class="txt">${escapeHtml(cutText(c))}</div>
+      <button data-i="${i}">Kaldır</button>`;
+    row.querySelector('.meta').onclick = () => { if(videoEl) videoEl.currentTime = Math.max(0,c.start-0.5); };
+    row.querySelector('button').onclick = () => { cuts.splice(i,1); renderTranscript(); renderCutlist(); updateStats(); drawTimeline(); persist(); };
+    el.appendChild(row);
+  });
+}
+
+function renderCaptionList(){
+  const el = $('captionlist');
+  if(!captions.length){ el.innerHTML = '<div class="empty">Yok</div>'; return; }
+  const emoji = {yumusak:'🟡', sert:'🔴', yukselis:'🟢', fixed:'⚪'};
+  el.innerHTML = '';
+  captions.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    const lines = captionLines(c);
+    row.innerHTML = `<span class="meta">${fmt(c.start)}–${fmt(c.end)}</span>
+      <div class="txt">${emoji[c.tone]||''} ${escapeHtml((lines.top?lines.top+' / ':'')+lines.bottom)}</div>
+      <button data-i="${i}">Kaldır</button>`;
+    row.querySelector('.meta').onclick = () => { if(videoEl) videoEl.currentTime = c.start; };
+    row.querySelector('button').onclick = () => { captions.splice(i,1); renderCaptionList(); persist(); };
+    el.appendChild(row);
+  });
+}
+
+function renderEvents(){
+  const el = $('eventList');
+  if(!events.length){ el.innerHTML = '<div class="empty">Henüz olay yok.</div>'; return; }
+  el.innerHTML = '';
+  events.forEach((ev,i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    const extra = ev.line1 || ev.query || ev.label || '';
+    row.innerHTML = `<span class="meta">${ev.type} @ ${ev.start}</span>
+      <div class="txt">${escapeHtml(extra)}</div>
+      <button data-i="${i}">Kaldır</button>`;
+    row.querySelector('.meta').onclick = () => {
+      const t = ev.start==='end-22.3' ? Math.max(0, duration-22.3) : Number(ev.start);
+      if(videoEl && !isNaN(t)) videoEl.currentTime = t;
+    };
+    row.querySelector('button').onclick = () => { events.splice(i,1); renderEvents(); persist(); };
+    el.appendChild(row);
+  });
+}
+
+$('evNow').onclick = () => {
+  if(!videoEl) return;
+  $('evExtra').dataset.t = videoEl.currentTime.toFixed(2);
+  $('evExtra').placeholder = 'zaman: ' + videoEl.currentTime.toFixed(2) + ' — metin / arama';
+};
+$('evAdd').onclick = () => {
+  const type = $('evType').value;
+  const t = $('evExtra').dataset.t || (videoEl ? videoEl.currentTime.toFixed(2) : '0');
+  const extra = $('evExtra').value.trim();
+  const ev = {type, start: Number(t), duration: type==='broll' ? 8.5 : type==='zoom' ? 0.8 : 2.3};
+  if(type==='hook'){
+    const parts = extra.split('|').map(s=>s.trim());
+    ev.line1 = parts[0]||''; ev.line2 = parts[1]||''; ev.start = 0; ev.duration = 3.2;
+  }
+  if(type==='broll') ev.query = extra;
+  if(type==='statcard') ev.label = extra;
+  if(type==='linegraph') ev.title = extra;
+  events.push(ev);
+  events.sort((a,b)=>String(a.start).localeCompare(String(b.start), undefined, {numeric:true}));
+  $('evExtra').value = ''; delete $('evExtra').dataset.t;
+  renderEvents(); persist();
+};
+$('evDefaults').onclick = () => {
+  if(!events.some(e=>e.type==='hook')) events.push({type:'hook', start:0, duration:3.2, line1:'', line2:''});
+  if(!events.some(e=>e.type==='banner' && e.start===20)) events.push({type:'banner', start:20, duration:2.3});
+  if(!events.some(e=>e.start==='end-22.3')) events.push({type:'banner', start:'end-22.3', duration:2.3});
+  renderEvents(); persist();
+};
+
+function updateStats(){
+  if(!duration) return;
+  const cutTotal = cuts.reduce((s,c)=>s+(c.end-c.start),0);
+  $('statCut').textContent = fmt(cutTotal);
+  $('statRemain').textContent = fmt(duration-cutTotal);
+}
+
+function keepClips(){
+  const ranges = keepRanges(duration, cuts);
+  const pts = [...splits].filter(s => ranges.some(r => s > r.start+0.03 && s < r.end-0.03)).sort((a,b)=>a-b);
+  const clips = [];
+  for(const r of ranges){
+    let t = r.start;
+    pts.filter(p => p > r.start && p < r.end).forEach(p => {
+      clips.push({start:t, end:p});
+      t = p;
+    });
+    clips.push({start:t, end:r.end});
+  }
+  return clips.filter(c => c.end-c.start > 0.04);
+}
+function sourceToEdit(t){
+  let acc = 0;
+  for(const c of keepClips()){
+    if(t < c.start) return acc;
+    if(t <= c.end) return acc + (t-c.start);
+    acc += c.end-c.start;
+  }
+  return acc;
+}
+function editToSource(et){
+  let acc = 0;
+  for(const c of keepClips()){
+    const d = c.end-c.start;
+    if(et <= acc+d) return c.start + (et-acc);
+    acc += d;
+  }
+  return duration;
+}
+function editDuration(){
+  return keepClips().reduce((s,c)=>s+(c.end-c.start),0);
+}
+function pushUndo(){
+  undoStack.push({cuts: JSON.parse(JSON.stringify(cuts)), splits: [...splits]});
+  if(undoStack.length > 40) undoStack.shift();
+}
+function undoEdit(){
+  const prev = undoStack.pop();
+  if(!prev) return;
+  cuts = prev.cuts; splits = prev.splits; selectedClip = null;
+  renderTranscript(); renderCutlist(); updateStats(); drawTimeline(); persist();
+}
+
+let lastActiveIdx = null, seekDragging = false, skipJumping = false;
+function onTimeUpdate(){
+  if(!videoEl) return;
+  let t = videoEl.currentTime;
+  if($('skipCuts') && $('skipCuts').checked && !seekDragging && !videoEl.paused && !skipJumping){
+    const hit = cuts.find(c => t >= c.start && t < c.end - 0.04);
+    if(hit){
+      skipJumping = true;
+      videoEl.currentTime = hit.end;
+      skipJumping = false;
+      t = hit.end;
+    }
+  }
+  $('timeLabel').textContent = fmt(t) + ' / ' + fmt(duration||0);
+  const ed = $('editTime');
+  if(ed) ed.textContent = 'düzen: ' + fmt(sourceToEdit(t)) + ' / ' + fmt(editDuration());
+  drawPlayhead();
+  updateCaptionPreview();
+  const w = words.find(w => t>=w.start && t<w.end);
+  if(w && w.idx===lastActiveIdx) return;
+  document.querySelectorAll('.w.active').forEach(el=>el.classList.remove('active'));
+  if(w){
+    lastActiveIdx = w.idx;
+    const el = document.querySelector('.w[data-idx="'+w.idx+'"]');
+    if(el){ el.classList.add('active'); el.scrollIntoView({block:'center', behavior:'smooth'}); }
+  } else lastActiveIdx = null;
+}
+
+function timeFromClientX(x){
+  const r = $('timeline').getBoundingClientRect();
+  if(!duration || r.width<=0) return 0;
+  const et = Math.max(0, Math.min(editDuration(), ((x-r.left)/r.width)*editDuration()));
+  return editToSource(et);
+}
+function drawTimeline(){
+  const tl = $('timeline');
+  if(!tl || !duration) return;
+  tl.innerHTML = '';
+  const clips = keepClips();
+  const total = Math.max(0.01, editDuration());
+  let acc = 0;
+  clips.forEach((c,i) => {
+    const d = document.createElement('div');
+    d.className = 'tl-clip' + (selectedClip && Math.abs(selectedClip.start-c.start)<0.02 && Math.abs(selectedClip.end-c.end)<0.02 ? ' sel' : '');
+    d.style.left = (acc/total*100)+'%';
+    d.style.width = Math.max(0.4, (c.end-c.start)/total*100)+'%';
+    d.innerHTML = `<div class="tl-edge l" data-edge="l" data-i="${i}"></div><span>${fmt(c.start)}</span><div class="tl-edge r" data-edge="r" data-i="${i}"></div>`;
+    d.dataset.i = i;
+    d.addEventListener('pointerdown', ev => {
+      if(ev.target.classList.contains('tl-edge')) return;
+      ev.stopPropagation();
+      selectedClip = {start:c.start, end:c.end, i};
+      if(videoEl) videoEl.currentTime = c.start + 0.01;
+      drawTimeline();
+    });
+    tl.appendChild(d);
+    acc += c.end-c.start;
+  });
+  if(markInT!=null && markOutT!=null){
+    const a = Math.min(markInT, markOutT), b = Math.max(markInT, markOutT);
+    const d = document.createElement('div');
+    d.className = 'tl-range';
+    d.style.left = (sourceToEdit(a)/total*100)+'%';
+    d.style.width = Math.max(0.3, (sourceToEdit(b)-sourceToEdit(a))/total*100)+'%';
+    tl.appendChild(d);
+  }
+  drawPlayhead();
+  updateIoLabel();
+  updateVidBadge();
+}
+function drawPlayhead(){
+  const tl = $('timeline');
+  if(!tl || !duration || !videoEl) return;
+  let p = tl.querySelector('.tl-play');
+  if(!p){ p = document.createElement('div'); p.className='tl-play'; tl.appendChild(p); }
+  const total = Math.max(0.01, editDuration());
+  p.style.left = (sourceToEdit(videoEl.currentTime)/total*100)+'%';
+}
+function updateIoLabel(){
+  const el = $('ioLabel');
+  if(!el) return;
+  el.textContent = 'I ' + (markInT==null?'–':fmt(markInT)) + '  /  O ' + (markOutT==null?'–':fmt(markOutT));
+}
+function updateVidBadge(){
+  const wrap = $('stageWrap');
+  if(!wrap) return;
+  let b = wrap.querySelector('.vid-badge');
+  if(markInT==null && markOutT==null){ if(b) b.remove(); return; }
+  if(!b){ b = document.createElement('div'); b.className='vid-badge'; wrap.appendChild(b); }
+  b.textContent = 'I ' + (markInT==null?'–':fmt(markInT)) + ' → O ' + (markOutT==null?'–':fmt(markOutT));
+}
+function nowT(){ return videoEl ? videoEl.currentTime : 0; }
+function setMarkIn(t){ markInT = +Number(t).toFixed(3); if(markOutT!=null && markOutT<=markInT) markOutT = null; drawTimeline(); }
+function setMarkOut(t){ markOutT = +Number(t).toFixed(3); drawTimeline(); }
+function addTimeCut(start, end){
+  if(!duration) return;
+  start = Math.max(0, Math.min(start, end));
+  end = Math.min(duration, Math.max(start, end));
+  if(end-start < 0.05) return;
+  pushUndo();
+  const overlapping = words.filter(w => w.start < end && w.end > start);
+  cuts.push({
+    start:+start.toFixed(3), end:+end.toFixed(3),
+    text: overlapping.length ? overlapping.map(w=>w.text).join(' ') : '[video aralığı]',
+    wordStart: overlapping.length ? overlapping[0].idx : undefined,
+    wordEnd: overlapping.length ? overlapping[overlapping.length-1].idx : undefined,
+    source: 'video'
+  });
+  cuts.sort((a,b)=>a.start-b.start);
+  splits = splits.filter(s => s < start-0.01 || s > end+0.01);
+  markInT = markOutT = null;
+  selectedClip = null;
+  renderTranscript(); renderCutlist(); updateStats(); drawTimeline(); persist();
+}
+function splitAtPlayhead(){
+  const t = +nowT().toFixed(3);
+  const clip = keepClips().find(c => t > c.start+0.05 && t < c.end-0.05);
+  if(!clip) return;
+  pushUndo();
+  splits.push(t);
+  splits.sort((a,b)=>a-b);
+  selectedClip = null;
+  drawTimeline(); persist();
+}
+function deleteSelectedClip(){
+  if(selectedClip){ addTimeCut(selectedClip.start, selectedClip.end); return; }
+  if(markInT!=null && markOutT!=null) addTimeCut(Math.min(markInT,markOutT), Math.max(markInT,markOutT));
+}
+
+$('markIn').onclick = () => setMarkIn(nowT());
+$('markOut').onclick = () => setMarkOut(nowT());
+$('clearMarks').onclick = () => { markInT = markOutT = null; drawTimeline(); };
+$('cutRange').onclick = () => {
+  if(markInT==null || markOutT==null){ if(markInT==null) setMarkIn(nowT()); else setMarkOut(nowT()); return; }
+  addTimeCut(Math.min(markInT, markOutT), Math.max(markInT, markOutT));
+};
+$('cutToHere').onclick = () => addTimeCut(0, nowT());
+$('cutFromHere').onclick = () => addTimeCut(nowT(), duration);
+$('splitBtn').onclick = splitAtPlayhead;
+$('deleteClip').onclick = deleteSelectedClip;
+$('undoBtn').onclick = undoEdit;
+
+let tlDrag = null;
+$('timeline').addEventListener('pointerdown', e => {
+  if(!duration || !videoEl) return;
+  const edge = e.target.closest('.tl-edge');
+  if(edge){
+    const clips = keepClips();
+    const clip = clips[Number(edge.dataset.i)];
+    if(!clip) return;
+    tlDrag = {mode:'trim', edge:edge.dataset.edge, start:clip.start, end:clip.end};
+    seekDragging = true;
+    $('timeline').setPointerCapture(e.pointerId);
+    return;
+  }
+  if(e.target.closest('.tl-clip')) return;
+  seekDragging = true;
+  const t = timeFromClientX(e.clientX);
+  videoEl.currentTime = t;
+  selectedClip = null;
+  $('timeline').setPointerCapture(e.pointerId);
+  tlDrag = {mode:'seek'};
+});
+$('timeline').addEventListener('pointermove', e => {
+  if(!tlDrag) return;
+  const t = timeFromClientX(e.clientX);
+  videoEl.currentTime = t;
+  if(tlDrag.mode==='trim'){
+    if(tlDrag.edge==='l') selectedClip = {start: Math.min(t, tlDrag.end-0.1), end: tlDrag.end};
+    else selectedClip = {start: tlDrag.start, end: Math.max(t, tlDrag.start+0.1)};
+  }
+});
+$('timeline').addEventListener('pointerup', () => {
+  if(tlDrag && tlDrag.mode==='trim' && selectedClip){
+    if(tlDrag.edge==='l' && selectedClip.start > tlDrag.start+0.05) addTimeCut(tlDrag.start, selectedClip.start);
+    if(tlDrag.edge==='r' && selectedClip.end < tlDrag.end-0.05) addTimeCut(selectedClip.end, tlDrag.end);
+  }
+  seekDragging = false;
+  tlDrag = null;
+  drawTimeline();
+});
+
+function setMode(id, next){
+  mode = next; pendingStart=null; $('confirmSlot').innerHTML='';
+  ['modeSeek','modeCut','modeEdit','modeCaption'].forEach(m => $(m).classList.toggle('active', m===id));
+  renderTranscript();
+}
+$('modeSeek').onclick = () => setMode('modeSeek','seek');
+$('modeCut').onclick = () => setMode('modeCut','cut');
+$('modeEdit').onclick = () => setMode('modeEdit','edit');
+$('modeCaption').onclick = () => setMode('modeCaption','caption');
+function setAccount(a){
+  account = a;
+  $('acctNihat').classList.toggle('active', a==='nihat');
+  $('acctMehmet').classList.toggle('active', a==='mehmet');
+}
+$('acctNihat').onclick = () => setAccount('nihat');
+$('acctMehmet').onclick = () => setAccount('mehmet');
+$('playBtn').onclick = () => { if(videoEl) videoEl.paused ? videoEl.play() : videoEl.pause(); };
+$('back5').onclick = () => { if(videoEl) videoEl.currentTime = Math.max(0, videoEl.currentTime-5); };
+$('fwd5').onclick = () => { if(videoEl) videoEl.currentTime += 5; };
+if($('capFont')){
+  $('capFont').addEventListener('input', () => {
+    layout.caption.fontSize = Number($('capFont').value);
+    positionBoxes(); persist();
+  });
+}
+document.addEventListener('keydown', e => {
+  if(['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
+  if(e.code==='Space'){ e.preventDefault(); if(videoEl) videoEl.paused ? videoEl.play() : videoEl.pause(); }
+  if(e.code==='ArrowRight' && videoEl) videoEl.currentTime += (e.shiftKey?1/30:1);
+  if(e.code==='ArrowLeft' && videoEl) videoEl.currentTime -= (e.shiftKey?1/30:1);
+  if(e.key==='s' || e.key==='S' || e.key==='b' || e.key==='B'){ e.preventDefault(); splitAtPlayhead(); }
+  if(e.key==='Delete' || e.key==='Backspace'){ e.preventDefault(); deleteSelectedClip(); }
+  if((e.ctrlKey||e.metaKey) && (e.key==='z'||e.key==='Z')){ e.preventDefault(); undoEdit(); }
+  if(e.key==='i' || e.key==='I'){ e.preventDefault(); setMarkIn(nowT()); }
+  if(e.key==='o' || e.key==='O'){ e.preventDefault(); setMarkOut(nowT()); }
+  if(e.key==='Enter' && markInT!=null && markOutT!=null){ e.preventDefault(); addTimeCut(Math.min(markInT,markOutT), Math.max(markInT,markOutT)); }
+});
+
+function splitTwoLines(text){
+  const parts = String(text||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return {top:'', bottom:''};
+  if(parts.length <= 3) return {top:'', bottom: parts.join(' ')};
+  const n = Math.min(parts.length, 6);
+  const half = Math.min(3, Math.ceil(n / 2));
+  return {top: parts.slice(0, half).join(' '), bottom: parts.slice(half, n).join(' ')};
+}
+function normalizeCaption(cap){
+  const c = Object.assign({}, cap);
+  const topN = String(c.top||'').trim().split(/\s+/).filter(Boolean).length;
+  const botN = String(c.bottom||'').trim().split(/\s+/).filter(Boolean).length;
+  if(topN <= 3 && botN <= 3 && (c.top || c.bottom)) return c;
+  const raw = [c.top, c.bottom, c.text].filter(Boolean).join(' ');
+  const lines = splitTwoLines(raw.toUpperCase());
+  c.top = lines.top;
+  c.bottom = lines.bottom;
+  const wc = raw.trim().split(/\s+/).filter(Boolean).length;
+  c.format = wc <= 2 ? 'B' : 'A';
+  return c;
+}
+function captionLines(cap){
+  const top = String(cap.top||'').trim();
+  const bot = String(cap.bottom||cap.text||'').trim();
+  const topN = top.split(/\s+/).filter(Boolean).length;
+  const botN = bot.split(/\s+/).filter(Boolean).length;
+  if(topN <= 3 && botN <= 3) return {top, bottom: bot};
+  return splitTwoLines((top+' '+bot).trim());
+}
+
+function displayScale(){
+  const wrap = $('stageWrap');
+  if(!wrap) return 1;
+  const w = wrap.getBoundingClientRect().width;
+  return w > 0 ? w / VW : 1;
+}
+function clampBox(st, kind){
+  if(!st) return;
+  const maxH = kind==='caption' ? 280 : 320;
+  st.w = Math.round(Math.min(Math.max(140, Number(st.w)||140), VW - 20));
+  st.h = Math.round(Math.min(Math.max(60, Number(st.h)||60), maxH));
+  st.x = Math.round(Math.max(0, Math.min(Number(st.x)||0, VW - st.w)));
+  st.y = Math.round(Math.max(0, Math.min(Number(st.y)||0, VH - st.h)));
+}
+function mountBoxes(){
+  const wrap = $('stageWrap');
+  wrap.querySelectorAll('.box,.safe').forEach(n=>n.remove());
+  const vid = $('videoEl');
+  if(!vid) return;
+  const safe = document.createElement('div');
+  safe.className = 'safe';
+  wrap.appendChild(safe);
+  makeBox('banner', layout.banner, 'Banner');
+  makeBox('caption', layout.caption, 'Altyazı');
+  positionBoxes();
+}
+function makeBox(id, state, label){
+  const box = document.createElement('div');
+  box.className = 'box' + (id==='caption'?' caption':'');
+  box.id = id+'Box';
+  box.innerHTML = `<div class="label">${label}</div><div class="handle"></div>` +
+    (id==='caption' ? `<div class="preview yumusak" id="capPreview"><div class="l1"></div><div class="l2"></div></div>` : '');
+  $('stageWrap').appendChild(box);
+  let dragging = null;
+  box.addEventListener('pointerdown', ev => {
+    if(ev.target.classList.contains('handle')) dragging = {mode:'resize', x:ev.clientX, y:ev.clientY, w:state.w, h:state.h};
+    else dragging = {mode:'move', x:ev.clientX, y:ev.clientY, left:state.x, top:state.y};
+    box.setPointerCapture(ev.pointerId);
+  });
+  box.addEventListener('pointermove', ev => {
+    if(!dragging) return;
+    const s = displayScale();
+    const dx = (ev.clientX-dragging.x)/s, dy = (ev.clientY-dragging.y)/s;
+    if(dragging.mode==='move'){ state.x = Math.round(dragging.left+dx); state.y = Math.round(dragging.top+dy); }
+    else { state.w = Math.round(Math.max(140, dragging.w+dx)); state.h = Math.round(Math.max(70, dragging.h+dy)); }
+    clampBox(state, id);
+    positionBoxes(); persist();
+  });
+  box.addEventListener('pointerup', () => dragging=null);
+}
+function positionBoxes(){
+  const s = displayScale();
+  const wrap = $('stageWrap');
+  if(!wrap) return;
+  clampBox(layout.banner, 'banner');
+  clampBox(layout.caption, 'caption');
+  [['banner', layout.banner], ['caption', layout.caption]].forEach(([id, st]) => {
+    const box = $(id+'Box');
+    if(!box) return;
+    box.style.left = (st.x*s)+'px';
+    box.style.top = (st.y*s)+'px';
+    box.style.width = (st.w*s)+'px';
+    box.style.height = (st.h*s)+'px';
+  });
+  $('bx').textContent=layout.banner.x; $('by').textContent=layout.banner.y;
+  $('bw').textContent=layout.banner.w; $('bh').textContent=layout.banner.h;
+  $('cx').textContent=layout.caption.x; $('cy').textContent=layout.caption.y;
+  $('cw').textContent=layout.caption.w; $('ch').textContent=layout.caption.h;
+  if(!layout.caption.fontSize) layout.caption.fontSize = 58;
+  if($('cfs')) $('cfs').textContent = layout.caption.fontSize;
+  if($('capFont')) $('capFont').value = layout.caption.fontSize;
+  fitCaptionPreview();
+}
+function fitCaptionPreview(){
+  const prev = $('capPreview');
+  const box = $('captionBox');
+  if(!prev || !box) return;
+  const maxW = Math.max(20, box.clientWidth - 14);
+  const maxH = Math.max(16, box.clientHeight - 28);
+  let size = Math.min(layout.caption.fontSize * displayScale(), maxH / 2.25);
+  prev.style.fontSize = size+'px';
+  const lines = prev.querySelectorAll('.l1,.l2');
+  for(let i=0;i<14;i++){
+    const overflow = [...lines].some(el => el.scrollWidth > maxW + 1);
+    if(!overflow || size <= 8) break;
+    size -= 1;
+    prev.style.fontSize = size+'px';
+  }
+}
+function updateCaptionPreview(){
+  const prev = $('capPreview');
+  if(!prev) return;
+  const t = videoEl ? videoEl.currentTime : 0;
+  const cap = captions.find(c => t >= c.start && t < c.end);
+  const l1 = prev.querySelector('.l1');
+  const l2 = prev.querySelector('.l2');
+  if(!cap){
+    if(l1) l1.textContent = '';
+    if(l2) l2.textContent = '';
+    prev.className = 'preview yumusak';
+    fitCaptionPreview();
+    return;
+  }
+  const lines = captionLines(cap);
+  if(l1) l1.textContent = lines.top;
+  if(l2) l2.textContent = lines.bottom;
+  prev.className = 'preview ' + (cap.tone || 'yumusak');
+  fitCaptionPreview();
+}
+window.addEventListener('resize', positionBoxes);
+if(window.ResizeObserver) new ResizeObserver(() => positionBoxes()).observe($('stageWrap'));
+
+function mergeCuts(list){
+  const items = [...list].map(c=>({start:c.start,end:c.end})).sort((a,b)=>a.start-b.start);
+  const m = [];
+  for(const c of items){
+    if(!m.length || c.start>m[m.length-1].end) m.push({...c});
+    else m[m.length-1].end = Math.max(m[m.length-1].end, c.end);
+  }
+  return m;
+}
+function keepRanges(dur, list){
+  let t=0; const out=[];
+  for(const c of mergeCuts(list)){
+    if(c.start>t+0.02) out.push({start:t, end:c.start});
+    t = Math.max(t, c.end);
+  }
+  if(dur-t>0.02) out.push({start:t, end:dur});
+  return out;
+}
+
+function buildProject(){
+  return {
+    version: 1,
+    account,
+    source: $('sourcePath').value.trim(),
+    duration,
+    cuts,
+    splits,
+    words: words.map(w=>({start:w.start, end:w.end, text:w.text})),
+    layout,
+    captions,
+    events
+  };
+}
+function download(name, obj){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+$('saveProject').onclick = () => { const p = buildProject(); persist(); download('project.json', p); };
+
+function persist(){
+  try{ localStorage.setItem('nihat-project', JSON.stringify(buildProject())); }catch(e){}
+}
+try{
+  const saved = localStorage.getItem('nihat-project');
+  if(saved) loadProject(JSON.parse(saved));
+}catch(e){}
+</script>
+</body>
+</html>

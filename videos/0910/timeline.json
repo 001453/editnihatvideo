@@ -1,0 +1,18 @@
+{
+  "broll": [
+    {"id": "gold", "file": "broll/gold.mp4", "start": 13.8, "dur": 8.0},
+    {"id": "market", "file": "broll/market.mp4", "start": 99.5, "dur": 8.0}
+  ],
+  "punches": [
+    [8.9, 7.5, 1.14],
+    [36.26, 7.5, 1.1],
+    [52.44, 8.0, 1.16],
+    [99.38, 7.0, 1.12]
+  ],
+  "hero": {"id": "split", "at": 37.04},
+  "special": {"type": "drone", "at": 86.0, "dur": 1.6, "card": "why"},
+  "igBanner": [
+    {"id": "a", "start": 90.5, "dur": 2.3},
+    {"id": "b", "start": 108.9, "dur": 2.3}
+  ]
+}

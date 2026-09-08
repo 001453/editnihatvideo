@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="tr" data-resolution="portrait" data-composition-variables="[{&quot;id&quot;: &quot;capSize&quot;, &quot;type&quot;: &quot;number&quot;, &quot;label&quot;: &quot;Altyazı punto&quot;, &quot;default&quot;: 66, &quot;min&quot;: 48, &quot;max&quot;: 86, &quot;step&quot;: 2}]">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <title>0910</title>
+    <style>
+      @font-face{font-family:Anton;font-style:normal;font-weight:400;font-display:block;src:url('public/fonts/Anton-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+      @font-face{font-family:Anton;font-style:normal;font-weight:400;font-display:block;src:url('public/fonts/Anton-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+      :root{
+        --bg:#0b0d12; --text:#f4f4f6;
+        --accent-0:#ffdd4f; --accent-1:#ff4646; --accent-2:#6ee68c; --accent-3:#5ab0ff; --accent-4:#fb923c;
+        --cap-size:66px;
+        /* IG Reels safe zone (1080×1920) */
+        --safe-right:120px;
+        --safe-left:40px;
+        --safe-top:120px;
+        --safe-bottom:280px;
+        --card-max-w:920px;
+      }
+      *{box-sizing:border-box;}
+      html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:"Segoe UI","Inter",Arial,sans-serif;color:var(--text);}
+      #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#000;contain:layout style;}
+      #broll-layer{position:absolute;inset:0;z-index:1;pointer-events:none;contain:layout style;}
+      .broll-cam{position:absolute;inset:0;overflow:hidden;opacity:0;}
+      .broll-vid{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;display:block;}
+      .video-wrapper{
+        position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;z-index:3;
+        transform-origin:50% 50%;border-radius:0;
+        box-shadow:none;
+      }
+      #video-cam{width:100%;height:100%;transform-origin:50% 38%;}
+      .video-wrapper video{width:100%;height:100%;object-fit:cover;display:block;}
+      /* No full-frame video darkening — captions carry their own stroke/3D */
+      .legibility{display:none;pointer-events:none;}
+      #overlays{position:absolute;inset:0;z-index:5;pointer-events:none;}
+      .card-host,.cap-stage,.ig-banner{position:absolute;z-index:5;overflow:visible;pointer-events:auto;}
+      .ig-banner{z-index:9;object-fit:contain;object-position:left top;background:transparent;}
+      .cap-stage{z-index:8;overflow:visible;}
+      .card-host .card,.card-host .card-fx,.card-host .root,.banner{width:100%;height:100%;}
+      .card-fx{transform-origin:50% 40%;transform-style:preserve-3d;perspective:1200px;will-change:transform,opacity;}
+      .cap-item{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;pointer-events:auto;opacity:0;visibility:hidden;gap:6px;overflow:visible;padding:8px 8px 28px;}
+      .cap-top,.cap-bot{
+        width:100%;cursor:text;user-select:text;font-family:Anton,"Arial Black",sans-serif;font-weight:400;
+        letter-spacing:-.03em;white-space:nowrap;overflow:visible;max-width:100%;line-height:.9;
+        text-transform:uppercase;display:block;transform-origin:50% 50%;
+        paint-order:stroke fill;
+      }
+      .root{
+        display:flex;flex-direction:column;justify-content:center;padding:22px 26px;border-radius:22px;
+        background:rgba(255,255,255,.07);
+        border:1px solid rgba(255,255,255,.32);
+        box-shadow:0 10px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.22);
+        position:relative;
+        text-shadow:0 2px 10px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.75);
+      }
+      .root.glass{overflow:hidden;padding-left:32px;background:rgba(255,255,255,.08);}
+      .root.punch{padding-left:28px;padding-right:28px;padding-top:36px;background:rgba(255,70,70,.10);border-color:rgba(255,120,120,.40);}
+      .card-accent{position:absolute;left:0;top:16px;bottom:16px;width:5px;border-radius:0 6px 6px 0;background:linear-gradient(180deg,#ffdd4f,#ff4646);transform-origin:50% 0%;z-index:2;pointer-events:none;box-shadow:0 0 12px rgba(255,221,79,.45);}
+      .card-sheen{position:absolute;top:-30%;left:0;width:160px;height:160%;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.28) 50%,transparent 80%);z-index:4;pointer-events:none;opacity:0;}
+      /* Warn badge: top-left — clear of IG like/comment rail */
+      .warn-badge{
+        position:absolute;left:22px;top:14px;margin-top:0;width:56px;height:56px;
+        border-radius:50%;display:flex;align-items:center;justify-content:center;
+        background:radial-gradient(circle at 35% 30%,#ff6b6b,#c41818 70%);
+        box-shadow:0 8px 20px rgba(255,50,50,.35), inset 0 1px 0 rgba(255,255,255,.25);
+        z-index:5;pointer-events:none;opacity:0;will-change:transform;
+      }
+      .warn-badge .warn-ico{
+        font-family:Anton,"Arial Black",sans-serif;font-size:30px;color:#fff;line-height:1;
+        text-shadow:0 2px 0 rgba(0,0,0,.35);position:relative;z-index:2;
+      }
+      .warn-badge .warn-ring{
+        position:absolute;inset:-8px;border-radius:50%;
+        border:2px dashed rgba(255,220,80,.85);
+        box-shadow:0 0 0 1px rgba(255,70,70,.25);
+      }
+      .warn-badge.warn-soft{
+        background:radial-gradient(circle at 35% 30%,#ffe08a,#d4a017 72%);
+      }
+      .warn-badge.warn-soft .warn-ring{border-color:rgba(255,255,255,.55);}
+      .root.hook{background:transparent;border:0;box-shadow:none;padding:10px 18px;justify-content:flex-start;overflow:visible;text-shadow:0 3px 14px rgba(0,0,0,.7);}
+      .root.slim{flex-direction:row;align-items:center;justify-content:center;gap:8px;padding:10px 16px 10px 32px;background:rgba(255,255,255,.10);border-color:rgba(255,221,79,.35);}
+      .chapter{
+        display:inline-flex;align-items:center;gap:10px;margin-bottom:10px;
+        font-size:18px;letter-spacing:.18em;font-weight:800;color:#ffdd4f;text-transform:uppercase;
+        text-shadow:0 2px 8px rgba(0,0,0,.65);
+      }
+      .chapter i{
+        display:inline-block;min-width:34px;height:34px;line-height:34px;text-align:center;
+        border-radius:10px;background:rgba(255,221,79,.22);border:1px solid rgba(255,221,79,.65);
+        font-style:normal;font-size:16px;letter-spacing:0;
+      }
+      .quote-mark{
+        font-family:Anton,"Arial Black",sans-serif;font-size:72px;line-height:.7;color:rgba(255,221,79,.55);
+        margin:0 0 4px;transform-origin:0% 50%;
+        text-shadow:0 4px 16px rgba(0,0,0,.5);
+      }
+      .cap-kw{display:inline-block;transform-origin:50% 50%;will-change:transform,filter;}
+      .title,.q,.note,.kicker,.lvl b,.stat b,.hero-num{text-shadow:0 2px 10px rgba(0,0,0,.55);}
+      .cap-top{
+        font-size:calc(var(--capSize, 66) * 1.30px);
+        color:#ffffff;
+        -webkit-text-fill-color:#ffffff;
+        -webkit-text-stroke:4px #000000;
+        text-shadow:
+          0 3px 0 #2c2c2c,
+          0 6px 0 #141414,
+          0 9px 0 #000000,
+          0 12px 0 #000000,
+          0 16px 22px rgba(0,0,0,.85);
+      }
+      .cap-top:empty{display:none;}
+      .cap-bot{
+        font-size:calc(var(--capSize, 66) * 0.86px);
+        -webkit-text-stroke:3.5px #000000;
+      }
+      .cap-item.tone-yumusak .cap-bot{
+        color:#ffd84a;
+        -webkit-text-fill-color:#ffd84a;
+        text-shadow:
+          0 3px 0 #c9a020,
+          0 6px 0 #7a5a10,
+          0 9px 0 #2a1a06,
+          0 12px 0 #000000,
+          0 16px 20px rgba(0,0,0,.85);
+      }
+      .cap-item.tone-sert .cap-bot{
+        color:#ff3b3b;
+        -webkit-text-fill-color:#ff3b3b;
+        text-shadow:
+          0 3px 0 #c02828,
+          0 6px 0 #6a1010,
+          0 9px 0 #2a0606,
+          0 12px 0 #000000,
+          0 16px 20px rgba(0,0,0,.85);
+      }
+      .cap-item.tone-yukselis .cap-bot{
+        color:#4dff78;
+        -webkit-text-fill-color:#4dff78;
+        text-shadow:
+          0 3px 0 #2aaa48,
+          0 6px 0 #186028,
+          0 9px 0 #0a2810,
+          0 12px 0 #000000,
+          0 16px 20px rgba(0,0,0,.85);
+      }
+      .cap-item.tone-fixed .cap-bot{
+        color:#ffffff;
+        -webkit-text-fill-color:#ffffff;
+        text-shadow:
+          0 3px 0 #2c2c2c,
+          0 6px 0 #141414,
+          0 9px 0 #000000,
+          0 12px 0 #000000,
+          0 16px 20px rgba(0,0,0,.85);
+      }
+      .cap-item.cap-punch .cap-bot{
+        filter:drop-shadow(0 0 10px rgba(255,221,79,.35));
+      }
+      .banner{
+        display:flex;align-items:center;justify-content:center;padding:0 20px;
+        background:transparent;border:0;border-radius:0;box-shadow:none;
+        font-weight:800;
+      }
+      .banner span{display:none;}
+      .banner b{
+        color:#ffffff;font-size:36px;letter-spacing:.04em;text-align:center;
+        text-shadow:
+          0 2px 0 #1a1a1a,
+          0 4px 0 #000,
+          0 8px 18px rgba(0,0,0,.75);
+        -webkit-text-stroke:2px #000;
+        paint-order:stroke fill;
+      }
+      .kicker{font-size:18px;letter-spacing:.16em;color:#ffdd4f;font-weight:700;margin-bottom:8px;}
+      .title{font-size:44px;font-weight:800;line-height:1.1;margin:0 0 10px;}
+      .title.red{color:#ff4646;font-size:56px;}
+      .q{font-size:34px;font-weight:800;margin:6px 0;color:#fff;}
+      .q.danger{color:#ff4646;}
+      .note{font-size:24px;color:#d5d5dc;margin-top:8px;font-weight:650;}
+      .note.warn{color:#ffdd4f;}
+      .lvl{display:flex;justify-content:space-between;align-items:baseline;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.12);}
+      .lvl span{font-size:20px;letter-spacing:.12em;color:#9aa0ae;}
+      .lvl b{font-size:52px;}
+      .lvl.up b{color:#6ee68c;}
+      .lvl.dn b{color:#ff4646;}
+      .lvl-track{height:10px;margin:0 4px 12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;}
+      .lvl-track i{display:block;width:100%;height:100%;border-radius:99px;transform-origin:0% 50%;background:#ffdd4f;will-change:transform;}
+      .lvl.up + .lvl-track i{background:#6ee68c;}
+      .lvl.dn + .lvl-track i{background:#ff4646;}
+      .chip{display:inline-block;margin:6px 8px 6px 0;padding:10px 18px;border-radius:999px;background:rgba(255,221,79,.20);border:1px solid #ffdd4f;color:#ffdd4f;font-size:28px;font-weight:800;transform-origin:50% 50%;box-shadow:0 6px 16px rgba(0,0,0,.25);text-shadow:0 2px 8px rgba(0,0,0,.55);}
+      .stat{display:flex;align-items:baseline;gap:12px;margin:6px 0;}
+      .stat b{font-size:64px;color:#ffdd4f;font-variant-numeric:tabular-nums;}
+      .stat span{font-size:24px;color:#c8cad1;}
+      .hero-num{font-size:96px;font-weight:800;color:#5ab0ff;line-height:1;font-variant-numeric:tabular-nums;display:inline-block;transform-origin:0% 50%;text-shadow:0 8px 24px rgba(90,176,255,.35);}
+      .graph-card svg{width:100%;height:auto;max-height:280px;}
+      .kicker,.title,.q,.note,.banner,.lvl b,.lvl span,.stat b,.stat span,.hero-num,.chip,.cap-top,.cap-bot,.chapter{cursor:text;user-select:text;-webkit-user-select:text;}
+
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-xt0e" id="stage" data-composition-id="talking-head-recut" data-start="0" data-duration="119.9" data-fps="30" data-width="1080" data-height="1920">
+      <div data-hf-id="hf-rdog" id="broll-layer">
+      <div data-hf-id="hf-zv3f" class="broll-cam" id="broll-gold-cam">
+        <video data-hf-id="hf-6h74" id="broll-gold" class="clip broll-vid" src="public/broll/gold.mp4" muted playsinline data-start="13.8000" data-duration="8.0000" data-track-index="4"></video>
+      </div>
+      <div data-hf-id="hf-ue4h" class="broll-cam" id="broll-market-cam">
+        <video data-hf-id="hf-54f3" id="broll-market" class="clip broll-vid" src="public/broll/market.mp4" muted playsinline data-start="99.5000" data-duration="8.0000" data-track-index="4"></video>
+      </div>
+      </div>
+      <div data-hf-id="hf-dltv" class="video-wrapper" id="video-wrap">
+        <div data-hf-id="hf-qyus" id="video-cam">
+          <video data-hf-id="hf-pc0j" id="bg-video" src="public/input-video.mp4" playsinline data-has-audio="true" data-start="0" data-duration="119.9" data-track-index="1"></video>
+        </div>
+      </div>
+      <div data-hf-id="hf-hh72" class="legibility"></div>
+      <div data-hf-id="hf-bq8u" id="overlays">
+﻿      <div data-hf-id="hf-ghi7" class="card-host clip" id="card-hook-host" data-card-id="card-hook" data-enter="slam" data-exit="scale" data-start="4.45" data-duration="7.16" data-track-index="2" style="left:40px;top:188px;width:920px;height:300px;" data-media-start="1.65">
+
+        <div data-hf-id="hf-ys1q" class="card" data-card-id="card-hook">
+
+          <div data-hf-id="hf-3u5i" class="card-fx" id="card-hook-fx">
+
+            <div data-hf-id="hf-fw5w" class="root hook" id="card-hook-root">
+
+              <div style="font-size: 23px" data-hf-id="hf-c3n5" class="kicker" id="hook-k" data-at="3.00" data-in="slam">PARADAN PARA KAZANMA DEVRİ</div>
+
+              <div data-hf-id="hf-fu54" class="q" id="hook-q1" data-at="5.88" data-in="slam">Nasıl para kazanırız?</div>
+
+              <div data-hf-id="hf-q75x" class="q" id="hook-q2" data-at="8.86" data-in="slam">Farklı alanlara yatırım</div>
+
+              <div data-hf-id="hf-b3mq" class="q danger" id="hook-q3" data-at="10.40" data-in="slam">Yoksa sandığımızı mı?</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-ho7k" class="card-host clip" id="card-assets-host" data-card-id="card-assets" data-enter="soft" data-exit="fade" data-start="12.2400" data-duration="8.3200" data-track-index="2" style="left:40px;top:168px;width:920px;height:120px;">
+
+        <div data-hf-id="hf-wzag" class="card" data-card-id="card-assets">
+
+          <div data-hf-id="hf-803w" class="card-fx" id="card-assets-fx">
+
+            <div data-hf-id="hf-f8f3" class="root glass chips slim" id="card-assets-root">
+
+              <span data-hf-id="hf-01vb" class="card-accent" id="card-assets-accent"></span>
+
+              <span data-hf-id="hf-9cpj" class="card-sheen" id="card-assets-sheen"></span>
+
+              <div data-hf-id="hf-nsmp" class="chip" id="as-1" data-at="14.02" data-in="spin">ALTIN</div>
+
+              <div data-hf-id="hf-n4p4" class="chip" id="as-2" data-at="16.58" data-in="spin">FON · HİSSE</div>
+
+              <div data-hf-id="hf-ubfb" class="chip" id="as-3" data-at="18.48" data-in="spin">KRİPTO</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-scwu" class="card-host clip" id="card-real-host" data-card-id="card-real" data-enter="glitch" data-exit="scale" data-start="20.9400" data-duration="5.7800" data-track-index="2" style="left:40px;top:168px;width:920px;height:120px;">
+
+        <div data-hf-id="hf-2t4f" class="card" data-card-id="card-real">
+
+          <div data-hf-id="hf-chyd" class="card-fx" id="card-real-fx">
+
+            <div data-hf-id="hf-36d2" class="root glass chips slim" id="card-real-root">
+
+              <span data-hf-id="hf-2r22" class="card-accent" id="card-real-accent"></span>
+
+              <span data-hf-id="hf-g9e8" class="card-sheen" id="card-real-sheen"></span>
+
+              <div data-hf-id="hf-60hu" class="chip" id="re-1" data-at="21.84" data-in="spin">REEL ÜRÜN</div>
+
+              <div data-hf-id="hf-0c2m" class="chip" id="re-2" data-at="23.60" data-in="spin">GAYRİMENKUL</div>
+
+              <div data-hf-id="hf-mp83" class="chip" id="re-3" data-at="24.18" data-in="spin">ARAÇ</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-nz5f" class="card-host clip" id="card-ask-host" data-card-id="card-ask" data-enter="tilt" data-exit="slide" data-start="27.0200" data-duration="6.0000" data-track-index="2" style="left:40px;top:210px;width:920px;height:360px;">
+
+        <div data-hf-id="hf-afda" class="card" data-card-id="card-ask">
+
+          <div data-hf-id="hf-f6p8" class="card-fx" id="card-ask-fx">
+
+            <div data-hf-id="hf-7231" class="root glass punch" id="card-ask-root">
+
+              <span data-hf-id="hf-o0ol" class="card-accent" id="card-ask-accent"></span>
+
+              <span data-hf-id="hf-lkyv" class="card-sheen" id="card-ask-sheen"></span>
+
+              <span data-hf-id="hf-lq0o" class="warn-badge" id="card-ask-warn"><span data-hf-id="hf-ue58" class="warn-ring"></span><span data-hf-id="hf-1okc" class="warn-ico">!</span></span>
+
+              <div data-hf-id="hf-zztb" class="kicker" id="ask-k" data-at="27.20">PEKİ BUNU YAPMADAN ÖNCE</div>
+
+              <div data-hf-id="hf-2pen" class="title red" id="ask-t" data-at="29.64" data-in="back">DOĞRU YATIRIM MI?</div>
+
+              <div data-hf-id="hf-607e" class="note" id="ask-n">Boş duracağına çalışsın mı diyorsunuz?</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-1bht" class="card-host clip" id="card-split-host" data-card-id="card-split" data-hero="1" data-enter="wipe" data-exit="fade" data-start="35.7" data-duration="12.67" data-track-index="2" style="left:40px;top:190px;width:920px;height:560px;" data-media-start="0.42">
+
+        <div data-hf-id="hf-62ch" class="card" data-card-id="card-split">
+
+          <div data-hf-id="hf-z94l" class="card-fx" id="card-split-fx">
+
+            <div data-hf-id="hf-c0y8" class="root glass levels graph-card" id="card-split-root">
+
+              <span data-hf-id="hf-t7p8" class="card-accent" id="card-split-accent"></span>
+
+              <span data-hf-id="hf-2z5o" class="card-sheen" id="card-split-sheen"></span>
+
+              <div data-hf-id="hf-px9o" class="chapter" id="sp-ch"><i data-hf-id="hf-b7wv">01</i> DAĞILIM</div>
+
+              <div data-hf-id="hf-bn1w" class="kicker" id="sp-k" data-at="35.44">5 MİLYON TL · RİSK HARİTASI</div>
+
+              <div data-hf-id="hf-885x" class="title" id="sp-t" data-at="37.04" data-in="slam">1 + 2 + 1 + 1</div>
+
+              <div data-hf-id="hf-b8ea" class="lvl up" id="sp-1" data-at="39.38"><span data-hf-id="hf-z3rd">TEMETTÜ HİSSE</span><b data-hf-id="hf-ftk3">1M</b></div>
+
+              <div data-hf-id="hf-kucg" class="lvl-track"><i data-hf-id="hf-xqby" data-fill="0.20" data-fill-at="39.50"></i></div>
+
+              <div data-hf-id="hf-331d" class="lvl" id="sp-2" data-at="42.40"><span data-hf-id="hf-4nnw">PARA PİYASASI FON</span><b data-hf-id="hf-pa20">2M</b></div>
+
+              <div data-hf-id="hf-a1zs" class="lvl-track"><i data-hf-id="hf-k528" data-fill="0.40" data-fill-at="42.55" style="background:#5ab0ff"></i></div>
+
+              <div data-hf-id="hf-qh5q" class="lvl" id="sp-3" data-at="45.58"><span data-hf-id="hf-96ih">KIYMETLİ METAL</span><b data-hf-id="hf-ty03">1M</b></div>
+
+              <div data-hf-id="hf-8v2p" class="lvl-track"><i data-hf-id="hf-qhea" data-fill="0.20" data-fill-at="45.70" style="background:#ffdd4f"></i></div>
+
+              <div data-hf-id="hf-njw7" class="lvl" id="sp-4" data-at="48.24"><span data-hf-id="hf-5935">ANLIK FIRSAT</span><b data-hf-id="hf-tjp2">1M</b></div>
+
+              <div data-hf-id="hf-99dq" class="lvl-track"><i data-hf-id="hf-j2ct" data-fill="0.20" data-fill-at="48.40" style="background:#fb923c"></i></div>
+
+              <div data-hf-id="hf-owo7" class="note" id="sp-n">Risk anlayışı net · kalan kenarda bekler</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-bl7p" class="card-host clip" id="card-rule-host" data-card-id="card-rule" data-enter="pop" data-exit="fade" data-start="51.6" data-duration="4.49" data-track-index="2" style="left:40px;top:210px;width:920px;height:360px;" data-media-start="0">
+
+        <div data-hf-id="hf-pmc1" class="card" data-card-id="card-rule">
+
+          <div data-hf-id="hf-yzs3" class="card-fx" id="card-rule-fx">
+
+            <div data-hf-id="hf-1icw" class="root glass punch" id="card-rule-root">
+
+              <span data-hf-id="hf-jqb0" class="card-accent" id="card-rule-accent"></span>
+
+              <span data-hf-id="hf-0ixq" class="card-sheen" id="card-rule-sheen"></span>
+
+              <span data-hf-id="hf-5l8v" class="warn-badge" id="card-rule-warn"><span data-hf-id="hf-4l5g" class="warn-ring"></span><span data-hf-id="hf-3m38" class="warn-ico">!</span></span>
+
+              <div data-hf-id="hf-mioc" class="chapter" id="rl-ch"><i data-hf-id="hf-atlu">02</i> KURAL</div>
+
+              <div data-hf-id="hf-zmqa" class="kicker" id="rl-k" data-at="51.68">İLK VE EN ÖNEMLİ KURAL</div>
+
+              <div data-hf-id="hf-j9zm" class="title red" id="rl-t" data-at="54.50" data-in="back">ACİL DURUM FONU</div>
+
+              <div data-hf-id="hf-a2t1" class="note" id="rl-n">Yarın lazım olan parayla yatırım yapmak risktir</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-17x3" class="card-host clip" id="card-need-host" data-card-id="card-need" data-enter="rise" data-exit="scale" data-start="66.67" data-duration="4.2" data-track-index="2" style="left:40px;top:200px;width:920px;height:440px;" data-media-start="2.87">
+
+        <div data-hf-id="hf-v15b" class="card" data-card-id="card-need">
+
+          <div data-hf-id="hf-d9yd" class="card-fx" id="card-need-fx">
+
+            <div data-hf-id="hf-oztf" class="root glass stats" id="card-need-root">
+
+              <span data-hf-id="hf-4ioq" class="card-accent" id="card-need-accent"></span>
+
+              <span data-hf-id="hf-06l4" class="card-sheen" id="card-need-sheen"></span>
+
+              <div data-hf-id="hf-u4rz" class="chapter" id="nd-ch"><i data-hf-id="hf-afat">03</i> EŞİK</div>
+
+              <div data-hf-id="hf-t6o7" class="kicker" id="nd-k" data-at="63.88">5.000 TL KAZANMAK İÇİN</div>
+
+              <div data-hf-id="hf-suqg" class="stat" id="nd-1"><b data-hf-id="hf-gv5s" class="hero-num" data-count="800000" data-count-at="66.80" data-count-dur="1.2" data-decimals="0" data-scale-in="">0</b><span data-hf-id="hf-pdt8">TL hisse tarafı</span></div>
+
+              <div data-hf-id="hf-3q83" class="stat" id="nd-2"><b data-hf-id="hf-2elt" data-count="200000" data-count-at="73.72" data-count-dur="1.0" data-decimals="0" data-scale-in="">0</b><span data-hf-id="hf-k7a5">TL fon tarafı</span></div>
+
+              <div data-hf-id="hf-tuxj" class="note warn" id="nd-n">Riski yüksek hisselerde bu eşik böyle</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-0nmc" class="card-host clip" id="card-rate-host" data-card-id="card-rate" data-enter="flip" data-exit="slide" data-start="76.0800" data-duration="7.2000" data-track-index="2" style="left:40px;top:210px;width:920px;height:360px;">
+
+        <div data-hf-id="hf-slp9" class="card" data-card-id="card-rate">
+
+          <div data-hf-id="hf-r8x3" class="card-fx" id="card-rate-fx">
+
+            <div data-hf-id="hf-aw6k" class="root glass punch" id="card-rate-root">
+
+              <span data-hf-id="hf-7krk" class="card-accent" id="card-rate-accent"></span>
+
+              <span data-hf-id="hf-8hwa" class="card-sheen" id="card-rate-sheen"></span>
+
+              <span data-hf-id="hf-vdcq" class="warn-badge warn-soft" id="card-rate-warn"><span data-hf-id="hf-3e8d" class="warn-ring"></span><span data-hf-id="hf-2f65" class="warn-ico">!</span></span>
+
+              <div data-hf-id="hf-akic" class="kicker" id="rt-k" data-at="77.10">GÜNCEL FAİZ VE FON GETİRİSİ</div>
+
+              <div data-hf-id="hf-wdzk" class="title red" id="rt-t" data-at="80.44" data-in="back">İNDİRİMDE GETİRİ DÜŞER</div>
+
+              <div data-hf-id="hf-hbal" class="note" id="rt-n">Yarın faiz indirimi gelirse fondaki getiri de iner</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-dgme" class="card-host clip" id="card-why-host" data-card-id="card-why" data-enter="snap" data-exit="scale" data-start="84.34" data-duration="4.44" data-track-index="2" style="left:40px;top:200px;width:920px;height:380px;" data-media-start="0.84">
+
+        <div data-hf-id="hf-3nqz" class="card" data-card-id="card-why">
+
+          <div data-hf-id="hf-ruxf" class="card-fx" id="card-why-fx">
+
+            <div data-hf-id="hf-w6fi" class="root glass" id="card-why-root">
+
+              <span data-hf-id="hf-f6um" class="card-accent" id="card-why-accent"></span>
+
+              <span data-hf-id="hf-4txu" class="card-sheen" id="card-why-sheen"></span>
+
+              <div data-hf-id="hf-qjkp" class="quote-mark" id="wh-q">“</div>
+
+              <div data-hf-id="hf-oodr" class="kicker" id="wh-k" data-at="83.86">KRİTİK SORU</div>
+
+              <div data-hf-id="hf-ygyd" class="title" id="wh-t" data-at="86.48" data-in="back">NEREYE VE NEDEN?</div>
+
+              <div data-hf-id="hf-fmaa" class="note" id="wh-n">Daha fazla getiri sunan fon veya mevduat mı?</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div><div data-hf-id="hf-i5f6" class="card-host clip" id="card-why-host-split-2" data-card-id="card-why" data-enter="snap" data-exit="scale" data-start="86.03" data-duration="1.715" data-track-index="2" style="left:40px;top:200px;width:920px;height:380px;" data-media-start="2.53">
+
+        <div data-hf-id="hf-5f7y" class="card" data-card-id="card-why">
+
+          <div data-hf-id="hf-gf2e" class="card-fx" id="card-why-fx">
+
+            <div data-hf-id="hf-ba4f" class="root glass" id="card-why-root">
+
+              <span data-hf-id="hf-lkv3" class="card-accent" id="card-why-accent"></span>
+
+              <span data-hf-id="hf-0dab" class="card-sheen" id="card-why-sheen"></span>
+
+              <div data-hf-id="hf-eto4" class="quote-mark" id="wh-q">“</div>
+
+              <div data-hf-id="hf-2wpu" class="kicker" id="wh-k" data-at="83.86">KRİTİK SORU</div>
+
+              <div data-hf-id="hf-xivk" class="title" id="wh-t" data-at="86.48" data-in="back">NEREYE VE NEDEN?</div>
+
+              <div data-hf-id="hf-0zsz" class="note" id="wh-n">Daha fazla getiri sunan fon veya mevduat mı?</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div><div data-hf-id="hf-x61p" class="card-host clip" id="card-why-host-split-2-split" data-card-id="card-why" data-enter="snap" data-exit="scale" data-start="87.745" data-duration="2.255" data-track-index="2" style="left:40px;top:200px;width:920px;height:380px;" data-media-start="4.245">
+
+        <div data-hf-id="hf-50wx" class="card" data-card-id="card-why">
+
+          <div data-hf-id="hf-g0rd" class="card-fx" id="card-why-fx">
+
+            <div data-hf-id="hf-bofg" class="root glass" id="card-why-root">
+
+              <span data-hf-id="hf-lz64" class="card-accent" id="card-why-accent"></span>
+
+              <span data-hf-id="hf-0rlc" class="card-sheen" id="card-why-sheen"></span>
+
+              <div data-hf-id="hf-efd3" class="quote-mark" id="wh-q">“</div>
+
+              <div data-hf-id="hf-2iet" class="kicker" id="wh-k" data-at="83.86">KRİTİK SORU</div>
+
+              <div data-hf-id="hf-x4kj" class="title" id="wh-t" data-at="86.48" data-in="back">NEREYE VE NEDEN?</div>
+
+              <div data-hf-id="hf-1e40" class="note" id="wh-n">Daha fazla getiri sunan fon veya mevduat mı?</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div><div data-hf-id="hf-z4h7" class="card-host clip" id="card-why-host-split" data-card-id="card-why" data-enter="snap" data-exit="scale" data-start="86.963" data-duration="3.037" data-track-index="2" style="left:40px;top:200px;width:920px;height:380px;">
+
+        <div data-hf-id="hf-5tiz" class="card" data-card-id="card-why">
+
+          <div data-hf-id="hf-gtdf" class="card-fx" id="card-why-fx">
+
+            <div data-hf-id="hf-avte" class="root glass" id="card-why-root">
+
+              <span data-hf-id="hf-l6k2" class="card-accent" id="card-why-accent"></span>
+
+              <span data-hf-id="hf-zyza" class="card-sheen" id="card-why-sheen"></span>
+
+              <div data-hf-id="hf-dmr1" class="quote-mark" id="wh-q">“</div>
+
+              <div data-hf-id="hf-3b0v" class="kicker" id="wh-k" data-at="83.86">KRİTİK SORU</div>
+
+              <div data-hf-id="hf-wbyh" class="title" id="wh-t" data-at="86.48" data-in="back">NEREYE VE NEDEN?</div>
+
+              <div data-hf-id="hf-0lhy" class="note" id="wh-n">Daha fazla getiri sunan fon veya mevduat mı?</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div data-hf-id="hf-m5xh" class="card-host clip" id="card-bist-host" data-card-id="card-bist" data-enter="drift" data-exit="fade" data-start="99.1000" data-duration="9.2000" data-track-index="2" style="left:40px;top:210px;width:920px;height:360px;">
+
+        <div data-hf-id="hf-oihd" class="card" data-card-id="card-bist">
+
+          <div data-hf-id="hf-kx2r" class="card-fx" id="card-bist-fx">
+
+            <div data-hf-id="hf-btvg" class="root glass" id="card-bist-root">
+
+              <span data-hf-id="hf-9030" class="card-accent" id="card-bist-accent"></span>
+
+              <span data-hf-id="hf-uryi" class="card-sheen" id="card-bist-sheen"></span>
+
+              <div data-hf-id="hf-36gg" class="chapter" id="bi-ch"><i data-hf-id="hf-d7g0">04</i> BIST</div>
+
+              <div data-hf-id="hf-zva4" class="kicker" id="bi-k" data-at="99.18">Borsa İstanbul · sağlam hisse</div>
+
+              <div data-hf-id="hf-w8wk" class="title" id="bi-t" data-at="102.64" data-in="back">FAİZ İNİNCE GÜZEL FİYATLAMA</div>
+
+              <div data-hf-id="hf-y32h" class="note" id="bi-n">Zamanı öngeremeyen için parçalı yatırım</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+            <div data-hf-id="hf-fgg2" class="card-host clip" id="card-disclaimer-host" data-card-id="card-disclaimer" data-enter="zoom" data-start="115.5600" data-duration="3.8000" data-track-index="3" style="left:40px;top:1580px;width:1000px;height:100px;" data-exit="scale">
+        <div data-hf-id="hf-gtqu" class="card" data-card-id="card-disclaimer">
+          <div data-hf-id="hf-vjtz" class="banner" id="ban-c" data-at="115.56" data-in="drop" data-out="118.90">
+            <b data-hf-id="hf-e9dq">YATIRIM TAVSİYESİ DEĞİL</b>
+          </div>
+        </div>
+      </div>
+      <img data-hf-id="hf-cypx" id="ig-ban-a" class="clip ig-banner" src="public/follow_banner.png" data-start="90.5000" data-duration="2.3000" data-track-index="8" style="left:0;top:36px;width:1080px;height:310px;" alt="banner">
+      <img data-hf-id="hf-wknc" id="ig-ban-b" class="clip ig-banner" src="public/follow_banner.png" data-start="108.9000" data-duration="2.3000" data-track-index="8" style="left:0;top:36px;width:1080px;height:310px;" alt="banner">
+      <div data-hf-id="hf-35p5" class="clip cap-stage" id="caption-host" data-start="0" data-duration="116.86" data-track-index="5" style="left:20px;top:1208px;width:1060px;height:320px;" data-media-start="0">
+        <div data-hf-id="hf-i6se" class="cap-item tone-yumusak" id="cap-000" data-cap-start="0.0000" data-cap-end="1.8667">
+          <div data-hf-id="hf-slbd" class="cap-top" id="cap-000-top">ARTIK DEVIR <span data-hf-id="hf-m2u8" class="cap-kw">PARA</span>DAN</div>
+          <div data-hf-id="hf-dk9k" class="cap-bot" id="cap-000-bot"><span data-hf-id="hf-2k7s" class="cap-kw">PARA</span> KAZANMA</div>
+        </div>
+        <div data-hf-id="hf-4afk" class="cap-item tone-yumusak" id="cap-001" data-cap-start="1.8667" data-cap-end="3.5667">
+          <div data-hf-id="hf-eote" class="cap-top" id="cap-001-top">DEVRI OLDUĞU IÇIN,</div>
+          <div data-hf-id="hf-cggn" class="cap-bot" id="cap-001-bot">BIR ÇOĞUMUZ</div>
+        </div>
+        <div data-hf-id="hf-sbtb" class="cap-item tone-yumusak" id="cap-002" data-cap-start="3.5667" data-cap-end="5.8667">
+          <div data-hf-id="hf-e0j7" class="cap-top" id="cap-002-top">AZ ÇOK DEMEDEN</div>
+          <div data-hf-id="hf-n7j4" class="cap-bot" id="cap-002-bot">BIRIKIMLERIMIZI ELEMEDEN</div>
+        </div>
+        <div data-hf-id="hf-zcfu" class="cap-item tone-yumusak" id="cap-003" data-cap-start="5.8667" data-cap-end="8.3000">
+          <div data-hf-id="hf-dgh2" class="cap-top" id="cap-003-top">NASIL <span data-hf-id="hf-1dap">PARA</span> KAZANIRIZ</div>
+          <div data-hf-id="hf-3te5" class="cap-bot" id="cap-003-bot"></div>
+        </div>
+        <div data-hf-id="hf-r7to" class="cap-item tone-yumusak" id="cap-004" data-cap-start="8.3000" data-cap-end="9.7333">
+          <div data-hf-id="hf-jug5" class="cap-top" id="cap-004-top"></div>
+          <div data-hf-id="hf-nqxu" class="cap-bot" id="cap-004-bot"><span data-hf-id="hf-93r5" data-hf-text-key="child:1:span"></span></div>
+        </div>
+        <div data-hf-id="hf-vchg" class="cap-item tone-yumusak" id="cap-005" data-cap-start="10.0000" data-cap-end="11.7333">
+          <div data-hf-id="hf-f0gx" class="cap-top" id="cap-005-top"></div>
+          <div data-hf-id="hf-8eo5" class="cap-bot" id="cap-005-bot"></div>
+        </div>
+        <div data-hf-id="hf-u8ef" class="cap-item tone-sert" id="cap-006" data-cap-start="12.2333" data-cap-end="14.0333">
+          <div data-hf-id="hf-jfor" class="cap-top" id="cap-006-top">BAZILARI <span data-hf-id="hf-so7x" class="cap-kw">RISK</span> SEVMEYIP</div>
+          <div data-hf-id="hf-i9cl" class="cap-bot" id="cap-006-bot">UZUN VADE</div>
+        </div>
+        <div data-hf-id="hf-rijk" class="cap-item tone-yumusak" id="cap-007" data-cap-start="14.0333" data-cap-end="16.5667">
+          <div data-hf-id="hf-j6os" class="cap-top" id="cap-007-top"><span data-hf-id="hf-s6ye" class="cap-kw">ALTIN</span> ALIRKEN, BAZILARI</div>
+          <div data-hf-id="hf-758q" class="cap-bot" id="cap-007-bot">ESNEK YAPIDA</div>
+        </div>
+        <div data-hf-id="hf-zkcd" class="cap-item tone-yumusak" id="cap-008" data-cap-start="16.5667" data-cap-end="19.2000">
+          <div data-hf-id="hf-0hzn" class="cap-top" id="cap-008-top"><span data-hf-id="hf-zp89" class="cap-kw">FON</span>, <span data-hf-id="hf-zlom" class="cap-kw">HISSE</span>, <span data-hf-id="hf-hkwr" class="cap-kw">KRIPTO</span></div>
+          <div data-hf-id="hf-291c" class="cap-bot" id="cap-008-bot"><span data-hf-id="hf-1rlq" class="cap-kw">PARA</span> VE</div>
+        </div>
+        <div data-hf-id="hf-u0zf" class="cap-item tone-yumusak" id="cap-009" data-cap-start="19.2000" data-cap-end="20.5667">
+          <div data-hf-id="hf-58a2" class="cap-top" id="cap-009-top">BENZER ALANLARA</div>
+          <div data-hf-id="hf-xfst" class="cap-bot" id="cap-009-bot"><span data-hf-id="hf-447p" class="cap-kw">YATIRIM</span> YAPIYOR.</div>
+        </div>
+        <div data-hf-id="hf-g9iy" class="cap-item tone-yumusak" id="cap-010" data-cap-start="20.9333" data-cap-end="23.2000">
+          <div data-hf-id="hf-3tv2" class="cap-top" id="cap-010-top">BAZILARI ISE REEL</div>
+          <div data-hf-id="hf-9sg9" class="cap-bot" id="cap-010-bot">ÜRÜN SEVIYOR,</div>
+        </div>
+        <div data-hf-id="hf-lukw" class="cap-item tone-yumusak" id="cap-011" data-cap-start="23.6000" data-cap-end="25.7333">
+          <div data-hf-id="hf-379b" class="cap-top" id="cap-011-top">GAYRIMENKUL ARAÇ VE</div>
+          <div data-hf-id="hf-sp3z" class="cap-bot" id="cap-011-bot">BENZER ALANLARDA</div>
+        </div>
+        <div data-hf-id="hf-8eu6" class="cap-item tone-yumusak" id="cap-012" data-cap-start="25.7333" data-cap-end="26.7333">
+          <div data-hf-id="hf-qmp8" class="cap-top" id="cap-012-top"></div>
+          <div data-hf-id="hf-dyr8" class="cap-bot" id="cap-012-bot">DEĞERLENDIRMEK ISTIYOR.</div>
+        </div>
+        <div data-hf-id="hf-r51s" class="cap-item tone-yumusak" id="cap-013" data-cap-start="27.0333" data-cap-end="28.9667">
+          <div data-hf-id="hf-hfo1" class="cap-top" id="cap-013-top">PEKI BUNU YAPMADAN</div>
+          <div data-hf-id="hf-0xtl" class="cap-bot" id="cap-013-bot">ÖNCE HIÇ</div>
+        </div>
+        <div data-hf-id="hf-tlbb" class="cap-item tone-yumusak" id="cap-014" data-cap-start="28.9667" data-cap-end="29.6333">
+          <div data-hf-id="hf-u4vu" class="cap-top" id="cap-014-top"></div>
+          <div data-hf-id="hf-yuem" class="cap-bot" id="cap-014-bot">DÜŞÜNDÜĞÜNÜZ MÜ?</div>
+        </div>
+        <div data-hf-id="hf-887e" class="cap-item tone-yumusak" id="cap-015" data-cap-start="29.6333" data-cap-end="31.1333">
+          <div data-hf-id="hf-viug" class="cap-top" id="cap-015-top"><span data-hf-id="hf-3546" class="cap-kw">DOĞRU</span> BIR</div>
+          <div data-hf-id="hf-4z8i" class="cap-bot" id="cap-015-bot"><span data-hf-id="hf-5b4s" class="cap-kw">YATIRIM</span> MI?</div>
+        </div>
+        <div data-hf-id="hf-mkx5" class="cap-item tone-yumusak" id="cap-016" data-cap-start="31.5000" data-cap-end="33.6333">
+          <div data-hf-id="hf-0y9c" class="cap-top" id="cap-016-top">YOKSA BOŞ DURACAĞINA</div>
+          <div data-hf-id="hf-lwtf" class="cap-bot" id="cap-016-bot">ÇALIŞSIN MI</div>
+        </div>
+        <div data-hf-id="hf-um68" class="cap-item tone-sert" id="cap-017" data-cap-start="33.6333" data-cap-end="36.4667">
+          <div data-hf-id="hf-lsxt" class="cap-top" id="cap-017-top">DIYORSUNUZ? BENIM <span data-hf-id="hf-rs1d" class="cap-kw">RISK</span></div>
+          <div data-hf-id="hf-lssk" class="cap-bot" id="cap-017-bot">ANLAYIŞIM NET.</div>
+        </div>
+        <div data-hf-id="hf-bo0a" class="cap-item tone-yumusak" id="cap-018" data-cap-start="37.0333" data-cap-end="38.4667">
+          <div data-hf-id="hf-u1yb" class="cap-top" id="cap-018-top"><span data-hf-id="hf-30kz" data-hf-text-key="child:0:span">5 MILYON</span> TL</div>
+          <div data-hf-id="hf-ffqh" class="cap-bot" id="cap-018-bot">BIR BÜTÇEM</div>
+        </div>
+        <div data-hf-id="hf-oqx5" class="cap-item tone-yumusak" id="cap-019" data-cap-start="38.4667" data-cap-end="40.4667">
+          <div data-hf-id="hf-ag4q" class="cap-top" id="cap-019-top">VARSA BUNUN <span data-hf-id="hf-vb9h" class="cap-kw">1</span></div>
+          <div data-hf-id="hf-fvse" class="cap-bot" id="cap-019-bot">MILYONU ILE</div>
+        </div>
+        <div data-hf-id="hf-ubb9" class="cap-item tone-yumusak" id="cap-020" data-cap-start="40.4667" data-cap-end="41.8333">
+          <div data-hf-id="hf-py7r" class="cap-top" id="cap-020-top">TEMETTÜ VEREN <span data-hf-id="hf-l40a" data-hf-text-key="child:1:span">HISSE</span></div>
+          <div data-hf-id="hf-f8a2" class="cap-bot" id="cap-020-bot">DE DURUR.</div>
+        </div>
+        <div data-hf-id="hf-7dn0" class="cap-item tone-sert" id="cap-021" data-cap-start="42.3667" data-cap-end="43.8667">
+          <div data-hf-id="hf-5i1q" class="cap-top" id="cap-021-top"><span data-hf-id="hf-jt4g" class="cap-kw">2 MILYON</span>U <span data-hf-id="hf-syyg" class="cap-kw">RISK</span>I</div>
+          <div data-hf-id="hf-t6th" class="cap-bot" id="cap-021-bot">DÜŞÜK <span data-hf-id="hf-0kon" class="cap-kw">PARA</span></div>
+        </div>
+        <div data-hf-id="hf-cpze" class="cap-item tone-yumusak" id="cap-022" data-cap-start="43.8667" data-cap-end="45.0667">
+          <div data-hf-id="hf-07kp" class="cap-top" id="cap-022-top"></div>
+          <div data-hf-id="hf-cfgo" class="cap-bot" id="cap-022-bot">PIYASASI <span data-hf-id="hf-sqq5" class="cap-kw">FON</span>LARINDADIR.</div>
+        </div>
+        <div data-hf-id="hf-clar" class="cap-item tone-yumusak" id="cap-023" data-cap-start="45.5667" data-cap-end="47.3667">
+          <div data-hf-id="hf-tkk9" class="cap-top" id="cap-023-top"><span data-hf-id="hf-svg7" class="cap-kw">1 MILYON</span>U KIYMETLI</div>
+          <div data-hf-id="hf-xwpu" class="cap-bot" id="cap-023-bot">METELDE DURUR.</div>
+        </div>
+        <div data-hf-id="hf-xtvu" class="cap-item tone-yumusak" id="cap-024" data-cap-start="47.7333" data-cap-end="49.3333">
+          <div data-hf-id="hf-0mdq" class="cap-top" id="cap-024-top">KALAN <span data-hf-id="hf-y4af" class="cap-kw">1 MILYON</span>LUK</div>
+          <div data-hf-id="hf-vh1t" class="cap-bot" id="cap-024-bot">DA ANLIK</div>
+        </div>
+        <div data-hf-id="hf-ajqe" class="cap-item tone-yukselis" id="cap-025" data-cap-start="49.3333" data-cap-end="50.8667">
+          <div data-hf-id="hf-9h9p" class="cap-top" id="cap-025-top"><span data-hf-id="hf-pakt" class="cap-kw">FIRSAT</span> IÇIN</div>
+          <div data-hf-id="hf-a67h" class="cap-bot" id="cap-025-bot">KENARDA BEKLER.</div>
+        </div>
+        <div data-hf-id="hf-301f" class="cap-item tone-yumusak" id="cap-026" data-cap-start="51.6000" data-cap-end="52.9667">
+          <div data-hf-id="hf-7ldq" class="cap-top" id="cap-026-top">İLK VE EN</div>
+          <div data-hf-id="hf-75v1" class="cap-bot" id="cap-026-bot">ÖNEMLI <span data-hf-id="hf-7b8h" class="cap-kw">KURAL</span>IMIZ.</div>
+        </div>
+        <div data-hf-id="hf-8hlc" class="cap-item tone-yumusak" id="cap-027" data-cap-start="53.3667" data-cap-end="55.6667">
+          <div data-hf-id="hf-e8at" class="cap-top" id="cap-027-top"><span data-hf-id="hf-4wtr" class="cap-kw">YATIRIM</span> YAPMADAN ÖNCE</div>
+          <div data-hf-id="hf-a18l" class="cap-bot" id="cap-027-bot"><span data-hf-id="hf-owcn" class="cap-kw">ACIL</span> DURUM</div>
+        </div>
+        <div data-hf-id="hf-vlwt" class="cap-item tone-yumusak" id="cap-028" data-cap-start="55.6667" data-cap-end="56.7000">
+          <div data-hf-id="hf-efwr" class="cap-top" id="cap-028-top"></div>
+          <div data-hf-id="hf-h9et" class="cap-bot" id="cap-028-bot"><span data-hf-id="hf-txn8" class="cap-kw">FON</span>UNUZUN OLMASI.</div>
+        </div>
+        <div data-hf-id="hf-dm1t" class="cap-item tone-yumusak" id="cap-029" data-cap-start="56.7000" data-cap-end="59.1333">
+          <div data-hf-id="hf-wd98" class="cap-top" id="cap-029-top">ÇÜNKÜ YARIN LAZIM</div>
+          <div data-hf-id="hf-mbm8" class="cap-bot" id="cap-029-bot">OLACAK BIR</div>
+        </div>
+        <div data-hf-id="hf-3usv" class="cap-item tone-yumusak" id="cap-030" data-cap-start="59.1333" data-cap-end="62.5333">
+          <div data-hf-id="hf-pnm1" class="cap-top" id="cap-030-top"><span data-hf-id="hf-0yzo" class="cap-kw">PARA</span>YLA <span data-hf-id="hf-63qu" class="cap-kw">YATIRIM</span> YAPMAK</div>
+          <div data-hf-id="hf-av2y" class="cap-bot" id="cap-030-bot">SIKIŞINCA SATACAĞINIZ</div>
+        </div>
+        <div data-hf-id="hf-l11n" class="cap-item tone-sert" id="cap-031" data-cap-start="62.5333" data-cap-end="63.5000">
+          <div data-hf-id="hf-nq7p" class="cap-top" id="cap-031-top"></div>
+          <div data-hf-id="hf-l9md" class="cap-bot" id="cap-031-bot">BIR <span data-hf-id="hf-sknf" class="cap-kw">RISK</span>DIR.</div>
+        </div>
+        <div data-hf-id="hf-7frk" class="cap-item tone-yumusak" id="cap-032" data-cap-start="63.8000" data-cap-end="65.4667">
+          <div data-hf-id="hf-xnq3" class="cap-top" id="cap-032-top">ORTALAMA <span data-hf-id="hf-wwhl" class="cap-kw">5 </span>.<span data-hf-id="hf-550i" class="cap-kw">000</span></div>
+          <div data-hf-id="hf-w8iu" class="cap-bot" id="cap-032-bot">TL KAZANMAK</div>
+        </div>
+        <div data-hf-id="hf-uq7g" class="cap-item tone-yumusak" id="cap-033" data-cap-start="65.4667" data-cap-end="66.8000">
+          <div data-hf-id="hf-8kcg" class="cap-top" id="cap-033-top">IÇIN <span data-hf-id="hf-libb" class="cap-kw">HISSE</span> TARAFINDA</div>
+          <div data-hf-id="hf-bhdb" class="cap-bot" id="cap-033-bot">EN AZ</div>
+        </div>
+        <div data-hf-id="hf-sskj" class="cap-item tone-yumusak" id="cap-034" data-cap-start="66.8000" data-cap-end="68.3333">
+          <div data-hf-id="hf-845i" class="cap-top" id="cap-034-top"><span data-hf-id="hf-2sd6" class="cap-kw"></span>.<span style="clip-path: inset(0px 0px 0px 4.65px)" data-hf-id="hf-pxvy" class="cap-kw"></span></div>
+          <div data-hf-id="hf-co0l" class="cap-bot" id="cap-034-bot"><span data-hf-id="hf-5pft" class="cap-kw">YATIRIM</span> YAPMAK</div>
+        </div>
+        <div data-hf-id="hf-lc5k" class="cap-item tone-sert" id="cap-035" data-cap-start="68.3333" data-cap-end="71.0667">
+          <div data-hf-id="hf-6f1v" class="cap-top" id="cap-035-top"><span data-hf-id="hf-ql4a" data-hf-text-key="child:1:span"></span></div>
+          <div data-hf-id="hf-syje" class="cap-bot" id="cap-035-bot"><span data-hf-id="hf-lwmc" data-hf-text-key="child:1:span"></span></div>
+        </div>
+        <div data-hf-id="hf-zi9u" class="cap-item tone-yumusak" id="cap-036" data-cap-start="71.0667" data-cap-end="71.7333">
+          <div data-hf-id="hf-8pg6" class="cap-top" id="cap-036-top"></div>
+          <div data-hf-id="hf-hf1k" class="cap-bot" id="cap-036-bot">BU DURUM BÖYLE.</div>
+        </div>
+        <div data-hf-id="hf-0b13" class="cap-item tone-yumusak" id="cap-037" data-cap-start="72.1667" data-cap-end="73.7333">
+          <div data-hf-id="hf-uwb2" class="cap-top" id="cap-037-top"><span data-hf-id="hf-tjc7" class="cap-kw">FON</span>D TARAFINDA ISE</div>
+          <div data-hf-id="hf-rx9z" class="cap-bot" id="cap-037-bot">TAKRİBİ BIR</div>
+        </div>
+        <div data-hf-id="hf-6s0s" class="cap-item tone-yumusak" id="cap-038" data-cap-start="73.7333" data-cap-end="75.6333">
+          <div data-hf-id="hf-4q8i" class="cap-top" id="cap-038-top"><span data-hf-id="hf-ga30" class="cap-kw">200 </span>.<span data-hf-id="hf-tcr6" class="cap-kw">000 TL</span></div>
+          <div data-hf-id="hf-bnjd" class="cap-bot" id="cap-038-bot"><span data-hf-id="hf-6wcw" class="cap-kw">YATIRIM</span> YAPMAK</div>
+        </div>
+        <div data-hf-id="hf-eaaz" class="cap-item tone-yumusak" id="cap-039" data-cap-start="75.6333" data-cap-end="78.4333">
+          <div data-hf-id="hf-qei0" class="cap-top" id="cap-039-top">GEREKIR. FAKAT BU</div>
+          <div data-hf-id="hf-vpx0" class="cap-bot" id="cap-039-bot">GÜNCEL <span data-hf-id="hf-4td8" class="cap-kw">FAIZ</span></div>
+        </div>
+        <div data-hf-id="hf-w9g8" class="cap-item tone-yumusak" id="cap-040" data-cap-start="78.4333" data-cap-end="80.7667">
+          <div data-hf-id="hf-owo4" class="cap-top" id="cap-040-top">VE <span data-hf-id="hf-uq9a" class="cap-kw">FON</span> <span data-hf-id="hf-jge8" class="cap-kw">GETIRI</span>SIYLE</div>
+          <div data-hf-id="hf-x7c4" class="cap-bot" id="cap-040-bot">YARIN <span data-hf-id="hf-6vr8" class="cap-kw">FAIZ</span></div>
+        </div>
+        <div data-hf-id="hf-bjgz" class="cap-item tone-yumusak" id="cap-041" data-cap-start="80.7667" data-cap-end="82.6000">
+          <div data-hf-id="hf-ezn1" class="cap-top" id="cap-041-top">INDIRIMI GELDIĞINDE <span data-hf-id="hf-uby9" class="cap-kw">FON</span>DAKI</div>
+          <div data-hf-id="hf-3c63" class="cap-bot" id="cap-041-bot"><span data-hf-id="hf-6htk" class="cap-kw">GETIRI</span> DE</div>
+        </div>
+        <div data-hf-id="hf-2re3" class="cap-item tone-yumusak" id="cap-042" data-cap-start="82.6000" data-cap-end="86.4667">
+          <div data-hf-id="hf-mij1" class="cap-top" id="cap-042-top">DÜŞECEKTIR. ŞIMDI KRITIK</div>
+          <div data-hf-id="hf-dn7t" class="cap-bot" id="cap-042-bot">SORU HAL</div>
+        </div>
+        <div data-hf-id="hf-dt4o" class="cap-item tone-yumusak" id="cap-043" data-cap-start="86.4667" data-cap-end="88.5667">
+          <div data-hf-id="hf-yzw5" class="cap-top" id="cap-043-top">BÖYLE IKEN INSANLAR</div>
+          <div data-hf-id="hf-od03" class="cap-bot" id="cap-043-bot"><span data-hf-id="hf-s240" class="cap-kw">NEREYE</span> VE</div>
+        </div>
+        <div data-hf-id="hf-2hos" class="cap-item tone-yumusak" id="cap-044" data-cap-start="88.5667" data-cap-end="89.6333">
+          <div data-hf-id="hf-glfd" class="cap-top" id="cap-044-top"></div>
+          <div data-hf-id="hf-nbco" class="cap-bot" id="cap-044-bot"><span data-hf-id="hf-05mm" class="cap-kw">NEDEN</span> <span data-hf-id="hf-6i1v" class="cap-kw">YATIRIM</span> YAPAR.</div>
+        </div>
+        <div data-hf-id="hf-6chg" class="cap-item tone-yumusak" id="cap-045" data-cap-start="90.2333" data-cap-end="92.0000">
+          <div data-hf-id="hf-5vkn" class="cap-top" id="cap-045-top">ELBETTE DAHA FAZLA</div>
+          <div data-hf-id="hf-aprr" class="cap-bot" id="cap-045-bot"><span data-hf-id="hf-5awh" class="cap-kw">GETIRI</span>R SUNAN</div>
+        </div>
+        <div data-hf-id="hf-ez8h" class="cap-item tone-yumusak" id="cap-046" data-cap-start="92.0000" data-cap-end="93.9333">
+          <div data-hf-id="hf-nd5f" class="cap-top" id="cap-046-top"></div>
+          <div data-hf-id="hf-2vis" class="cap-bot" id="cap-046-bot"><span data-hf-id="hf-vivc" data-hf-text-key="child:0:span">FON</span> VEYA MEVDUATA.</div>
+        </div>
+        <div data-hf-id="hf-syhl" class="cap-item tone-yumusak" id="cap-047" data-cap-start="94.3000" data-cap-end="96.6667">
+          <div data-hf-id="hf-5rj9" class="cap-top" id="cap-047-top">O HALDE BUGÜN</div>
+          <div data-hf-id="hf-wvmd" class="cap-bot" id="cap-047-bot">OLDUĞUMUZ NOKTADA</div>
+        </div>
+        <div data-hf-id="hf-7p89" class="cap-item tone-yumusak" id="cap-048" data-cap-start="96.6667" data-cap-end="99.0333">
+          <div data-hf-id="hf-xynz" class="cap-top" id="cap-048-top">TEMETTÜ VEREN SAĞLAM</div>
+          <div data-hf-id="hf-nczp" class="cap-bot" id="cap-048-bot">ŞIRKETLER DAHIL.</div>
+        </div>
+        <div data-hf-id="hf-77k6" class="cap-item tone-yumusak" id="cap-049" data-cap-start="99.1000" data-cap-end="101.5667">
+          <div data-hf-id="hf-jw4l" class="cap-top" id="cap-049-top"><span data-hf-id="hf-wi8l" class="cap-kw">BORSA</span> İSTANBUL'DAKI SAĞLAM</div>
+          <div data-hf-id="hf-9p1z" class="cap-bot" id="cap-049-bot"><span data-hf-id="hf-maxd" class="cap-kw">HISSE</span> FIYATLARI</div>
+        </div>
+        <div data-hf-id="hf-q3jz" class="cap-item tone-yumusak" id="cap-050" data-cap-start="101.5667" data-cap-end="104.4333">
+          <div data-hf-id="hf-jiim" class="cap-top" id="cap-050-top"><span data-hf-id="hf-5ou5" class="cap-kw">FAIZ</span>LERIN INDIĞI BIR</div>
+          <div data-hf-id="hf-j2td" class="cap-bot" id="cap-050-bot">SENARYODA NE</div>
+        </div>
+        <div data-hf-id="hf-4brv" class="cap-item tone-yumusak" id="cap-051" data-cap-start="104.4333" data-cap-end="105.2333">
+          <div data-hf-id="hf-ww53" class="cap-top" id="cap-051-top"></div>
+          <div data-hf-id="hf-a1kd" class="cap-bot" id="cap-051-bot">OLACAK DERSINIZ?</div>
+        </div>
+        <div data-hf-id="hf-r6ji" class="cap-item tone-yumusak" id="cap-052" data-cap-start="105.6667" data-cap-end="107.9667">
+          <div data-hf-id="hf-s9fv" class="cap-top" id="cap-052-top">TAHMIN EDECEĞINIZ ÜZERE</div>
+          <div data-hf-id="hf-hptt" class="cap-bot" id="cap-052-bot">GÜZEL FIYATLAMALAR</div>
+        </div>
+        <div data-hf-id="hf-1vyf" class="cap-item tone-yumusak" id="cap-053" data-cap-start="107.9667" data-cap-end="109.7000">
+          <div data-hf-id="hf-r3hj" class="cap-top" id="cap-053-top">GÖRECEK. BUNUN NE</div>
+          <div data-hf-id="hf-14y2" class="cap-bot" id="cap-053-bot">ZAMAN OLACAĞINI</div>
+        </div>
+        <div data-hf-id="hf-y94d" class="cap-item tone-yumusak" id="cap-054" data-cap-start="109.7000" data-cap-end="112.4333">
+          <div data-hf-id="hf-xf2l" class="cap-top" id="cap-054-top">ÖNGEREMEYENLER IÇIN PARÇALI</div>
+          <div data-hf-id="hf-6l0g" class="cap-bot" id="cap-054-bot"><span data-hf-id="hf-1c2i" class="cap-kw">YATIRIM</span> YAPMAYA</div>
+        </div>
+        <div data-hf-id="hf-894k" class="cap-item tone-yumusak" id="cap-055" data-cap-start="112.4333" data-cap-end="115.3333">
+          <div data-hf-id="hf-l55l" class="cap-top" id="cap-055-top">DA STRATEJISINI</div>
+          <div data-hf-id="hf-ocsw" class="cap-bot" id="cap-055-bot">MUTLAKA ÖNERIRIM.</div>
+        </div>
+        <div data-hf-id="hf-tdtf" class="cap-item tone-yumusak" id="cap-056" data-cap-start="115.5667" data-cap-end="117.7667">
+          <div data-hf-id="hf-hpxn" class="cap-top" id="cap-056-top">ANLATTIKLARIM ISE KENDI</div>
+          <div data-hf-id="hf-x11c" class="cap-bot" id="cap-056-bot">FIKIRLERIM OLUP</div>
+        </div>
+        <div data-hf-id="hf-jw2v" class="cap-item tone-yumusak" id="cap-057" data-cap-start="117.7667" data-cap-end="119.5000">
+          <div data-hf-id="hf-mhpl" class="cap-top" id="cap-057-top"></div>
+          <div data-hf-id="hf-swtu" class="cap-bot" id="cap-057-bot"><span data-hf-id="hf-0xrh" class="cap-kw">YATIRIM</span> TAVSIYESINI ÇARMAMAKTADIR.</div>
+        </div>
+      </div>
+      </div>
+      <audio data-hf-id="hf-mdye" id="sfx-whoosh-gold" src="public/sfx/whoosh-short.mp3" data-start="13.8000" data-duration="0.3667" data-track-index="13" data-volume="0.16"></audio>
+      <audio data-hf-id="hf-zghz" id="sfx-whoosh-out-gold" src="public/sfx/whoosh-long.mp3" data-start="21.3333" data-duration="0.4667" data-track-index="13" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-rra9" id="sfx-whoosh-market" src="public/sfx/whoosh-short.mp3" data-start="99.5000" data-duration="0.3667" data-track-index="13" data-volume="0.16"></audio>
+      <audio data-hf-id="hf-44nv" id="sfx-whoosh-out-market" src="public/sfx/whoosh-long.mp3" data-start="107.0667" data-duration="0.4667" data-track-index="13" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-37rx" id="sfx-cam-in-0" src="public/sfx/click-soft.mp3" data-start="8.9000" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-1onl" id="sfx-cam-sub-0" src="public/sfx/sub-hit.mp3" data-start="8.9000" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-1uxz" id="sfx-cam-out-0" src="public/sfx/click-soft.mp3" data-start="16.4000" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio data-hf-id="hf-jvyx" id="sfx-cam-in-1" src="public/sfx/click-soft.mp3" data-start="36.2667" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-xnu1" id="sfx-cam-sub-1" src="public/sfx/sub-hit.mp3" data-start="36.2667" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-0yvm" id="sfx-cam-out-1" src="public/sfx/click-soft.mp3" data-start="43.7667" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio data-hf-id="hf-avek" id="sfx-cam-in-2" src="public/sfx/click-soft.mp3" data-start="52.4333" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-tnuq" id="sfx-cam-sub-2" src="public/sfx/sub-hit.mp3" data-start="52.4333" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-hzch" id="sfx-cam-out-2" src="public/sfx/click-soft.mp3" data-start="60.4333" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio data-hf-id="hf-3bjn" id="sfx-cam-in-3" src="public/sfx/click-soft.mp3" data-start="99.3667" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-8nir" id="sfx-cam-sub-3" src="public/sfx/sub-hit.mp3" data-start="99.3667" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-2918" id="sfx-cam-out-3" src="public/sfx/click-soft.mp3" data-start="106.3667" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio data-hf-id="hf-zt48" id="sfx-card-hook" src="public/sfx/pop.mp3" data-start="2.8000" data-duration="0.4333" data-track-index="16" data-volume="0.20"></audio>
+      <audio data-hf-id="hf-coom" id="sfx-card-click-hook" src="public/sfx/sub-hit.mp3" data-start="2.8000" data-duration="0.2667" data-track-index="17" data-volume="0.10"></audio>
+      <audio data-hf-id="hf-xvoc" id="sfx-card-assets" src="public/sfx/tick.mp3" data-start="12.2333" data-duration="0.1667" data-track-index="16" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-4diz" id="sfx-card-real" src="public/sfx/tick.mp3" data-start="20.9333" data-duration="0.1667" data-track-index="16" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-dsj9" id="sfx-card-ask" src="public/sfx/pop.mp3" data-start="27.0333" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-nzrk" id="sfx-card-warn-ask" src="public/sfx/alarm-soft.mp3" data-start="27.1000" data-duration="0.2667" data-track-index="17" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-brzf" id="sfx-card-split" src="public/sfx/pop.mp3" data-start="35.2667" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-d649" id="sfx-card-click-split" src="public/sfx/click-soft.mp3" data-start="35.2667" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-wbk0" id="sfx-card-rule" src="public/sfx/pop.mp3" data-start="51.6000" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-oluw" id="sfx-card-warn-rule" src="public/sfx/alarm-soft.mp3" data-start="51.6667" data-duration="0.2667" data-track-index="17" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-apek" id="sfx-card-need" src="public/sfx/pop.mp3" data-start="63.8000" data-duration="0.4333" data-track-index="16" data-volume="0.17"></audio>
+      <audio data-hf-id="hf-dt50" id="sfx-card-click-need" src="public/sfx/click-soft.mp3" data-start="63.8000" data-duration="0.3000" data-track-index="17" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-ox7a" id="sfx-card-rate" src="public/sfx/pop.mp3" data-start="76.0667" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-u2d2" id="sfx-card-warn-rate" src="public/sfx/alarm-soft.mp3" data-start="76.1667" data-duration="0.2667" data-track-index="17" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-5tci" id="sfx-card-why" src="public/sfx/pop.mp3" data-start="83.5000" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-m60i" id="sfx-card-click-why" src="public/sfx/click-soft.mp3" data-start="83.5000" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-759v" id="sfx-card-bist" src="public/sfx/pop.mp3" data-start="99.1000" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-ferl" id="sfx-card-click-bist" src="public/sfx/click-soft.mp3" data-start="99.1000" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-2a8f" id="sfx-card-disclaimer" src="public/sfx/paper.mp3" data-start="115.5667" data-duration="0.3000" data-track-index="16" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-kh1s" id="sfx-line-0" src="public/sfx/sub-hit.mp3" data-start="3.0000" data-duration="0.2333" data-track-index="18" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-klu2" id="sfx-line-t-0" src="public/sfx/tick.mp3" data-start="3.0333" data-duration="0.1333" data-track-index="22" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-2y3y" id="sfx-line-1" src="public/sfx/sub-hit.mp3" data-start="5.8667" data-duration="0.2333" data-track-index="18" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-l1vo" id="sfx-line-t-1" src="public/sfx/tick.mp3" data-start="5.9333" data-duration="0.1333" data-track-index="22" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-g6ps" id="sfx-line-2" src="public/sfx/sub-hit.mp3" data-start="8.8667" data-duration="0.2333" data-track-index="18" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-03mp" id="sfx-line-t-2" src="public/sfx/tick.mp3" data-start="8.9000" data-duration="0.1333" data-track-index="22" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-crsf" id="sfx-line-3" src="public/sfx/sub-hit.mp3" data-start="10.4000" data-duration="0.2333" data-track-index="18" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-v9ix" id="sfx-line-t-3" src="public/sfx/tick.mp3" data-start="10.4333" data-duration="0.1333" data-track-index="22" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-mgs2" id="sfx-line-4" src="public/sfx/tick.mp3" data-start="14.0333" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-vkb2" id="sfx-line-5" src="public/sfx/tick.mp3" data-start="16.5667" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-g9sa" id="sfx-line-6" src="public/sfx/tick.mp3" data-start="18.4667" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-1bp9" id="sfx-line-7" src="public/sfx/tick.mp3" data-start="21.8333" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-ho4p" id="sfx-line-8" src="public/sfx/tick.mp3" data-start="23.6000" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-41d5" id="sfx-line-9" src="public/sfx/tick.mp3" data-start="24.1667" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio data-hf-id="hf-tar5" id="sfx-line-10" src="public/sfx/tick.mp3" data-start="27.2000" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio data-hf-id="hf-txxl" id="sfx-line-11" src="public/sfx/click-soft.mp3" data-start="29.6333" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio data-hf-id="hf-h6is" id="sfx-line-b-11" src="public/sfx/sub-hit.mp3" data-start="29.6333" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio data-hf-id="hf-phgv" id="sfx-line-12" src="public/sfx/tick.mp3" data-start="35.4333" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio data-hf-id="hf-3ify" id="sfx-line-13" src="public/sfx/sub-hit.mp3" data-start="37.0333" data-duration="0.2333" data-track-index="18" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-wetv" id="sfx-line-t-13" src="public/sfx/tick.mp3" data-start="37.0667" data-duration="0.1333" data-track-index="22" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-ojzq" id="sfx-line-14" src="public/sfx/tick.mp3" data-start="39.3667" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio data-hf-id="hf-blbf" id="sfx-line-15" src="public/sfx/tick.mp3" data-start="42.4000" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio data-hf-id="hf-wzwt" id="sfx-line-16" src="public/sfx/tick.mp3" data-start="45.5667" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio data-hf-id="hf-lgx4" id="sfx-line-17" src="public/sfx/tick.mp3" data-start="48.2333" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio data-hf-id="hf-hedf" id="sfx-line-18" src="public/sfx/tick.mp3" data-start="51.6667" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio data-hf-id="hf-lr1l" id="sfx-line-19" src="public/sfx/click-soft.mp3" data-start="54.5000" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio data-hf-id="hf-pp5o" id="sfx-line-b-19" src="public/sfx/sub-hit.mp3" data-start="54.5000" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio data-hf-id="hf-lo1l" id="sfx-line-20" src="public/sfx/tick.mp3" data-start="63.8667" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio data-hf-id="hf-58b1" id="sfx-line-21" src="public/sfx/tick.mp3" data-start="77.1000" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio data-hf-id="hf-pyn4" id="sfx-line-22" src="public/sfx/click-soft.mp3" data-start="80.4333" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio data-hf-id="hf-3v8z" id="sfx-line-b-22" src="public/sfx/sub-hit.mp3" data-start="80.4333" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio data-hf-id="hf-lpug" id="sfx-line-23" src="public/sfx/tick.mp3" data-start="83.8667" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio data-hf-id="hf-veoq" id="sfx-line-24" src="public/sfx/click-soft.mp3" data-start="86.4667" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio data-hf-id="hf-7vkp" id="sfx-line-b-24" src="public/sfx/sub-hit.mp3" data-start="86.4667" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio data-hf-id="hf-qkb2" id="sfx-line-25" src="public/sfx/tick.mp3" data-start="99.1667" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio data-hf-id="hf-ya2h" id="sfx-line-26" src="public/sfx/click-soft.mp3" data-start="102.6333" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio data-hf-id="hf-pn9a" id="sfx-line-b-26" src="public/sfx/sub-hit.mp3" data-start="102.6333" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio data-hf-id="hf-lwdo" id="sfx-hero-whoosh" src="public/sfx/whoosh-short.mp3" data-start="37.0333" data-duration="0.3667" data-track-index="23" data-volume="0.18"></audio>
+      <audio data-hf-id="hf-jcp1" id="sfx-hero-hit" src="public/sfx/sub-hit.mp3" data-start="37.1000" data-duration="0.2667" data-track-index="25" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-ql23" id="sfx-drone-whoosh" src="public/sfx/whoosh-long.mp3" data-start="86.0000" data-duration="0.4667" data-track-index="26" data-volume="0.14"></audio>
+      <audio data-hf-id="hf-zb1r" id="sfx-drone-tick" src="public/sfx/tick.mp3" data-start="86.0667" data-duration="0.1333" data-track-index="26" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-osm5" id="sfx-whip-gold" src="public/sfx/whoosh-long.mp3" data-start="13.8000" data-duration="0.2667" data-track-index="24" data-volume="0.10"></audio>
+      <audio data-hf-id="hf-g52k" id="sfx-whip-market" src="public/sfx/whoosh-long.mp3" data-start="99.5000" data-duration="0.2667" data-track-index="24" data-volume="0.10"></audio>
+      <audio data-hf-id="hf-z2b5" id="sfx-count-1" src="public/sfx/ui-confirm.mp3" data-start="68.0000" data-duration="0.2333" data-track-index="19" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-3dcb" id="sfx-count-2" src="public/sfx/ui-confirm.mp3" data-start="74.7333" data-duration="0.2333" data-track-index="19" data-volume="0.12"></audio>
+      <audio data-hf-id="hf-nonn" id="sfx-ig-a" src="public/sfx/swoosh-up.mp3" data-start="90.5000" data-duration="0.4333" data-track-index="20" data-volume="0.13"></audio>
+      <audio data-hf-id="hf-7xe6" id="sfx-ig-b" src="public/sfx/swoosh-up.mp3" data-start="108.9000" data-duration="0.4333" data-track-index="20" data-volume="0.13"></audio>
+      <script src="public/vendor/gsap.min.js"></script>
+      <script>
+
+        (function(){
+          const tl = window.gsap.timeline({paused:true});
+          const cam = "#video-cam";
+          function punchHold(t, hold, scale){
+            var sc = scale || 1.12;
+            tl.set(cam, {scale:sc, immediateRender:false}, t);
+            tl.to(cam, {scale:1, duration:0.48, ease:"power2.inOut"}, t+hold);
+          }
+          function enterMode(host){
+            var forced = host.getAttribute("data-enter");
+            if(forced) return forced;
+            var root = host.querySelector(".root");
+            if(!root) return "pop";
+            if(root.classList.contains("hook")) return "slam";
+            if(root.classList.contains("punch") || root.querySelector(".warn-badge")) return "glitch";
+            if(root.classList.contains("slim")) return "soft";
+            if(root.classList.contains("levels") || root.classList.contains("graph-card")) return "tilt";
+            if(root.classList.contains("stats")) return "wipe";
+            return "pop";
+          }
+          var ENTER_POOL = ["slam","soft","glitch","tilt","wipe","pop","rise","flip","snap","drift","zoom","fold"];
+          var enterUsed = {};
+          function uniqueEnter(host, idx){
+            var forced = host.getAttribute("data-enter");
+            if(forced && !enterUsed[forced]){
+              enterUsed[forced] = 1;
+              return forced;
+            }
+            for(var i=0;i<ENTER_POOL.length;i++){
+              var m = ENTER_POOL[(idx+i) % ENTER_POOL.length];
+              if(!enterUsed[m]){
+                enterUsed[m] = 1;
+                host.setAttribute("data-enter", m);
+                return m;
+              }
+            }
+            return forced || ENTER_POOL[idx % ENTER_POOL.length];
+          }
+          function exitMode(host){
+            var forced = host.getAttribute("data-exit");
+            if(forced) return forced;
+            var mode = host.getAttribute("data-enter") || enterMode(host);
+            if(mode === "soft" || mode === "wipe" || mode === "drift") return "fade";
+            if(mode === "glitch" || mode === "slam" || mode === "snap" || mode === "zoom") return "scale";
+            if(mode === "tilt" || mode === "flip" || mode === "fold") return "slide";
+            return "fade";
+          }
+          function exitCard(fxSel, host, tEnd){
+            var mode = exitMode(host);
+            var t = tEnd - 0.34;
+            if(t < (parseFloat(host.getAttribute("data-start")) || 0) + 0.5) return;
+            if(mode === "scale"){
+              tl.to(fxSel,{opacity:0,scale:0.88,y:-16,duration:0.32,ease:"power2.in"}, t);
+            } else if(mode === "slide"){
+              tl.to(fxSel,{opacity:0,x:48,rotateY:8,duration:0.34,ease:"power2.in"}, t);
+            } else {
+              tl.to(fxSel,{opacity:0,y:-8,duration:0.3,ease:"power1.in"}, t);
+            }
+          }
+          function progressCard(fxSel, t, dur, mode){
+            if(dur < 2.2) return;
+            var mid = t + Math.min(dur * 0.4, 2.8);
+            if(mode === "tilt" || mode === "flip" || mode === "fold"){
+              tl.to(fxSel,{rotateY:7,duration:Math.min(dur*0.35,2.2),ease:"sine.inOut",yoyo:true,repeat:1}, mid);
+            } else if(mode === "drift" || mode === "soft" || mode === "rise"){
+              tl.to(fxSel,{y:-12,duration:Math.min(dur*0.4,2.4),ease:"sine.inOut",yoyo:true,repeat:1}, t+0.55);
+            } else if(mode === "wipe" || mode === "zoom" || mode === "pop"){
+              tl.to(fxSel,{scale:1.035,duration:0.85,ease:"sine.inOut",yoyo:true,repeat:1}, mid);
+            } else if(mode === "slam" || mode === "snap" || mode === "glitch"){
+              tl.to(fxSel,{x:6,duration:0.35,ease:"sine.inOut",yoyo:true,repeat:1}, mid);
+            }
+          }
+          /* Motion on .card-fx / accents only — never .card-host (Studio left/top). */
+          function popCard(fxSel, t, mode){
+            var from, to;
+            if(mode === "slam"){
+              from = {opacity:0,y:48,scale:1.22,rotateX:0,rotateZ:0};
+              to = {opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,duration:0.4,ease:"back.out(2.1)",immediateRender:false};
+            } else if(mode === "soft"){
+              from = {opacity:0,y:14,scale:0.98,rotateX:4,rotateZ:0};
+              to = {opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,duration:0.5,ease:"power2.out",immediateRender:false};
+            } else if(mode === "glitch"){
+              from = {opacity:0,y:10,scale:0.94,rotateX:6,rotateZ:-2,x:-16};
+              to = {opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,x:0,duration:0.42,ease:"power3.out",immediateRender:false};
+            } else if(mode === "tilt"){
+              from = {opacity:0,y:20,scale:0.92,rotateY:-18,rotateX:6};
+              to = {opacity:1,y:0,scale:1,rotateY:0,rotateX:0,duration:0.55,ease:"power3.out",immediateRender:false};
+            } else if(mode === "wipe"){
+              from = {opacity:0,y:0,scale:1,rotateX:0,clipPath:"inset(0 0 100% 0)"};
+              to = {opacity:1,y:0,scale:1,rotateX:0,clipPath:"inset(0 0 0% 0)",duration:0.48,ease:"power2.inOut",immediateRender:false};
+            } else if(mode === "rise"){
+              from = {opacity:0,y:60,scale:0.9,rotateX:12};
+              to = {opacity:1,y:0,scale:1,rotateX:0,duration:0.55,ease:"power3.out",immediateRender:false};
+            } else if(mode === "flip"){
+              from = {opacity:0,rotateY:85,scale:0.88};
+              to = {opacity:1,rotateY:0,scale:1,duration:0.58,ease:"power3.out",immediateRender:false};
+            } else if(mode === "snap"){
+              from = {opacity:0,scale:1.35,y:-8};
+              to = {opacity:1,scale:1,y:0,duration:0.32,ease:"back.out(2.4)",immediateRender:false};
+            } else if(mode === "drift"){
+              from = {opacity:0,x:-40,y:10,rotateZ:-3};
+              to = {opacity:1,x:0,y:0,rotateZ:0,duration:0.6,ease:"power2.out",immediateRender:false};
+            } else if(mode === "zoom"){
+              from = {opacity:0,scale:0.55,rotateX:8};
+              to = {opacity:1,scale:1,rotateX:0,duration:0.5,ease:"power4.out",immediateRender:false};
+            } else if(mode === "fold"){
+              from = {opacity:0,rotateX:70,y:-24};
+              to = {opacity:1,rotateX:0,y:0,duration:0.52,ease:"power3.out",immediateRender:false};
+            } else {
+              from = {opacity:0,y:36,scale:0.88,rotateX:10,rotateZ:-1.2};
+              to = {opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,duration:0.52,ease:"power3.out",immediateRender:false};
+            }
+            tl.fromTo(fxSel, from, to, t);
+            var host = document.querySelector(fxSel);
+            if(!host) return;
+            var accent = host.querySelector(".card-accent");
+            var sheen = host.querySelector(".card-sheen");
+            var warn = host.querySelector(".warn-badge");
+            var ring = host.querySelector(".warn-ring");
+            var chapter = host.querySelector(".chapter");
+            var quote = host.querySelector(".quote-mark");
+            if(accent){
+              tl.fromTo(accent,{scaleY:0},{scaleY:1,duration:0.55,ease:"power3.out",immediateRender:false}, t+0.04);
+            }
+            if(sheen){
+              tl.fromTo(sheen,{x:-520,opacity:0},{x:900,opacity:1,duration:0.6,ease:"power2.out",immediateRender:false}, t+0.08);
+              tl.to(sheen,{opacity:0,duration:0.22,ease:"power1.in"}, t+0.62);
+            }
+            if(warn){
+              tl.fromTo(warn,{opacity:0,scale:0.45,rotation:-40},{opacity:1,scale:1,rotation:0,duration:0.48,ease:"back.out(2)",immediateRender:false}, t+0.1);
+              tl.to(warn,{scale:1.08,duration:0.18,yoyo:true,repeat:1,ease:"power1.inOut"}, t+0.55);
+            }
+            if(ring){
+              var end = t + (parseFloat(host.closest(".card-host").getAttribute("data-duration")) || 4);
+              tl.fromTo(ring,{rotation:0},{rotation:720,duration:Math.max(3, end-t),ease:"none",immediateRender:false}, t+0.18);
+            }
+            if(chapter){
+              tl.fromTo(chapter,{opacity:0,x:-18},{opacity:1,x:0,duration:0.36,ease:"power3.out",immediateRender:false}, t+0.06);
+            }
+            if(quote){
+              tl.fromTo(quote,{opacity:0,scale:0.6},{opacity:1,scale:1,duration:0.4,ease:"back.out(1.8)",immediateRender:false}, t+0.08);
+            }
+          }
+          function countNum(el, t, end, dur, decimals){
+            var obj = {v:0};
+            tl.to(obj, {
+              v:end,
+              duration:dur,
+              ease:"power2.out",
+              onUpdate:function(){
+                if(!el) return;
+                var n = decimals ? obj.v.toFixed(decimals) : String(Math.round(obj.v));
+                el.textContent = n.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+              }
+            }, t);
+          }
+          document.querySelectorAll(".cap-item").forEach(function(el){
+            var s = parseFloat(el.getAttribute("data-cap-start"));
+            var e = parseFloat(el.getAttribute("data-cap-end"));
+            tl.set(el, {autoAlpha:1}, s);
+            var kws = el.querySelectorAll(".cap-kw");
+            kws.forEach(function(kw, i){
+              tl.fromTo(kw,{scale:1,filter:"brightness(1)"},{scale:1.14,filter:"brightness(1.25)",duration:0.22,yoyo:true,repeat:1,ease:"power2.out",immediateRender:false}, s+0.06+i*0.05);
+            });
+            tl.set(el, {autoAlpha:0}, e);
+          });
+
+
+          tl.fromTo("#broll-gold-cam",{opacity:0,x:140,scale:1.14},{opacity:1,x:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}, 13.8);
+          tl.to("#broll-gold-cam",{opacity:0,x:-100,scale:1.06,duration:0.3,ease:"power2.in"}, 21.50);
+          tl.fromTo("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0},{scale:0.30,x:-350,y:-20,borderRadius:"36px",rotation:-1.5,duration:0.36,ease:"power3.inOut",immediateRender:false}, 13.8);
+          tl.to("#video-wrap",{rotation:0,duration:0.2,ease:"power1.out"}, 14.16);
+          tl.to("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,duration:0.36,ease:"power3.inOut"}, 21.44);
+
+          tl.fromTo("#broll-market-cam",{opacity:0,x:140,scale:1.14},{opacity:1,x:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}, 99.5);
+          tl.to("#broll-market-cam",{opacity:0,x:-100,scale:1.06,duration:0.3,ease:"power2.in"}, 107.20);
+          tl.fromTo("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0},{scale:0.30,x:-350,y:-20,borderRadius:"36px",rotation:-1.5,duration:0.36,ease:"power3.inOut",immediateRender:false}, 99.5);
+          tl.to("#video-wrap",{rotation:0,duration:0.2,ease:"power1.out"}, 99.86);
+          tl.to("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,duration:0.36,ease:"power3.inOut"}, 107.14);
+
+          punchHold(8.9, 7.5, 1.14);
+          punchHold(36.26, 7.5, 1.1);
+          punchHold(52.44, 8.0, 1.16);
+          punchHold(99.38, 7.0, 1.12);
+
+          (function(){
+            var heroHost = document.getElementById("card-split-host");
+            if(!heroHost) return;
+            var fx = heroHost.querySelector(".card-fx");
+            if(!fx || !fx.id) return;
+            var ht = 37.04;
+            var sel = "#"+fx.id;
+            /* Mid-card hero 3D flourish (enter still runs at card start) */
+            tl.to(sel,{rotateY:-42,rotateX:10,scale:0.94,duration:0.26,ease:"power2.in"}, ht);
+            tl.to(sel,{rotateY:0,rotateX:0,scale:1,duration:0.62,ease:"power4.out"}, ht+0.26);
+          })();
+
+
+          (function(){
+            var st = 86.0, sd = 1.6;
+            var cardId = "why";
+            var fx = null;
+            if(cardId){
+              var host = document.getElementById("card-"+cardId+"-host");
+              if(host) fx = host.querySelector(".card-fx");
+            }
+            if(!fx){
+              document.querySelectorAll(".card-host").forEach(function(h){
+                if(fx) return;
+                var s = parseFloat(h.getAttribute("data-start"))||0;
+                var d = parseFloat(h.getAttribute("data-duration"))||0;
+                if(st >= s && st <= s+d) fx = h.querySelector(".card-fx");
+              });
+            }
+            if(!fx || !fx.id) return;
+            var sel = "#"+fx.id;
+            var up = Math.max(0.5, sd * 0.4);
+            var down = Math.max(0.55, sd - up);
+            /* Visible "drone" on card: pull back in Z / scale, then return */
+            tl.to(sel,{scale:0.68,y:-90,rotateX:18,rotateY:-22,z:-120,duration:up,ease:"power2.inOut"}, st);
+            tl.to(sel,{scale:1,y:0,rotateX:0,rotateY:0,z:0,duration:down,ease:"power3.out"}, st+up);
+          })();
+
+          var cardIdx = 0;
+          document.querySelectorAll(".card-host").forEach(function(host){
+            var t = parseFloat(host.getAttribute("data-start")) || 0;
+            var dur = parseFloat(host.getAttribute("data-duration")) || 4;
+            var fx = host.querySelector(".card-fx");
+            if(fx && fx.id){
+              var mode = uniqueEnter(host, cardIdx++);
+              popCard("#"+fx.id, t, mode);
+              progressCard("#"+fx.id, t, dur, mode);
+              exitCard("#"+fx.id, host, t + dur);
+            } else {
+              var ban = host.querySelector(".banner");
+              if(ban && ban.id){
+                tl.fromTo("#"+ban.id,{opacity:0,y:18,scale:0.98},{opacity:1,y:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}, t);
+              }
+            }
+          });
+          document.querySelectorAll("[data-at]").forEach(function(el){
+            if(el.classList.contains("banner")) return;
+            var t = parseFloat(el.getAttribute("data-at"));
+            var kind = el.getAttribute("data-in") || "";
+            if(kind === "back"){
+              tl.fromTo(el,{opacity:0,scale:0.82,y:22,rotateZ:-2},{opacity:1,scale:1,y:0,rotateZ:0,duration:0.5,ease:"back.out(1.8)",immediateRender:false}, t);
+            } else if(kind === "drop"){
+              tl.fromTo(el,{opacity:0,y:-18,scale:0.96},{opacity:1,y:0,scale:1,duration:0.34,ease:"power3.out",immediateRender:false}, t);
+            } else if(kind === "spin"){
+              tl.fromTo(el,{opacity:0,scale:0.7,rotation:-18,y:10},{opacity:1,scale:1,rotation:0,y:0,duration:0.4,ease:"back.out(1.9)",immediateRender:false}, t);
+            } else if(kind === "slam"){
+              tl.fromTo(el,{opacity:0,scale:1.28,y:28},{opacity:1,scale:1,y:0,duration:0.36,ease:"back.out(2.2)",immediateRender:false}, t);
+            } else {
+              tl.fromTo(el,{opacity:0,y:18,scale:0.96},{opacity:1,y:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}, t);
+            }
+          });
+          document.querySelectorAll("[data-out]").forEach(function(el){
+            var kind = el.getAttribute("data-out-kind") || "fade";
+            var t = parseFloat(el.getAttribute("data-out"));
+            if(kind === "scale") tl.to(el,{opacity:0,scale:0.9,duration:0.28,ease:"power2.in"}, t);
+            else tl.to(el,{opacity:0,duration:0.22,ease:"power2.in"}, t);
+          });
+          document.querySelectorAll("[data-count]").forEach(function(el){
+            var t = parseFloat(el.getAttribute("data-count-at") || "0");
+            var end = parseFloat(el.getAttribute("data-count"));
+            var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+            var dur = parseFloat(el.getAttribute("data-count-dur") || "1");
+            el.textContent = decimals ? (0).toFixed(decimals) : "0";
+            countNum(el, t, end, dur, decimals);
+            if(el.hasAttribute("data-scale-in")){
+              tl.fromTo(el,{scale:0.78},{scale:1,duration:dur,ease:"power2.out",immediateRender:false}, t);
+            }
+          });
+          document.querySelectorAll("path[data-draw]").forEach(function(path){
+            var t = parseFloat(path.getAttribute("data-draw-at") || "0");
+            var len = path.getTotalLength();
+            tl.set(path,{strokeDasharray:len,strokeDashoffset:len}, Math.max(0, t-0.15));
+            tl.to(path,{strokeDashoffset:0,duration:1.85,ease:"power2.inOut"}, t);
+          });
+          document.querySelectorAll("[data-fill]").forEach(function(el){
+            var t = parseFloat(el.getAttribute("data-fill-at") || "0");
+            var v = parseFloat(el.getAttribute("data-fill"));
+            tl.fromTo(el,{scaleX:0},{scaleX:v,duration:0.75,ease:"power3.out",immediateRender:false}, t);
+          });
+          var punches = [[8.9, 7.5], [36.26, 7.5], [52.44, 8.0], [99.38, 7.0]];
+          punches.forEach(function(p){
+            var t = p[0];
+            document.querySelectorAll(".cap-item").forEach(function(el){
+              var s = parseFloat(el.getAttribute("data-cap-start"));
+              var e = parseFloat(el.getAttribute("data-cap-end"));
+              if(!(s <= t && e >= t)) return;
+              var bot = el.querySelector(".cap-bot");
+              if(!bot) return;
+              tl.fromTo(bot,{scale:1},{scale:1.06,duration:0.28,yoyo:true,repeat:1,ease:"power1.inOut",immediateRender:false}, t);
+              tl.set("#card-hook-root", { width: 607, height: 198, immediateRender: true }, 0);
+              gsap.set("#card-hook-root", { x: 313, y: 1241 });
+              gsap.set("#cap-003-top", { x: -10, y: -1066 });
+              gsap.set("#cap-002", { x: -20, y: -1040 });
+              gsap.set("#caption-host", { x: 0, y: -134 }, 0);
+              gsap.set("#card-ask-root", { x: 40, y: -109 });
+              gsap.set("#card-split-root", { x: 152, y: 1194 });
+              tl.set("#card-split-root", { width: 694, height: 422, immediateRender: true }, 0);
+              gsap.set("#cap-000", { x: 0, y: 124 });
+              gsap.set("#cap-006", { x: 0, y: 194 });
+              gsap.set("#cap-013", { x: 0, y: 114 });
+              gsap.set("#cap-015", { x: 0, y: 104 });
+              gsap.set("#cap-016", { x: 0, y: 84 });
+              gsap.set("#cap-018", { x: -8, y: 208 });
+              gsap.set("#bg-video", { x: 15, y: 0 });
+              gsap.set("#cap-017", { x: 0, y: 225 });
+              gsap.set("#cap-019", { x: 4, y: 168 });
+              gsap.set("#cap-021", { x: 0, y: 122 });
+              gsap.set("#cap-022", { x: 0, y: 103 });
+              gsap.set("#cap-023", { x: 20, y: 141 });
+              gsap.set("#cap-024", { x: 2, y: 86 });
+              gsap.set("#cap-025", { x: 0, y: 114 });
+              gsap.set("#cap-026", { x: 0, y: 160 });
+              gsap.set("#cap-027", { x: 0, y: 195 });
+              gsap.set("#card-rule-root", { x: 0, y: -94 });
+              gsap.set("#cap-029", { x: 0, y: 199 });
+              gsap.set("#cap-030", { x: 0, y: 233 });
+              gsap.set("#cap-032", { x: -8, y: 160 });
+              gsap.set("#card-need-root", { x: 107, y: 1091 });
+              tl.set("#card-need-root", { width: 855, height: 408, immediateRender: true }, 0);
+              gsap.set("#cap-035", { x: 0, y: 129 });
+              gsap.set("#cap-033", { x: 0, y: 209 });
+              gsap.set("#cap-034", { x: 20, y: 41 });
+              gsap.set("#cap-036", { x: 2, y: 119 });
+              gsap.set("#cap-037", { x: 2, y: 199 });
+              gsap.set("#cap-038", { x: 2, y: 129 });
+              gsap.set("[data-hf-id=\"hf-pxvy\"]", { x: 25, y: 0 });
+              gsap.set("#cap-032-top", { x: 36, y: -36 });
+              gsap.set("#cap-032-bot", { x: 36, y: -7 });
+              gsap.set("#cap-033-top", { x: 13, y: -85 });
+              gsap.set("#cap-033-bot", { x: 13, y: -45 });
+              gsap.set("[data-hf-id=\"hf-pxvy\"]", { x: -14, y: -1071 });
+              gsap.set("[data-hf-id=\"hf-2sd6\"]", { x: 16, y: -1035 });
+              gsap.set("#cap-034-bot", { x: -20, y: -173 });
+              gsap.set("#cap-035-top", { x: -28, y: -1102 });
+              gsap.set("#cap-035-bot", { x: -10, y: -235 });
+              gsap.set("[data-hf-id=\"hf-lwmc\"]", { x: -20, y: 0 });
+              gsap.set("#cap-031", { x: 20, y: 124 });
+              gsap.set("#cap-039", { x: 5, y: 194 });
+              gsap.set("#card-rate-root", { x: 50, y: -94 });
+              gsap.set("#cap-040", { x: 5, y: 219 });
+              gsap.set("#card-why-root", { x: 40, y: -134 });
+              gsap.set("#cap-041", { x: 5, y: 160 });
+              gsap.set("#cap-042", { x: 15, y: 119 });
+              gsap.set("#cap-048", { x: 5, y: 129 });
+              gsap.set("#card-bist-root", { x: 0, y: -79 });
+              gsap.set("#cap-049", { x: 0, y: 197 });
+              gsap.set("#cap-050", { x: -10, y: 197 });
+              gsap.set("#cap-051", { x: 8, y: 197 });
+              gsap.set("#cap-052", { x: 8, y: 197 });
+              gsap.set("#cap-053", { x: 5, y: 204 });
+              gsap.set("#cap-054", { x: 0, y: 160 });
+              gsap.set("#cap-055", { x: 15, y: 160 });
+              gsap.set("#cap-056", { x: 0, y: 119 });
+            });
+          });
+          window.__timelines["talking-head-recut"] = tl;
+        })();
+
+      </script>
+    </div>
+  </body>
+</html>

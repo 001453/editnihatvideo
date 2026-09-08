@@ -1,0 +1,45 @@
+---
+description: Nihat/Mehmet 9:16 talking-head — every new video is packaged like 0907 (analyze, then new cards/b-roll; same flow)
+alwaysApply: true
+---
+
+# Video pipeline
+
+9:16, 1080×1920. Human control in `editor.html`. Render HyperFrames `0.8.30`.
+
+**Show locked:** transparent cards, unique enter/exit per card, keyword caption pop, max 2×8s b-roll whip, PIP left, 1 hero 3D, ≤1 special moment (drone/crash/mockup…). See `shared/SHOW_STANDARD.md`. Topic copy only — never reuse 0907 text.
+
+**0907 is the show bible.** Every new talking-head gets the same flow. The agent analyzes this video's transcript and writes **new** cards and b-roll for this topic. Do not leave empty `cards.html`.
+
+On new source / `project.json` ready: follow the package-nihat-video skill at the workspace `.cursor/skills/package-nihat-video/SKILL.md` and `shared/show-flow.json`. Clone card HTML structure from `videos/0907/cards.html`.
+
+## New video
+
+```
+python scripts/new_video.py 0910 --source "D:\path.mp4" --account nihat
+```
+
+Human: editor → `project.json` (cuts + captions).
+
+Agent: read transcript → plan beats → `cards.html` + `public/broll` + `timeline.json` → `build_composition.py` → tell user Ctrl+F5 → draft then high render.
+
+## Locked
+
+- Captions: one `#caption-host`, Anton 3D. Top solid white. Bottom carries tone + 3D (Nihat yellow/red/green, Mehmet white). Tone on `.cap-item`. No 72 caption clips. No `paintCap` onUpdate. No full-frame video darkening.
+- Layout: face full-bleed; **cards in top band**; captions mid-lower; IG right rail clear; PIP **left**.
+- Talking-head: unmuted `<video data-has-audio="true">`. No second VO from the same file.
+- `#overlays` has no `data-start`. Root clips `top:0;left:0`. Cards nested in untimed `#overlays`.
+- IG follow banner: PNG only, no banner `m4a`. Exclusive window. Default ~24s and ~11s before end, 2.3s.
+- Punch: hold then ease out. Soft `click-soft` + `sub-hit` on zoom in; click out. Scales 1.10–1.16.
+- Cards: **transparent glass** (no heavy black plate). Unique `data-enter` per card from pool slam/soft/glitch/tilt/wipe/pop/rise/flip/snap/drift/zoom/fold + matching exit + mid-hold progress motion. One hero 3D per video.
+- Captions: Anton 3D + **keyword pop** (`.cap-kw` scale/brightness on emphasis words/numbers).
+- B-roll: muted 9:16, **max 2×8s**, PIP left, whip + whoosh. Labs prompts in `public/broll/LABS_PROMPTS.md`.
+- Disclaimer: transparent, centered **YATIRIM TAVSİYESİ DEĞİL** only, bottom (~y1580), no NİHAT plate.
+- Standard notes: `shared/SHOW_STANDARD.md` + `shared/show-flow.json`.
+- After rebuild: rewrite `index.html` from the builder; tell user Ctrl+F5.
+- Do not use `C:\Users\nihat\Downloads\project.json` (old C0082).
+- NVENC unavailable here; encode with libx264 GOP 15. `--gpu` will not help.
+
+## Per video (content only)
+
+Cuts, caption times, card copy, b-roll files, punch times. Look stays in `shared/`.

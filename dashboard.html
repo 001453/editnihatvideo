@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nihat Pipeline</title>
+<style>
+  :root{
+    --bg0:#0a0b0e; --bg1:#12141a; --line:#2a2f3a;
+    --text:#f2f0ea; --muted:#9a9aaa; --gold:#e2b84a; --ok:#5dcc8a; --bad:#ff5c5c;
+    --display:"Segoe UI Semibold","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(226,184,74,.14), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(90,176,255,.08), transparent 50%),
+    linear-gradient(180deg,var(--bg0),var(--bg1));
+    color:var(--text);font-family:var(--display);}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 22px 80px;}
+  .brand{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0 0 10px;}
+  h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;margin:0 0 12px;font-weight:750;letter-spacing:-.03em;}
+  .lead{color:var(--muted);font-size:1.05rem;line-height:1.5;margin:0 0 36px;max-width:40rem;}
+  .steps{display:grid;gap:14px;}
+  .step{
+    background:rgba(23,26,34,.92);border:1px solid var(--line);border-radius:18px;
+    padding:18px;display:grid;gap:12px;box-shadow:0 18px 40px rgba(0,0,0,.28);
+  }
+  .top{display:flex;align-items:baseline;gap:12px;}
+  .n{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+    background:rgba(226,184,74,.12);border:1px solid rgba(226,184,74,.45);color:var(--gold);font-size:13px;font-weight:700;}
+  .title{font-size:1.05rem;font-weight:700;margin:0;}
+  .hint{color:var(--muted);font-size:.9rem;margin:0;line-height:1.4;}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
+  input,select{
+    width:100%;background:#0d0f14;border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:11px 12px;font-size:14px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:720px){.grid2{grid-template-columns:1fr;}}
+  .drop{
+    border:2px dashed rgba(226,184,74,.35);border-radius:16px;padding:28px 18px;text-align:center;
+    background:rgba(13,15,20,.65);cursor:pointer;transition:border-color .15s, background .15s;
+  }
+  .drop.over{border-color:var(--gold);background:rgba(226,184,74,.08);}
+  .drop strong{display:block;font-size:1.05rem;margin-bottom:6px;}
+  .drop span{color:var(--muted);font-size:.9rem;}
+  .file-name{margin-top:8px;color:var(--gold);font-size:13px;word-break:break-all;}
+  button{
+    border:1px solid var(--line);background:#12151c;color:var(--text);
+    border-radius:12px;padding:12px 16px;font-size:14px;font-weight:650;cursor:pointer;
+  }
+  button:hover{border-color:var(--gold);}
+  button.primary{background:linear-gradient(180deg,#f0d06a,#c99620);color:#1a1406;border-color:#e2b84a;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .log{
+    font-family:ui-monospace,Consolas,monospace;font-size:11.5px;line-height:1.45;
+    background:#0a0c10;border:1px solid var(--line);border-radius:12px;padding:12px;
+    min-height:110px;max-height:240px;overflow:auto;color:#b9c0d0;white-space:pre-wrap;
+  }
+  .status{font-size:13px;color:var(--muted);}
+  .status.ok{color:var(--ok);} .status.err{color:var(--bad);} .status.run{color:var(--gold);}
+  .prompt-box{
+    background:#0a0c10;border:1px dashed rgba(226,184,74,.45);border-radius:12px;
+    padding:12px;font-size:13.5px;line-height:1.45;color:#f0e6c8;
+  }
+  .list{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted);cursor:pointer;background:transparent;}
+  .chip:hover{border-color:var(--gold);color:var(--gold);}
+  .foot{margin-top:28px;color:var(--muted);font-size:12.5px;line-height:1.5;}
+  #fileInput{display:none;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="brand">Nihat · Mehmet</p>
+    <h1>Video pipeline</h1>
+    <p class="lead">MP4’ü sürükle → transcript → Cursor’da tek cümle paketle → Studio. Yol yazmana gerek yok. Çözünürlük bozulmaz; hızlı draft encode, yüksek kalite son render’da.</p>
+
+    <div class="steps">
+      <section class="step">
+        <div class="top"><span class="n">1</span><h2 class="title">Video hazırla</h2></div>
+        <p class="hint">Kanca kesilmiş temiz sesli 9:16 MP4. Kutuya bırak veya tıkla. ID kısa olsun: <b>0910</b> (dosya adı değil).</p>
+
+        <div class="drop" id="drop" tabindex="0">
+          <strong>MP4 sürükle-bırak</strong>
+          <span>veya tıkla · dosya seç</span>
+          <div class="file-name" id="fileLabel">dosya seçilmedi</div>
+        </div>
+        <input id="fileInput" type="file" accept="video/mp4,video/quicktime,video/*" />
+
+        <div class="grid2">
+          <div>
+            <label>Video ID</label>
+            <input id="vid" type="text" placeholder="0910" />
+          </div>
+          <div>
+            <label>Hesap</label>
+            <select id="account"><option value="nihat">Nihat</option><option value="mehmet">Mehmet</option></select>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="primary" id="btnPrepare">Hazırla (encode + transcript)</button>
+          <span class="status" id="stPrepare">bekliyor</span>
+        </div>
+        <div class="log" id="log"></div>
+      </section>
+
+      <section class="step">
+        <div class="top"><span class="n">2</span><h2 class="title">Özelleştir (kart + b-roll)</h2></div>
+        <p class="hint">Cümleyi kopyala → Cursor chat. Soru sormadan paketlesin.</p>
+        <div class="prompt-box" id="prompt">Önce adım 1’i bitir.</div>
+        <div class="row"><button id="btnCopy">Cümleyi kopyala</button></div>
+      </section>
+
+      <section class="step">
+        <div class="top"><span class="n">3</span><h2 class="title">HyperFrames aç</h2></div>
+        <p class="hint">Alttaki siyah şerit Studio play çubuğu — videonun parçası değil.</p>
+        <div class="row">
+          <button class="primary" id="btnStudio">Studio’yu aç</button>
+          <span class="status" id="stStudio"></span>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="top"><span class="n">•</span><h2 class="title">Mevcut videolar</h2></div>
+        <div class="list" id="list"></div>
+      </section>
+    </div>
+
+    <p class="foot">
+      Başlat: <code>py -3.12 scripts\dashboard_server.py</code> · sayfayı yenile (Ctrl+F5)
+    </p>
+  </div>
+<script>
+let pickedFile = null;
+let pollTimer = null;
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('fileInput');
+const fileLabel = document.getElementById('fileLabel');
+const logEl = document.getElementById('log');
+const stPrepare = document.getElementById('stPrepare');
+const promptEl = document.getElementById('prompt');
+
+function setStatus(el, text, cls){
+  el.textContent = text;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+function suggestId(name){
+  const m = String(name||'').match(/(\d{3,4})/);
+  if (m) return m[1];
+  const d = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return mm + dd;
+}
+function takeFile(f){
+  if (!f) return;
+  if (!/\.(mp4|mov|m4v|webm)$/i.test(f.name)) {
+    alert('MP4 / MOV seç');
+    return;
+  }
+  pickedFile = f;
+  fileLabel.textContent = f.name + ' · ' + Math.round(f.size/1024/1024) + ' MB';
+  const vid = document.getElementById('vid');
+  if (!vid.value.trim()) vid.value = suggestId(f.name);
+}
+
+drop.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => takeFile(fileInput.files[0]));
+['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.add('over');
+}));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.remove('over');
+}));
+drop.addEventListener('drop', e => {
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  takeFile(f);
+});
+
+async function refreshList(){
+  const r = await fetch('/api/videos');
+  const data = await r.json();
+  const box = document.getElementById('list');
+  box.innerHTML = '';
+  (data.videos || []).forEach(v => {
+    const c = document.createElement('button');
+    c.className = 'chip';
+    c.type = 'button';
+    c.textContent = v.id + (v.package_me ? ' · paketle' : '') + (v.has_video ? '' : ' · boş');
+    c.onclick = () => { document.getElementById('vid').value = v.id; };
+    box.appendChild(c);
+  });
+}
+
+async function poll(vid){
+  clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    const r = await fetch('/api/status/' + encodeURIComponent(vid));
+    const j = await r.json();
+    if (j.log) {
+      logEl.textContent = j.log.join('\n');
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+    if (j.status === 'running' || j.status === 'queued') setStatus(stPrepare, 'çalışıyor…', 'run');
+    if (j.status === 'ready') {
+      setStatus(stPrepare, 'hazır', 'ok');
+      if (j.prompt) promptEl.textContent = j.prompt;
+      clearInterval(pollTimer);
+      refreshList();
+    }
+    if (j.status === 'error') {
+      setStatus(stPrepare, 'hata', 'err');
+      clearInterval(pollTimer);
+    }
+  }, 1200);
+}
+
+document.getElementById('btnPrepare').onclick = async () => {
+  let id = document.getElementById('vid').value.trim().replace(/\.mp4$/i,'');
+  id = id.replace(/[^\w\-]+/g,'');
+  document.getElementById('vid').value = id;
+  const account = document.getElementById('account').value;
+  if (!id) { alert('Video ID yaz (örn: 0910)'); return; }
+  if (!pickedFile) { alert('Önce MP4 sürükle veya seç'); return; }
+
+  logEl.textContent = 'yükleniyor…';
+  setStatus(stPrepare, 'yükleniyor…', 'run');
+  const fd = new FormData();
+  fd.append('id', id);
+  fd.append('account', account);
+  fd.append('file', pickedFile, pickedFile.name);
+
+  const r = await fetch('/api/upload-prepare', { method: 'POST', body: fd });
+  const j = await r.json();
+  if (!r.ok) {
+    setStatus(stPrepare, j.error || 'hata', 'err');
+    logEl.textContent = j.error || 'hata';
+    return;
+  }
+  logEl.textContent = 'sunucuya indi, encode + transcript başlıyor…';
+  poll(j.id || id);
+};
+
+document.getElementById('btnCopy').onclick = async () => {
+  await navigator.clipboard.writeText(promptEl.textContent.trim());
+  setStatus(stPrepare, 'kopyalandı — Cursor’a yapıştır', 'ok');
+};
+
+document.getElementById('btnStudio').onclick = async () => {
+  const id = document.getElementById('vid').value.trim().replace(/\.mp4$/i,'');
+  if (!id) { alert('Video ID yaz'); return; }
+  const r = await fetch('/api/studio', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({id})
+  });
+  const j = await r.json();
+  document.getElementById('stStudio').textContent = j.msg || '';
+  document.getElementById('stStudio').className = 'status ' + (j.ok ? 'ok' : 'err');
+};
+
+refreshList();
+</script>
+</body>
+</html>

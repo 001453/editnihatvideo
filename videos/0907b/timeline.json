@@ -1,0 +1,12 @@
+{
+  "broll": [
+    {"id": "gold", "file": "broll/gold.mp4", "start": 13.8, "dur": 9.8},
+    {"id": "cash", "file": "broll/cash.mp4", "start": 54.5, "dur": 9.5},
+    {"id": "market", "file": "broll/market.mp4", "start": 99.5, "dur": 8.8}
+  ],
+  "punches": [[8.9, 8.5], [36.26, 7.5], [52.44, 8.0], [99.38, 7.0]],
+  "igBanner": [
+    {"id": "a", "start": 90.5, "dur": 2.3},
+    {"id": "b", "start": 109.0, "dur": 2.3}
+  ]
+}

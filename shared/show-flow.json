@@ -1,0 +1,84 @@
+{
+  "bible": "videos/0907",
+  "look": "shared/composition.css",
+  "standardDoc": "shared/SHOW_STANDARD.md",
+  "locked": true,
+  "format": {
+    "canvas": "1080x1920",
+    "layout": "face-forward, transparent cards top band, captions mid-lower, no full-frame darken",
+    "face": "full-bleed talking-head unmuted",
+    "topBand": "cards/chapter ~y120-600",
+    "captionBand": "~y1208 Anton 3D + keyword pop",
+    "pipSide": "left",
+    "cards": "transparent glass, never opaque black plates"
+  },
+  "density": {
+    "cards": "6-10 on ~2min",
+    "broll": "max 2 clips × 8s (Labs)",
+    "punches": "3-5, hold 6-10s",
+    "hero3d": "exactly 1 per video",
+    "specialMoment": "at most 1 per video (drone|crash|mockup|split|scrub|stamp)"
+  },
+  "cardEnter": ["slam", "soft", "glitch", "tilt", "wipe", "pop", "rise", "flip", "snap", "drift", "zoom", "fold"],
+  "cardExit": ["fade", "scale", "slide"],
+  "cardRule": "Every card-host gets a unique data-enter from cardEnter pool; progress motion on hold; topic-specific copy only",
+  "captionKeywords": true,
+  "slots": [
+    {"type": "hook", "class": "root hook", "when": "opening questions"},
+    {"type": "chips", "class": "root glass chips slim", "when": "2-4 named drivers"},
+    {"type": "levels", "class": "root glass levels", "when": "allocation / levels"},
+    {"type": "stats", "class": "root glass stats", "when": "one or two numbers"},
+    {"type": "verdict", "class": "root glass punch", "when": "warning / rule"},
+    {"type": "scenario", "class": "root glass", "when": "critical question / quote"},
+    {"type": "chapter", "class": "chapter", "when": "01/02 section"},
+    {"type": "disclaimer", "class": "banner transparent", "when": "end YATIRIM TAVSİYESİ DEĞİL only"}
+  ],
+  "igBanner": {"dur": 2.3, "first": 24.0, "lastOffset": 11.0, "exclusive": true, "sfx": "swoosh-up"},
+  "broll": {
+    "muted": true,
+    "maxClips": 2,
+    "dur": 8,
+    "pip": true,
+    "pipSide": "left",
+    "pipX": -350,
+    "pipScale": 0.3,
+    "pipRadius": 36,
+    "whip": true,
+    "whoosh": true,
+    "whooshOut": "whoosh-long",
+    "overlapSlimCards": true,
+    "overlapIg": false,
+    "labsPrompts": "videos/<id>/public/broll/LABS_PROMPTS.md"
+  },
+  "punch": {"clickInOut": true, "subHit": true, "scales": [1.1, 1.12, 1.14, 1.16], "overlapCard": true, "overlapIg": false},
+  "hero": {"onePerVideo": true, "flourish": "rotateY 3D mid-card", "timelineKey": "hero"},
+  "special": {
+    "maxPerVideo": 1,
+    "types": ["drone", "crash", "mockup", "split", "scrub", "stamp"],
+    "drone": "pull-back scale~0.82 + slight rotate ~1.2-1.5s on thesis beat"
+  },
+  "sfx": {
+    "cardPop": "pop",
+    "lineTick": "tick",
+    "lineSlam": "sub-hit+tick",
+    "lineTitle": "click+sub-hit",
+    "warn": "alarm-soft",
+    "countDone": "ui-confirm",
+    "punchLow": "sub-hit",
+    "disclaimer": "paper",
+    "ig": "swoosh-up",
+    "hero": "whoosh+sub-hit"
+  },
+  "safeZone": {"left": 40, "right": 120, "top": 120, "bottom": 280, "cardMaxW": 920},
+  "videoGrade": {"legibilityOverlay": false},
+  "researchBacklog": [
+    "special.drone pull-back once per video",
+    "special.crash zoom on warn word",
+    "phone mockup frame component",
+    "split-tilt A vs B compare card",
+    "chart scrub on one hero number",
+    "0.5s open hook slam",
+    "optional ducked bed A/B"
+  ],
+  "copyRule": "Only numbers and claims present in this video's transcript. Never reuse 0907 CDS/faiz text. Animation/look locked; copy is per-topic."
+}

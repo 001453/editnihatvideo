@@ -1,0 +1,24 @@
+{
+  "broll": [
+    {"id": "city", "file": "broll/city.mp4", "start": 32.0, "dur": 10.2},
+    {"id": "oil", "file": "broll/oil.mp4", "start": 51.6, "dur": 9.5},
+    {"id": "market", "file": "broll/market.mp4", "start": 109.6, "dur": 9.6}
+  ],
+  "punches": [[8.9, 9.4], [43.2, 7.5], [75.7, 9.4], [123.2, 6.0]],
+  "igBanner": [
+    {"id": "a", "start": 24.0, "dur": 2.3},
+    {"id": "b", "start": 142.2, "dur": 2.3}
+  ],
+  "cardSfx": [
+    ["hook", 0.35],
+    ["price", 15.9],
+    ["levels", 42.7],
+    ["macro", 55.3],
+    ["infl", 61.5],
+    ["cds", 86.1],
+    ["cds-hist", 100.8],
+    ["drop", 121.4],
+    ["hike", 130.0],
+    ["disclaimer", 147.5]
+  ]
+}
