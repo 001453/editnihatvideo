@@ -2,7 +2,7 @@
 
 Talking-head videoları **HyperFrames 0.8.30** ile paketleyen yerel hat: kesim + altyazı → konu-özel kartlar / b-roll / punch / SFX → Studio preview → MP4 render.
 
-Format: **9:16 · 1080×1920**. Show bible: `videos/0907`. Standart: `shared/SHOW_STANDARD.md` + `shared/show-flow.json`.
+Format: **9:16 · 1080×1920**. Standart: `shared/SHOW_STANDARD.md` + `shared/show-flow.json`. Çalışan örnek paket: `videos/0910` (referans: `videos/0907b`).
 
 Repo: [github.com/001453/editnihatvideo](https://github.com/001453/editnihatvideo)
 
