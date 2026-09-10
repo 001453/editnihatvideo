@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Altyazı düzelt</title>
+<style>
+  :root{
+    --bg0:#0a0b0e; --bg1:#12141a; --line:#2a2f3a;
+    --text:#f2f0ea; --muted:#9a9aaa; --gold:#e2b84a; --ok:#5dcc8a; --bad:#ff5c5c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg0),var(--bg1));color:var(--text);
+    font-family:"Segoe UI Semibold","Segoe UI",system-ui,sans-serif;}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 80px;}
+  .brand{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 8px;}
+  h1{font-size:1.8rem;margin:0 0 8px;}
+  .lead{color:var(--muted);margin:0 0 22px;line-height:1.45;}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px;}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
+  select,input,textarea{
+    width:100%;background:#0d0f14;border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:10px 12px;font-size:14px;
+  }
+  textarea{min-height:52px;resize:vertical;font-family:Anton,"Arial Black","Segoe UI",sans-serif;
+    text-transform:uppercase;letter-spacing:.02em;line-height:1.25;}
+  button{
+    border:1px solid var(--line);background:#12151c;color:var(--text);
+    border-radius:12px;padding:11px 14px;font-size:14px;font-weight:650;cursor:pointer;
+  }
+  button.primary{background:linear-gradient(180deg,#f0d06a,#c99620);color:#1a1406;border-color:#e2b84a;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  .status{font-size:13px;color:var(--muted);}
+  .status.ok{color:var(--ok);} .status.err{color:var(--bad);}
+  table{width:100%;border-collapse:collapse;}
+  th,td{border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top;text-align:left;}
+  th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;background:#12141a;}
+  .idx{width:40px;color:var(--muted);font-size:12px;}
+  .time{width:88px;}
+  .time input{font-variant-numeric:tabular-nums;font-size:12px;padding:8px;}
+  .tone{width:120px;}
+  .preview{
+    margin-top:6px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.35);
+    font-family:Anton,"Arial Black",sans-serif;text-transform:uppercase;line-height:1.05;
+  }
+  .preview .t{color:#fff;font-size:15px;}
+  .preview .b{color:#ffd84a;font-size:14px;}
+  a{color:var(--gold);}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="brand">Nihat pipeline</p>
+    <h1>Altyazı yazım düzelt</h1>
+    <p class="lead">Tüm altyazılar tek sayfada. İ/ı, ç, ğ, ş, ü, ö doğru büyük harf. Kaydet → project.json + rebuild. Panel: <a href="/">Dashboard</a></p>
+
+    <div class="bar">
+      <div style="min-width:140px;flex:0 0 160px;">
+        <label>Video</label>
+        <select id="vid"></select>
+      </div>
+      <button id="loadBtn">Yükle</button>
+      <button id="fixTr" type="button">Türkçe İ/ç düzelt</button>
+      <button id="saveBtn" class="primary" disabled>Kaydet + rebuild</button>
+      <span class="status" id="status"></span>
+      <a href="/" style="margin-left:auto;font-size:13px;">← Dashboard</a>
+    </div>
+
+    <div id="empty" class="lead">Video seç → Yükle.</div>
+    <table id="tbl" hidden>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Baş</th>
+          <th>Bit</th>
+          <th>Üst satır</th>
+          <th>Alt satır</th>
+          <th>Ton</th>
+        </tr>
+      </thead>
+      <tbody id="body"></tbody>
+    </table>
+  </div>
+<script>
+const $ = id => document.getElementById(id);
+let captions = [];
+let project = null;
+
+function trUpper(s){
+  return String(s||'').replace(/i/g,'İ').replace(/ı/g,'I').toLocaleUpperCase('tr-TR');
+}
+
+async function listVideos(){
+  const r = await fetch('/api/videos');
+  const j = await r.json();
+  const sel = $('vid');
+  sel.innerHTML = '';
+  (j.videos||[]).filter(v=>v.has_project).forEach(v=>{
+    const o = document.createElement('option');
+    o.value = v.id; o.textContent = v.id;
+    sel.appendChild(o);
+  });
+  const q = new URLSearchParams(location.search).get('id');
+  if(q) sel.value = q;
+}
+
+function rowHtml(c, i){
+  return `<tr data-i="${i}">
+    <td class="idx">${i+1}</td>
+    <td class="time"><input data-k="start" value="${Number(c.start).toFixed(2)}" /></td>
+    <td class="time"><input data-k="end" value="${Number(c.end).toFixed(2)}" /></td>
+    <td><textarea data-k="top">${escape(c.top||'')}</textarea>
+      <div class="preview"><div class="t"></div><div class="b"></div></div></td>
+    <td><textarea data-k="bottom">${escape(c.bottom||c.text||'')}</textarea></td>
+    <td class="tone"><select data-k="tone">
+      ${['yumusak','sert','yukselis','fixed'].map(t=>`<option value="${t}" ${c.tone===t?'selected':''}>${t}</option>`).join('')}
+    </select></td>
+  </tr>`;
+}
+function escape(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
+
+function paint(){
+  $('body').innerHTML = captions.map(rowHtml).join('');
+  $('tbl').hidden = !captions.length;
+  $('empty').hidden = !!captions.length;
+  $('saveBtn').disabled = !captions.length;
+  $('body').querySelectorAll('tr').forEach(tr => syncPreview(tr));
+  $('body').querySelectorAll('textarea,input,select').forEach(el=>{
+    el.addEventListener('input', () => {
+      const tr = el.closest('tr');
+      const i = Number(tr.dataset.i);
+      const k = el.dataset.k;
+      if(k==='start'||k==='end') captions[i][k] = Number(el.value)||0;
+      else captions[i][k] = el.value;
+      if(k==='top'||k==='bottom') syncPreview(tr);
+    });
+  });
+}
+
+function syncPreview(tr){
+  const i = Number(tr.dataset.i);
+  const prev = tr.querySelector('.preview');
+  if(!prev) return;
+  prev.querySelector('.t').textContent = captions[i].top || '';
+  prev.querySelector('.b').textContent = captions[i].bottom || '';
+}
+
+$('loadBtn').onclick = async () => {
+  const id = $('vid').value;
+  $('status').textContent = 'yükleniyor…';
+  $('status').className = 'status';
+  const r = await fetch('/api/project/' + encodeURIComponent(id));
+  const j = await r.json();
+  if(!r.ok){ $('status').textContent = j.error||'hata'; $('status').className='status err'; return; }
+  project = j.project;
+  captions = (project.captions||[]).map(c => ({
+    ...c,
+    top: c.top||'',
+    bottom: c.bottom||c.text||'',
+    tone: c.tone||'yumusak'
+  }));
+  history.replaceState(null,'', '?id='+id);
+  $('status').textContent = captions.length + ' altyazı';
+  $('status').className = 'status ok';
+  paint();
+};
+
+$('fixTr').onclick = () => {
+  captions = captions.map(c => ({
+    ...c,
+    top: trUpper(c.top||''),
+    bottom: trUpper(c.bottom||'')
+  }));
+  paint();
+  $('status').textContent = 'Türkçe büyük harf uygulandı — kaydetmeyi unutma';
+  $('status').className = 'status ok';
+};
+
+$('saveBtn').onclick = async () => {
+  const id = $('vid').value;
+  $('saveBtn').disabled = true;
+  $('status').textContent = 'kaydediliyor…';
+  $('status').className = 'status';
+  const body = {
+    id,
+    captions: captions.map(c => ({
+      ...c,
+      top: String(c.top||'').trim(),
+      bottom: String(c.bottom||'').trim(),
+      text: [c.top, c.bottom].filter(Boolean).join(' ').trim(),
+      start: Number(c.start),
+      end: Number(c.end),
+      tone: c.tone||'yumusak'
+    })),
+    rebuild: true
+  };
+  const r = await fetch('/api/captions/save', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  const j = await r.json();
+  $('saveBtn').disabled = false;
+  if(!r.ok){ $('status').textContent = j.error||'hata'; $('status').className='status err'; return; }
+  $('status').textContent = j.msg || 'kaydedildi';
+  $('status').className = 'status ok';
+};
+
+listVideos().then(()=>{ if($('vid').value) $('loadBtn').click(); });
+</script>
+</body>
+</html>

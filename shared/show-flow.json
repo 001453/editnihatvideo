@@ -38,6 +38,8 @@
     "muted": true,
     "maxClips": 2,
     "dur": 8,
+    "durLocked": true,
+    "prep": "User prepares exactly 8s clips from the spoken start sentence; agent only gives keyword + start time",
     "pip": true,
     "pipSide": "left",
     "pipX": -350,
@@ -52,6 +54,12 @@
   },
   "punch": {"clickInOut": true, "subHit": true, "scales": [1.1, 1.12, 1.14, 1.16], "overlapCard": true, "overlapIg": false},
   "hero": {"onePerVideo": true, "flourish": "rotateY 3D mid-card", "timelineKey": "hero"},
+  "mg": {
+    "timelineKey": "mg",
+    "types": ["sparkline", "stroke", "sparks", "flash", "ticker", "underline"],
+    "density": "2-5 per ~2min video",
+    "note": "Motion graphics overlays — not cards; timed via timeline.json mg[]"
+  },
   "special": {
     "maxPerVideo": 1,
     "types": ["drone", "crash", "mockup", "split", "scrub", "stamp"],

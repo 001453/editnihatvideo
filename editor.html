@@ -282,6 +282,9 @@ function fmt(s){
   return String(m).padStart(2,'0')+':'+String(sec).padStart(5,'0');
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function trUpper(s){
+  return String(s||'').replace(/i/g,'İ').replace(/ı/g,'I').toLocaleUpperCase('tr-TR');
+}
 
 function computeGaps(){
   gaps = [];
@@ -872,7 +875,7 @@ function normalizeCaption(cap){
   const botN = String(c.bottom||'').trim().split(/\s+/).filter(Boolean).length;
   if(topN <= 3 && botN <= 3 && (c.top || c.bottom)) return c;
   const raw = [c.top, c.bottom, c.text].filter(Boolean).join(' ');
-  const lines = splitTwoLines(raw.toUpperCase());
+  const lines = splitTwoLines(trUpper(raw));
   c.top = lines.top;
   c.bottom = lines.bottom;
   const wc = raw.trim().split(/\s+/).filter(Boolean).length;

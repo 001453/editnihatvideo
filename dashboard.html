@@ -6,263 +6,433 @@
 <title>Nihat Pipeline</title>
 <style>
   :root{
-    --bg0:#0a0b0e; --bg1:#12141a; --line:#2a2f3a;
-    --text:#f2f0ea; --muted:#9a9aaa; --gold:#e2b84a; --ok:#5dcc8a; --bad:#ff5c5c;
-    --display:"Segoe UI Semibold","Segoe UI",system-ui,sans-serif;
+    --bg0:#090a0d; --bg1:#12141a; --card:#171a22; --line:#2c313c;
+    --text:#f3f1ea; --muted:#9a9aaa; --gold:#e2b84a; --ok:#5dcc8a; --bad:#ff5c5c; --blue:#6aa8ff;
+    --font:"Segoe UI Semibold","Segoe UI",system-ui,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;min-height:100%;background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(226,184,74,.14), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(90,176,255,.08), transparent 50%),
+    radial-gradient(900px 420px at 8% -8%, rgba(226,184,74,.16), transparent 55%),
     linear-gradient(180deg,var(--bg0),var(--bg1));
-    color:var(--text);font-family:var(--display);}
-  .wrap{max-width:880px;margin:0 auto;padding:48px 22px 80px;}
-  .brand{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0 0 10px;}
-  h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;margin:0 0 12px;font-weight:750;letter-spacing:-.03em;}
-  .lead{color:var(--muted);font-size:1.05rem;line-height:1.5;margin:0 0 36px;max-width:40rem;}
-  .steps{display:grid;gap:14px;}
-  .step{
-    background:rgba(23,26,34,.92);border:1px solid var(--line);border-radius:18px;
-    padding:18px;display:grid;gap:12px;box-shadow:0 18px 40px rgba(0,0,0,.28);
+    color:var(--text);font-family:var(--font);}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 18px 90px;}
+  .brand{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 8px;}
+  h1{font-size:clamp(1.8rem,4vw,2.6rem);margin:0 0 8px;letter-spacing:-.03em;}
+  .lead{color:var(--muted);line-height:1.45;margin:0 0 18px;max-width:42rem;}
+  .sticky{
+    position:sticky;top:0;z-index:20;margin:0 0 18px;padding:12px;border:1px solid var(--line);
+    border-radius:16px;background:rgba(18,20,26,.94);backdrop-filter:blur(10px);
+    display:grid;gap:10px;
   }
-  .top{display:flex;align-items:baseline;gap:12px;}
-  .n{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
-    background:rgba(226,184,74,.12);border:1px solid rgba(226,184,74,.45);color:var(--gold);font-size:13px;font-weight:700;}
-  .title{font-size:1.05rem;font-weight:700;margin:0;}
-  .hint{color:var(--muted);font-size:.9rem;margin:0;line-height:1.4;}
-  label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
+  .sticky .row{display:flex;flex-wrap:wrap;gap:8px;align-items:end;}
+  label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase;}
   input,select{
     width:100%;background:#0d0f14;border:1px solid var(--line);color:var(--text);
-    border-radius:10px;padding:11px 12px;font-size:14px;
+    border-radius:10px;padding:10px 12px;font-size:14px;
   }
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  @media (max-width:720px){.grid2{grid-template-columns:1fr;}}
+  .field{min-width:120px;flex:1;}
+  .field.sm{flex:0 0 140px;min-width:120px;}
+  button,.btn{
+    border:1px solid var(--line);background:#12151c;color:var(--text);border-radius:12px;
+    padding:11px 14px;font-size:13.5px;font-weight:650;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+  }
+  button:hover,.btn:hover{border-color:var(--gold);}
+  button.primary{background:linear-gradient(180deg,#f0d06a,#c99620);color:#1a1406;border-color:#e2b84a;}
+  button.ghost{background:transparent;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  .rail{display:flex;gap:8px;overflow:auto;padding-bottom:2px;}
+  .chip{
+    border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12px;color:var(--muted);
+    background:transparent;white-space:nowrap;cursor:pointer;
+  }
+  .chip.on{border-color:var(--gold);color:var(--gold);background:rgba(226,184,74,.08);}
+  .chip .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;background:#444;}
+  .chip .dot.ok{background:var(--ok);} .chip .dot.warn{background:var(--gold);}
+  .guide{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 18px;
+  }
+  @media (max-width:800px){.guide{grid-template-columns:1fr 1fr;}}
+  .g{
+    border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:rgba(23,26,34,.7);
+    font-size:12px;color:var(--muted);line-height:1.35;
+  }
+  .g b{display:block;color:var(--text);font-size:13px;margin-bottom:3px;}
+  .g span{color:var(--gold);font-size:11px;letter-spacing:.06em;text-transform:uppercase;}
+  .steps{display:grid;gap:12px;}
+  .step{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;
+    box-shadow:0 16px 36px rgba(0,0,0,.25);display:grid;gap:10px;
+  }
+  .step.dim{opacity:.55;}
+  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .n{
+    width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+    background:rgba(226,184,74,.12);border:1px solid rgba(226,184,74,.45);color:var(--gold);font-size:13px;font-weight:700;
+  }
+  .title{font-size:1.05rem;font-weight:700;margin:0;}
+  .hint{color:var(--muted);font-size:.9rem;margin:0;line-height:1.4;}
   .drop{
-    border:2px dashed rgba(226,184,74,.35);border-radius:16px;padding:28px 18px;text-align:center;
-    background:rgba(13,15,20,.65);cursor:pointer;transition:border-color .15s, background .15s;
+    border:2px dashed rgba(226,184,74,.35);border-radius:14px;padding:22px 14px;text-align:center;
+    background:rgba(13,15,20,.65);cursor:pointer;
   }
   .drop.over{border-color:var(--gold);background:rgba(226,184,74,.08);}
-  .drop strong{display:block;font-size:1.05rem;margin-bottom:6px;}
-  .drop span{color:var(--muted);font-size:.9rem;}
-  .file-name{margin-top:8px;color:var(--gold);font-size:13px;word-break:break-all;}
-  button{
-    border:1px solid var(--line);background:#12151c;color:var(--text);
-    border-radius:12px;padding:12px 16px;font-size:14px;font-weight:650;cursor:pointer;
-  }
-  button:hover{border-color:var(--gold);}
-  button.primary{background:linear-gradient(180deg,#f0d06a,#c99620);color:#1a1406;border-color:#e2b84a;}
-  button:disabled{opacity:.45;cursor:not-allowed;}
+  .drop strong{display:block;margin-bottom:4px;}
+  .drop span,.file-name{color:var(--muted);font-size:.88rem;}
+  .file-name{margin-top:8px;color:var(--gold);}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
   .log{
     font-family:ui-monospace,Consolas,monospace;font-size:11.5px;line-height:1.45;
-    background:#0a0c10;border:1px solid var(--line);border-radius:12px;padding:12px;
-    min-height:110px;max-height:240px;overflow:auto;color:#b9c0d0;white-space:pre-wrap;
+    background:#0a0c10;border:1px solid var(--line);border-radius:12px;padding:10px;
+    min-height:72px;max-height:180px;overflow:auto;color:#b9c0d0;white-space:pre-wrap;
   }
   .status{font-size:13px;color:var(--muted);}
   .status.ok{color:var(--ok);} .status.err{color:var(--bad);} .status.run{color:var(--gold);}
   .prompt-box{
     background:#0a0c10;border:1px dashed rgba(226,184,74,.45);border-radius:12px;
-    padding:12px;font-size:13.5px;line-height:1.45;color:#f0e6c8;
+    padding:12px;font-size:13.5px;line-height:1.45;color:#f0e6c8;min-height:48px;
   }
-  .list{display:flex;flex-wrap:wrap;gap:8px;}
-  .chip{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted);cursor:pointer;background:transparent;}
-  .chip:hover{border-color:var(--gold);color:var(--gold);}
-  .foot{margin-top:28px;color:var(--muted);font-size:12.5px;line-height:1.5;}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;}
+  .foot{margin-top:22px;color:var(--muted);font-size:12.5px;line-height:1.5;}
   #fileInput{display:none;}
+  code{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:5px;}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <p class="brand">Nihat · Mehmet</p>
-    <h1>Video pipeline</h1>
-    <p class="lead">MP4’ü sürükle → transcript → Cursor’da tek cümle paketle → Studio. Yol yazmana gerek yok. Çözünürlük bozulmaz; hızlı draft encode, yüksek kalite son render’da.</p>
+    <p class="brand">Nihat · Mehmet · 9:16</p>
+    <h1>Pipeline paneli</h1>
+    <p class="lead">Her adım ayrı. Önce video seç, sonra sadece ihtiyacın olan parçaya bas. Kod yok — yönlendirmeyi takip et.</p>
+
+    <div class="sticky">
+      <div class="row">
+        <div class="field sm">
+          <label>Aktif video</label>
+          <input id="vid" type="text" placeholder="0909" />
+        </div>
+        <div class="field sm">
+          <label>Hesap</label>
+          <select id="account"><option value="nihat">Nihat</option><option value="mehmet">Mehmet</option></select>
+        </div>
+        <button type="button" class="ghost" id="btnRefresh">Listeyi yenile</button>
+        <span class="status" id="stGlobal"></span>
+      </div>
+      <div class="rail" id="list"></div>
+    </div>
+
+    <div class="guide">
+      <div class="g"><span>1</span><b>Hazırla</b>MP4 → encode + transcript</div>
+      <div class="g"><span>2</span><b>Altyazı</b>Yazım / İ-ç düzelt</div>
+      <div class="g"><span>3</span><b>Paketle</b>Cursor’a cümle yapıştır</div>
+      <div class="g"><span>4</span><b>Önizle</b>Studio + Ctrl+F5</div>
+      <div class="g"><span>5</span><b>Render</b>Draft veya high</div>
+    </div>
 
     <div class="steps">
-      <section class="step">
+      <section class="step" id="step1">
         <div class="top"><span class="n">1</span><h2 class="title">Video hazırla</h2></div>
-        <p class="hint">Kanca kesilmiş temiz sesli 9:16 MP4. Kutuya bırak veya tıkla. ID kısa olsun: <b>0910</b> (dosya adı değil).</p>
-
+        <p class="hint">Yeni çekim için. Sadece MP4 bırak → <b>Hazırla</b>. Uzun sürerse log’u izle; bitince adım 2’ye geç.</p>
         <div class="drop" id="drop" tabindex="0">
           <strong>MP4 sürükle-bırak</strong>
           <span>veya tıkla · dosya seç</span>
           <div class="file-name" id="fileLabel">dosya seçilmedi</div>
         </div>
         <input id="fileInput" type="file" accept="video/mp4,video/quicktime,video/*" />
-
-        <div class="grid2">
-          <div>
-            <label>Video ID</label>
-            <input id="vid" type="text" placeholder="0910" />
-          </div>
-          <div>
-            <label>Hesap</label>
-            <select id="account"><option value="nihat">Nihat</option><option value="mehmet">Mehmet</option></select>
-          </div>
+        <div class="actions">
+          <button class="primary" id="btnPrepare">Tam hazırla (encode+transcript+altyazı)</button>
+          <button type="button" id="btnTxOnly" title="Klasör zaten varsa">Sadece transcript</button>
+          <button type="button" id="btnCapOnly">Sadece altyazı üret</button>
         </div>
-
-        <div class="row">
-          <button class="primary" id="btnPrepare">Hazırla (encode + transcript)</button>
-          <span class="status" id="stPrepare">bekliyor</span>
-        </div>
+        <span class="status" id="stPrepare">bekliyor</span>
         <div class="log" id="log"></div>
       </section>
 
-      <section class="step">
-        <div class="top"><span class="n">2</span><h2 class="title">Özelleştir (kart + b-roll)</h2></div>
-        <p class="hint">Cümleyi kopyala → Cursor chat. Soru sormadan paketlesin.</p>
-        <div class="prompt-box" id="prompt">Önce adım 1’i bitir.</div>
-        <div class="row"><button id="btnCopy">Cümleyi kopyala</button></div>
+      <section class="step" id="step2">
+        <div class="top"><span class="n">2</span><h2 class="title">Altyazıya müdahale</h2></div>
+        <p class="hint">Tüm satırları tek sayfada gör, yazım düzelt. <b>İ / ç / ğ</b> için otomatik düğme var. Kaydetince rebuild olur.</p>
+        <div class="actions">
+          <a class="btn primary" id="btnCaps" href="/captions">Altyazı sayfasını aç</a>
+          <button type="button" id="btnFixTr">Türkçe İ/ç otomatik + rebuild</button>
+          <button type="button" id="btnRebuild">Sadece rebuild</button>
+        </div>
+        <span class="status" id="stCaps"></span>
       </section>
 
-      <section class="step">
-        <div class="top"><span class="n">3</span><h2 class="title">HyperFrames aç</h2></div>
-        <p class="hint">Alttaki siyah şerit Studio play çubuğu — videonun parçası değil.</p>
-        <div class="row">
-          <button class="primary" id="btnStudio">Studio’yu aç</button>
-          <span class="status" id="stStudio"></span>
+      <section class="step" id="step3b">
+        <div class="top"><span class="n">B</span><h2 class="title">B-roll sürükle-bırak (2 video)</h2></div>
+        <p class="hint">Her b-roll <b>hep 8 saniye</b> — başlangıç cümlesine göre sen hazırlıyorsun. Kutuya 9:16 MP4 bırak (encode 8s keser). İkisi yeşil → rebuild.</p>
+        <div id="brollSlots" class="grid2" style="gap:12px;"></div>
+        <div class="actions" style="margin-top:8px;">
+          <button type="button" id="btnBrollRefresh">Slotları yenile</button>
+          <button class="primary" type="button" id="btnBrollBuild" disabled>İkisi hazır → ölçek + PIP build</button>
+        </div>
+        <span class="status" id="stBroll"></span>
+        <input id="brollFile1" type="file" accept="video/*" hidden />
+        <input id="brollFile2" type="file" accept="video/*" hidden />
+      </section>
+
+      <section class="step" id="step3">
+        <div class="top"><span class="n">3</span><h2 class="title">Kart + b-roll paketle</h2></div>
+        <p class="hint">Bu cümleyi Cursor’a yapıştır. Agent soru sormadan 0907 akışıyla paketler.</p>
+        <div class="prompt-box" id="prompt">Önce video hazır olsun (adım 1) veya listeden seç.</div>
+        <div class="actions">
+          <button class="primary" id="btnCopy">Cümleyi kopyala</button>
+          <button type="button" id="btnLoadPrompt">Prompt’u yenile</button>
         </div>
       </section>
 
-      <section class="step">
-        <div class="top"><span class="n">•</span><h2 class="title">Mevcut videolar</h2></div>
-        <div class="list" id="list"></div>
+      <section class="step" id="step4">
+        <div class="top"><span class="n">4</span><h2 class="title">Studio önizleme</h2></div>
+        <p class="hint">Açtıktan sonra mutlaka <code>Ctrl+F5</code>. Alttaki siyah şerit Studio çubuğu — videonun parçası değil.</p>
+        <div class="actions">
+          <button class="primary" id="btnStudio">Studio’yu aç</button>
+          <button type="button" id="btnRebuild2">Rebuild + Ctrl+F5 hatırlat</button>
+        </div>
+        <span class="status" id="stStudio"></span>
+      </section>
+
+      <section class="step" id="step5">
+        <div class="top"><span class="n">5</span><h2 class="title">Render (isteğe bağlı)</h2></div>
+        <p class="hint">Studio Export yerine CLI daha güvenli. Bitene kadar sayfayı yenileme (~15–20 dk high).</p>
+        <div class="prompt-box" id="renderCmd">cd videos\ID
+$env:HYPERFRAMES_SKIP_SKILLS='1'
+npx --yes hyperframes@0.8.30 render --quality high --fps 30 --output renders\ID-high.mp4</div>
+        <div class="actions"><button type="button" id="btnCopyRender">Render komutunu kopyala</button></div>
       </section>
     </div>
 
     <p class="foot">
-      Başlat: <code>py -3.12 scripts\dashboard_server.py</code> · sayfayı yenile (Ctrl+F5)
+      Başlat: <code>py -3.12 scripts\dashboard_server.py</code>
+      · Panel: <code>http://127.0.0.1:8765/</code>
+      · Altyazı: <code>http://127.0.0.1:8765/captions?id=0909</code>
+      · Eski sunucu açıksa kapatıp yeniden başlat.
     </p>
   </div>
 <script>
 let pickedFile = null;
 let pollTimer = null;
-const drop = document.getElementById('drop');
-const fileInput = document.getElementById('fileInput');
-const fileLabel = document.getElementById('fileLabel');
-const logEl = document.getElementById('log');
-const stPrepare = document.getElementById('stPrepare');
-const promptEl = document.getElementById('prompt');
+const $ = id => document.getElementById(id);
 
 function setStatus(el, text, cls){
-  el.textContent = text;
+  el.textContent = text || '';
   el.className = 'status' + (cls ? ' ' + cls : '');
+}
+function vid(){
+  return ($('vid').value || '').trim().replace(/\.mp4$/i,'').replace(/[^\w\-]+/g,'');
 }
 function suggestId(name){
   const m = String(name||'').match(/(\d{3,4})/);
   if (m) return m[1];
   const d = new Date();
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const dd = String(d.getDate()).padStart(2,'0');
-  return mm + dd;
+  return String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
 }
 function takeFile(f){
   if (!f) return;
-  if (!/\.(mp4|mov|m4v|webm)$/i.test(f.name)) {
-    alert('MP4 / MOV seç');
-    return;
-  }
+  if (!/\.(mp4|mov|m4v|webm)$/i.test(f.name)) { alert('MP4 / MOV seç'); return; }
   pickedFile = f;
-  fileLabel.textContent = f.name + ' · ' + Math.round(f.size/1024/1024) + ' MB';
-  const vid = document.getElementById('vid');
-  if (!vid.value.trim()) vid.value = suggestId(f.name);
+  $('fileLabel').textContent = f.name + ' · ' + Math.round(f.size/1024/1024) + ' MB';
+  if (!$('vid').value.trim()) $('vid').value = suggestId(f.name);
+  updateCapsLink();
 }
-
-drop.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', () => takeFile(fileInput.files[0]));
-['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {
-  e.preventDefault(); drop.classList.add('over');
-}));
-['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {
-  e.preventDefault(); drop.classList.remove('over');
-}));
-drop.addEventListener('drop', e => {
-  const f = e.dataTransfer.files && e.dataTransfer.files[0];
-  takeFile(f);
-});
-
+function updateCapsLink(){
+  const id = vid() || '0909';
+  $('btnCaps').href = '/captions?id=' + encodeURIComponent(id);
+  $('renderCmd').textContent =
+`cd videos\\${id}
+$env:HYPERFRAMES_SKIP_SKILLS='1'
+npx --yes hyperframes@0.8.30 render --quality high --fps 30 --output renders\\${id}-high.mp4`;
+}
 async function refreshList(){
   const r = await fetch('/api/videos');
   const data = await r.json();
-  const box = document.getElementById('list');
+  const box = $('list');
   box.innerHTML = '';
+  const cur = vid();
   (data.videos || []).forEach(v => {
     const c = document.createElement('button');
-    c.className = 'chip';
     c.type = 'button';
-    c.textContent = v.id + (v.package_me ? ' · paketle' : '') + (v.has_video ? '' : ' · boş');
-    c.onclick = () => { document.getElementById('vid').value = v.id; };
+    c.className = 'chip' + (v.id === cur ? ' on' : '');
+    const ok = v.has_video && v.has_project;
+    c.innerHTML = `<span class="dot ${ok?'ok':(v.has_project?'warn':'')}"></span>${v.id}` +
+      (v.caption_count ? ` · ${v.caption_count} yazı` : '') +
+      (v.package_me ? ' · paket' : '');
+    c.onclick = async () => {
+      $('vid').value = v.id;
+      updateCapsLink();
+      await loadPrompt(v.id);
+      refreshList();
+    };
     box.appendChild(c);
   });
 }
-
-async function poll(vid){
+async function loadPrompt(id){
+  id = id || vid();
+  if (!id) return;
+  try {
+    const r = await fetch('/api/videos');
+    const j = await r.json();
+    const hit = (j.videos||[]).find(v => v.id === id);
+    if (hit && hit.package_me) {
+      // pull status for prompt if job has it, else generic
+      const s = await fetch('/api/status/' + encodeURIComponent(id));
+      const st = await s.json();
+      if (st.prompt) { $('prompt').textContent = st.prompt; return; }
+    }
+    $('prompt').textContent =
+      `videos/${id} hazir. project.json + transcript var. 0907 akisiyla paketle: kartlar, b-roll, punch, IG, build. Ctrl+F5 soyle. Kod bilmiyorum; soru sorma, dogrudan uygula.`;
+  } catch(e) {
+    $('prompt').textContent = 'Prompt yüklenemedi.';
+  }
+}
+async function poll(id){
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
-    const r = await fetch('/api/status/' + encodeURIComponent(vid));
+    const r = await fetch('/api/status/' + encodeURIComponent(id));
     const j = await r.json();
-    if (j.log) {
-      logEl.textContent = j.log.join('\n');
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-    if (j.status === 'running' || j.status === 'queued') setStatus(stPrepare, 'çalışıyor…', 'run');
+    if (j.log) { $('log').textContent = j.log.join('\n'); $('log').scrollTop = $('log').scrollHeight; }
+    if (j.status === 'running' || j.status === 'queued') setStatus($('stPrepare'), 'çalışıyor…', 'run');
     if (j.status === 'ready') {
-      setStatus(stPrepare, 'hazır', 'ok');
-      if (j.prompt) promptEl.textContent = j.prompt;
+      setStatus($('stPrepare'), 'hazır ✓', 'ok');
+      if (j.prompt) $('prompt').textContent = j.prompt;
       clearInterval(pollTimer);
       refreshList();
     }
     if (j.status === 'error') {
-      setStatus(stPrepare, 'hata', 'err');
+      setStatus($('stPrepare'), 'hata', 'err');
       clearInterval(pollTimer);
     }
-  }, 1200);
+  }, 1000);
+}
+async function postAction(action, extra={}){
+  const id = vid();
+  if (!id) { alert('Üstten Video ID seç / yaz'); return; }
+  setStatus($('stGlobal'), action + '…', 'run');
+  const r = await fetch('/api/action', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ id, action, account: $('account').value, ...extra })
+  });
+  const j = await r.json();
+  if (!r.ok) { setStatus($('stGlobal'), j.error || 'hata', 'err'); return j; }
+  if (action === 'transcribe' || action === 'captions' || action === 'flag') poll(id);
+  else setStatus($('stGlobal'), j.msg || 'ok', 'ok');
+  return j;
 }
 
-document.getElementById('btnPrepare').onclick = async () => {
-  let id = document.getElementById('vid').value.trim().replace(/\.mp4$/i,'');
-  id = id.replace(/[^\w\-]+/g,'');
-  document.getElementById('vid').value = id;
-  const account = document.getElementById('account').value;
-  if (!id) { alert('Video ID yaz (örn: 0910)'); return; }
-  if (!pickedFile) { alert('Önce MP4 sürükle veya seç'); return; }
+$('drop').onclick = () => $('fileInput').click();
+$('fileInput').onchange = () => takeFile($('fileInput').files[0]);
+['dragenter','dragover'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.add('over'); }));
+['dragleave','drop'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.remove('over'); }));
+$('drop').addEventListener('drop', e => takeFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+$('vid').addEventListener('input', updateCapsLink);
+$('btnRefresh').onclick = refreshList;
 
-  logEl.textContent = 'yükleniyor…';
-  setStatus(stPrepare, 'yükleniyor…', 'run');
+$('btnPrepare').onclick = async () => {
+  const id = vid();
+  $('vid').value = id;
+  if (!id) { alert('Video ID yaz (örn: 0909)'); return; }
+  if (!pickedFile) { alert('Önce MP4 sürükle'); return; }
+  $('log').textContent = 'yükleniyor…';
+  setStatus($('stPrepare'), 'yükleniyor…', 'run');
   const fd = new FormData();
   fd.append('id', id);
-  fd.append('account', account);
+  fd.append('account', $('account').value);
   fd.append('file', pickedFile, pickedFile.name);
-
-  const r = await fetch('/api/upload-prepare', { method: 'POST', body: fd });
+  const r = await fetch('/api/upload-prepare', { method:'POST', body: fd });
   const j = await r.json();
-  if (!r.ok) {
-    setStatus(stPrepare, j.error || 'hata', 'err');
-    logEl.textContent = j.error || 'hata';
-    return;
-  }
-  logEl.textContent = 'sunucuya indi, encode + transcript başlıyor…';
+  if (!r.ok) { setStatus($('stPrepare'), j.error || 'hata', 'err'); $('log').textContent = j.error || ''; return; }
   poll(j.id || id);
 };
 
-document.getElementById('btnCopy').onclick = async () => {
-  await navigator.clipboard.writeText(promptEl.textContent.trim());
-  setStatus(stPrepare, 'kopyalandı — Cursor’a yapıştır', 'ok');
+$('btnTxOnly').onclick = () => postAction('transcribe');
+$('btnCapOnly').onclick = () => postAction('captions');
+$('btnFixTr').onclick = async () => {
+  const j = await postAction('fix-tr', { rebuild:true });
+  if (j && j.ok) setStatus($('stCaps'), j.msg, 'ok');
+  else if (j) setStatus($('stCaps'), j.error || j.msg || 'hata', 'err');
 };
-
-document.getElementById('btnStudio').onclick = async () => {
-  const id = document.getElementById('vid').value.trim().replace(/\.mp4$/i,'');
+$('btnRebuild').onclick = $('btnRebuild2').onclick = async () => {
+  const j = await postAction('rebuild');
+  if (j && j.ok) {
+    setStatus($('stCaps'), j.msg + ' → Studio Ctrl+F5', 'ok');
+    setStatus($('stStudio'), 'Rebuild OK — Ctrl+F5', 'ok');
+  }
+};
+$('btnCopy').onclick = async () => {
+  await navigator.clipboard.writeText($('prompt').textContent.trim());
+  setStatus($('stGlobal'), 'kopyalandı — Cursor’a yapıştır', 'ok');
+};
+$('btnLoadPrompt').onclick = () => loadPrompt();
+$('btnCopyRender').onclick = async () => {
+  await navigator.clipboard.writeText($('renderCmd').textContent.trim());
+  setStatus($('stGlobal'), 'render komutu kopyalandı', 'ok');
+};
+$('btnStudio').onclick = async () => {
+  const id = vid();
   if (!id) { alert('Video ID yaz'); return; }
   const r = await fetch('/api/studio', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({id})
   });
   const j = await r.json();
-  document.getElementById('stStudio').textContent = j.msg || '';
-  document.getElementById('stStudio').className = 'status ' + (j.ok ? 'ok' : 'err');
+  setStatus($('stStudio'), (j.msg || '') + (j.ok ? ' · Ctrl+F5' : ''), j.ok ? 'ok' : 'err');
 };
 
-refreshList();
+let brollCache = [];
+async function loadBrollSlots(){
+  const id = vid();
+  const box = $('brollSlots');
+  if (!id) { box.innerHTML = '<p class="hint">Üstten video seç (örn 0909)</p>'; return; }
+  const r = await fetch('/api/broll-slots/' + encodeURIComponent(id));
+  const j = await r.json();
+  if (!r.ok) { box.innerHTML = `<p class="hint">${j.error||'slot yok'}</p>`; return; }
+  brollCache = j.slots || [];
+  box.innerHTML = '';
+  brollCache.forEach((s, idx) => {
+    const el = document.createElement('div');
+    el.className = 'drop';
+    el.style.minHeight = '110px';
+    el.innerHTML = `<strong>B-ROLL ${s.index} · ${s.keyword}</strong>
+      <span>başlangıç ${s.start.toFixed(1)}s · <b>8s sabit</b></span>
+      <div class="file-name">${s.hint || s.file}</div>
+      <div class="file-name" style="color:${s.ready?'var(--ok)':'var(--gold)'}">${s.ready ? '✓ video bağlı' : '↓ buraya video bırak'}</div>`;
+    const input = $(idx === 0 ? 'brollFile1' : 'brollFile2');
+    el.onclick = () => input.click();
+    input.onchange = () => { if (input.files[0]) uploadBroll(s.id, input.files[0]); };
+    ['dragenter','dragover'].forEach(ev => el.addEventListener(ev, e => { e.preventDefault(); el.classList.add('over'); }));
+    ['dragleave','drop'].forEach(ev => el.addEventListener(ev, e => { e.preventDefault(); el.classList.remove('over'); }));
+    el.addEventListener('drop', e => {
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) uploadBroll(s.id, f);
+    });
+    box.appendChild(el);
+  });
+  $('btnBrollBuild').disabled = !(j.ready);
+  setStatus($('stBroll'), j.ready ? 'iki b-roll hazır' : 'kelimeye uygun 2 video bırak', j.ready ? 'ok' : '');
+}
+async function uploadBroll(slotId, file){
+  const id = vid();
+  if (!id) { alert('Video ID yaz'); return; }
+  setStatus($('stBroll'), slotId + ' yükleniyor / encode…', 'run');
+  const fd = new FormData();
+  fd.append('id', id);
+  fd.append('slot', slotId);
+  fd.append('file', file, file.name);
+  const r = await fetch('/api/upload-broll', { method:'POST', body: fd });
+  const j = await r.json();
+  if (!r.ok) { setStatus($('stBroll'), j.error || 'hata', 'err'); return; }
+  setStatus($('stBroll'), j.msg || 'ok', 'ok');
+  await loadBrollSlots();
+}
+$('btnBrollRefresh').onclick = loadBrollSlots;
+$('btnBrollBuild').onclick = async () => {
+  const j = await postAction('rebuild');
+  if (j && j.ok) setStatus($('stBroll'), j.msg + ' → Studio Ctrl+F5', 'ok');
+};
+
+const q = new URLSearchParams(location.search).get('id');
+if (q) $('vid').value = q;
+updateCapsLink();
+refreshList().then(() => { if (vid()) { loadPrompt(); loadBrollSlots(); } });
+$('vid').addEventListener('change', () => { updateCapsLink(); loadBrollSlots(); });
 </script>
 </body>
 </html>

@@ -70,7 +70,7 @@ def main() -> None:
         "words": [],
         "layout": {
             "banner": {"x": 76, "y": 220, "w": 928, "h": 120},
-            "caption": {"x": 20, "y": 1208, "w": 1060, "h": 320, "fontSize": 62},
+            "caption": {"x": 40, "y": 1208, "w": 1000, "h": 340, "fontSize": 58},
         },
         "captions": [],
         "events": [],

@@ -36,8 +36,20 @@ def run(cmd, cwd=None):
 def ensure_folder(vid: str, source: Path, account: str, force: bool, quality: str) -> Path:
     dest = VIDEOS / vid
     pub = dest / "public" / "input-video.mp4"
+    # Yarim klasor (bos / videosuz) → guvenle yeniden kur
     incomplete = dest.exists() and not pub.exists()
-    if not dest.exists() or force or incomplete:
+    # Paketlenmis proje: cards + project varken ASLA sessizce silme
+    packaged = (
+        dest.exists()
+        and (dest / "project.json").exists()
+        and (dest / "cards.html").exists()
+        and pub.exists()
+    )
+    if packaged and force:
+        print("UYARI: paket var — --force yok sayildi (silmek icin klasoru elle sil)", flush=True)
+        force = False
+
+    if not dest.exists() or incomplete:
         cmd = [
             sys.executable, str(SCRIPTS / "new_video.py"), vid,
             "--source", str(source),
@@ -45,18 +57,28 @@ def ensure_folder(vid: str, source: Path, account: str, force: bool, quality: st
             "--quality", quality,
         ]
         if dest.exists():
-            cmd.append("--force")
+            cmd.append("--force")  # sadece bos/yarim
+        run(cmd)
+    elif force:
+        cmd = [
+            sys.executable, str(SCRIPTS / "new_video.py"), vid,
+            "--source", str(source),
+            "--account", account,
+            "--quality", quality,
+            "--force",
+        ]
         run(cmd)
     else:
-        if source.exists() and source.stat().st_mtime > pub.stat().st_mtime:
+        if source.exists() and (not pub.exists() or source.stat().st_mtime > pub.stat().st_mtime):
             sys.path.insert(0, str(SCRIPTS))
             from encode_input import encode
             encode(source, pub, quality=quality)
         proj_path = dest / "project.json"
-        proj = json.loads(proj_path.read_text(encoding="utf-8"))
-        proj["account"] = account
-        proj["source"] = str(source)
-        proj_path.write_text(json.dumps(proj, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        if proj_path.exists():
+            proj = json.loads(proj_path.read_text(encoding="utf-8"))
+            proj["account"] = account
+            proj["source"] = str(source)
+            proj_path.write_text(json.dumps(proj, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return dest
 
 
@@ -124,24 +146,63 @@ def write_package_flag(dest: Path, account: str) -> None:
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("id")
-    p.add_argument("--source", required=True)
+    p.add_argument("--source", default="")
     p.add_argument("--account", default="nihat", choices=["nihat", "mehmet"])
     p.add_argument("--skip-transcribe", action="store_true")
     p.add_argument("--force", action="store_true")
     p.add_argument("--quality", choices=["draft", "final"], default="draft")
+    p.add_argument(
+        "--only",
+        choices=["all", "encode", "transcribe", "captions", "flag"],
+        default="all",
+        help="Tek parça çalıştır (hızlı müdahale)",
+    )
     args = p.parse_args()
     vid = sanitize_id(args.id)
-    source = Path(args.source)
-    if not source.is_file():
-        raise SystemExit(f"kaynak bir video DOSYASI olmali (klasor degil): {source}")
+    dest = VIDEOS / vid
+    source = Path(args.source) if args.source else None
 
-    dest = ensure_folder(vid, source, args.account, args.force, args.quality)
-    if not args.skip_transcribe:
-        tx = transcribe(dest)
-        captions(dest, tx, args.account, str(source))
-    write_package_flag(dest, args.account)
-    print(f"OK {dest}")
-    print(f"PROMPT: {(dest / 'PACKAGE_ME.txt').read_text(encoding='utf-8').strip()}")
+    if args.only == "all":
+        if not source or not source.is_file():
+            raise SystemExit(f"kaynak bir video DOSYASI olmali: {source}")
+        dest = ensure_folder(vid, source, args.account, args.force, args.quality)
+        if not args.skip_transcribe:
+            tx = transcribe(dest)
+            captions(dest, tx, args.account, str(source))
+        write_package_flag(dest, args.account)
+    elif args.only == "encode":
+        if not source or not source.is_file():
+            raise SystemExit("encode icin --source gerekli")
+        dest = ensure_folder(vid, source, args.account, args.force, args.quality)
+    elif args.only == "transcribe":
+        if not dest.exists():
+            raise SystemExit(f"klasor yok: {dest}")
+        transcribe(dest)
+    elif args.only == "captions":
+        if not dest.exists():
+            raise SystemExit(f"klasor yok: {dest}")
+        tx = dest / "transcripts" / "input-video.json"
+        if not tx.exists():
+            raise SystemExit("once transcript gerekli")
+        proj = dest / "project.json"
+        account = args.account
+        src = str(source) if source else ""
+        if proj.exists():
+            try:
+                account = json.loads(proj.read_text(encoding="utf-8")).get("account") or account
+                src = json.loads(proj.read_text(encoding="utf-8")).get("source") or src
+            except Exception:
+                pass
+        captions(dest, tx, account, src)
+    elif args.only == "flag":
+        if not dest.exists():
+            raise SystemExit(f"klasor yok: {dest}")
+        write_package_flag(dest, args.account)
+
+    print(f"OK {dest} only={args.only}")
+    prompt_path = dest / "PACKAGE_ME.txt"
+    if prompt_path.exists():
+        print(f"PROMPT: {prompt_path.read_text(encoding='utf-8').strip()}")
 
 
 if __name__ == "__main__":

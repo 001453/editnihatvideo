@@ -196,6 +196,21 @@
       .hero-num{font-size:96px;font-weight:800;color:#5ab0ff;line-height:1;font-variant-numeric:tabular-nums;display:inline-block;transform-origin:0% 50%;text-shadow:0 8px 24px rgba(90,176,255,.35);}
       .graph-card svg{width:100%;height:auto;max-height:280px;}
       .kicker,.title,.q,.note,.banner,.lvl b,.lvl span,.stat b,.stat span,.hero-num,.chip,.cap-top,.cap-bot,.chapter{cursor:text;user-select:text;-webkit-user-select:text;}
+      /* Motion graphics overlays (timeline.json "mg") */
+      .mg-host{pointer-events:none;overflow:visible;}
+      .mg-sparkline{width:100%;height:100%;display:block;}
+      .mg-sparkline path{fill:none;stroke:#ffdd4f;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(255,221,79,.55));}
+      .mg-sparkline .mg-dot{fill:#ffdd4f;filter:drop-shadow(0 0 6px rgba(255,221,79,.8));}
+      .mg-stroke{position:absolute;left:0;top:50%;height:3px;width:100%;border-radius:99px;background:linear-gradient(90deg,transparent,#ffdd4f 20%,#fff 50%,#ffdd4f 80%,transparent);box-shadow:0 0 18px rgba(255,221,79,.65);transform-origin:0% 50%;}
+      .mg-sparks{position:absolute;inset:0;}
+      .mg-sparks i{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:50%;background:#ffdd4f;box-shadow:0 0 12px rgba(255,221,79,.9);opacity:0;}
+      .mg-sparks i:nth-child(odd){background:#5ab0ff;box-shadow:0 0 12px rgba(90,176,255,.85);}
+      .mg-sparks i:nth-child(3n){background:#ff4646;box-shadow:0 0 12px rgba(255,70,70,.8);}
+      .mg-flash{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(255,221,79,.55),rgba(255,255,255,.12) 45%,transparent 70%);opacity:0;}
+      .mg-ticker{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,.15) 40%,rgba(0,0,0,.35));border-top:1px solid rgba(255,221,79,.35);border-bottom:1px solid rgba(255,221,79,.35);}
+      .mg-ticker-track{display:flex;white-space:nowrap;will-change:transform;}
+      .mg-ticker-track span{font-family:Anton,Impact,sans-serif;font-size:28px;letter-spacing:.12em;color:#ffdd4f;padding:0 48px;text-shadow:0 2px 10px rgba(0,0,0,.75);}
+      .mg-underline{position:absolute;left:80px;bottom:18px;height:4px;width:320px;border-radius:99px;background:#ffdd4f;box-shadow:0 0 14px rgba(255,221,79,.7);transform-origin:0% 50%;}
 
     </style>
   </head>
@@ -517,6 +532,27 @@
       </div>
       <img data-hf-id="hf-43i5" id="ig-ban-a" class="clip ig-banner" src="follow_banner.png" data-start="90.5000" data-duration="2.3000" data-track-index="8" style="left:0;top:36px;width:1080px;height:310px;" alt="banner">
       <img data-hf-id="hf-t84i" id="ig-ban-b" class="clip ig-banner" src="follow_banner.png" data-start="108.9000" data-duration="2.3000" data-track-index="8" style="left:0;top:36px;width:1080px;height:310px;" alt="banner">
+      <div data-hf-id="hf-ochs" class="clip mg-host" id="mg-flash1" data-mg="flash" data-start="8.9000" data-duration="0.2667" data-track-index="9" style="left:0;top:0;width:1080px;height:1920px;">
+        <div data-hf-id="hf-dg16" class="mg-flash" id="mg-flash1-flash"></div>
+      </div>
+      <div data-hf-id="hf-0jau" class="clip mg-host" id="mg-line1" data-mg="sparkline" data-start="14.6000" data-duration="5.5000" data-track-index="7" style="left:60px;top:560px;width:960px;height:160px;">
+        <svg data-hf-id="hf-0c58" class="mg-sparkline" viewBox="0 0 960 160" preserveAspectRatio="none">
+          <path data-hf-id="hf-xi24" id="mg-line1-path" d="M20 120 C120 110,180 40,280 70 S420 140,520 90 S700 20,820 55 S920 100,940 88" />
+          <circle data-hf-id="hf-nkde" class="mg-dot" id="mg-line1-dot" cx="20" cy="120" r="6" />
+        </svg>
+      </div>
+      <div data-hf-id="hf-9g9b" class="clip mg-host" id="mg-stroke1" data-mg="stroke" data-start="37.0000" data-duration="1.3000" data-track-index="7" style="left:40px;top:760px;width:1000px;height:24px;">
+        <div data-hf-id="hf-k2r8" class="mg-stroke" id="mg-stroke1-line"></div>
+      </div>
+      <div data-hf-id="hf-3ky2" class="clip mg-host" id="mg-sparks1" data-mg="sparks" data-start="52.4333" data-duration="0.9333" data-track-index="7" style="left:240px;top:720px;width:600px;height:400px;">
+        <div data-hf-id="hf-bgss" class="mg-sparks" id="mg-sparks1-sparks"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i><i data-hf-id="hf-ylp6"></i><i data-hf-id="hf-0l8b"></i><i data-hf-id="hf-0zjc"></i><i data-hf-id="hf-zsm9"></i><i data-hf-id="hf-06xa"></i><i data-hf-id="hf-26gf"></i><i data-hf-id="hf-2krg"></i><i data-hf-id="hf-oz7w"></i><i data-hf-id="hf-okwv"></i></div>
+      </div>
+      <div data-hf-id="hf-97f0" class="clip mg-host" id="mg-tick1" data-mg="ticker" data-start="66.5000" data-duration="4.2000" data-track-index="7" style="left:0;top:980px;width:1080px;height:56px;">
+        <div data-hf-id="hf-k5j7" class="mg-ticker"><div data-hf-id="hf-xc96" class="mg-ticker-track" id="mg-tick1-track"><span data-hf-id="hf-47v5">800.000 TL  ·  EŞİK  ·  HİSSE  ·  RİSK</span><span data-hf-id="hf-4nyd">800.000 TL  ·  EŞİK  ·  HİSSE  ·  RİSK</span><span data-hf-id="hf-5uvg">800.000 TL  ·  EŞİK  ·  HİSSE  ·  RİSK</span><span data-hf-id="hf-5gkf">800.000 TL  ·  EŞİK  ·  HİSSE  ·  RİSK</span></div></div>
+      </div>
+      <div data-hf-id="hf-cvuz" class="clip mg-host" id="mg-ul1" data-mg="underline" data-start="80.4333" data-duration="2.4000" data-track-index="7" style="left:40px;top:560px;width:920px;height:40px;">
+        <div data-hf-id="hf-5ae8" class="mg-underline" id="mg-ul1-ul"></div>
+      </div>
       <div data-hf-id="hf-35p5" class="clip cap-stage" id="caption-host" data-start="0" data-duration="119.9" data-track-index="5" style="left:20px;top:1208px;width:1060px;height:320px;">
         <div data-hf-id="hf-i6se" class="cap-item tone-yumusak" id="cap-000" data-cap-start="0.0000" data-cap-end="1.8667">
           <div data-hf-id="hf-slbd" class="cap-top" id="cap-000-top">ARTIK DEVIR <span data-hf-id="hf-m2u8" class="cap-kw">PARA</span>DAN</div>
@@ -834,6 +870,12 @@
       <audio data-hf-id="hf-rd2t" id="sfx-count-2" src="sfx/ui-confirm.mp3" data-start="74.7333" data-duration="0.2333" data-track-index="19" data-volume="0.12"></audio>
       <audio data-hf-id="hf-778h" id="sfx-ig-a" src="sfx/swoosh-up.mp3" data-start="90.5000" data-duration="0.4333" data-track-index="20" data-volume="0.13"></audio>
       <audio data-hf-id="hf-t2se" id="sfx-ig-b" src="sfx/swoosh-up.mp3" data-start="108.9000" data-duration="0.4333" data-track-index="20" data-volume="0.13"></audio>
+      <audio data-hf-id="hf-rakq" id="sfx-mg-flash1" src="sfx/tick.mp3" data-start="8.9000" data-duration="0.1333" data-track-index="21" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-mnxh" id="sfx-mg-line1" src="sfx/whoosh-short.mp3" data-start="14.6000" data-duration="0.2667" data-track-index="21" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-cb4q" id="sfx-mg-stroke1" src="sfx/whoosh-short.mp3" data-start="37.0000" data-duration="0.2667" data-track-index="21" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-rznp" id="sfx-mg-sparks1" src="sfx/tick.mp3" data-start="52.4333" data-duration="0.1333" data-track-index="21" data-volume="0.08"></audio>
+      <audio data-hf-id="hf-hjag" id="sfx-mg-tick1" src="sfx/swoosh-up.mp3" data-start="66.5000" data-duration="0.3333" data-track-index="21" data-volume="0.09"></audio>
+      <audio data-hf-id="hf-phhm" id="sfx-mg-ul1" src="sfx/whoosh-short.mp3" data-start="80.4333" data-duration="0.2667" data-track-index="21" data-volume="0.08"></audio>
       <script src="vendor/gsap.min.js"></script>
       <script>
 
@@ -1060,6 +1102,59 @@
             tl.to(sel,{scale:1,y:0,rotateX:0,rotateY:0,z:0,duration:down,ease:"power3.out"}, st+up);
           })();
 
+          /* Motion graphics from timeline.mg */
+          (function(){
+            var el = document.getElementById("mg-flash1-flash");
+            if(!el) return;
+            tl.fromTo(el,{opacity:0},{opacity:1,duration:0.06,ease:"none",immediateRender:false}, 8.9);
+            tl.to(el,{opacity:0,duration:0.22,ease:"power2.out"}, 8.9+0.06);
+          })();
+          (function(){
+            var path = document.getElementById("mg-line1-path");
+            var dot = document.getElementById("mg-line1-dot");
+            if(!path || !dot) return;
+            var len = path.getTotalLength();
+            var t0 = 14.680;
+            tl.set(path,{strokeDasharray:len,strokeDashoffset:len}, Math.max(0,t0-0.05));
+            tl.to(path,{strokeDashoffset:0,duration:Math.min(2.2,5.5*0.7),ease:"power2.inOut"}, t0);
+            var obj = {p:0};
+            tl.to(obj,{p:1,duration:Math.min(2.2,5.5*0.7),ease:"power2.inOut",onUpdate:function(){
+              var pt = path.getPointAtLength(obj.p * len);
+              dot.setAttribute("cx", pt.x); dot.setAttribute("cy", pt.y);
+            }}, t0);
+            tl.fromTo("#mg-line1",{opacity:0},{opacity:1,duration:0.2,immediateRender:false}, 14.6);
+            tl.to("#mg-line1",{opacity:0,duration:0.28,ease:"power1.in"}, 14.6+5.5-0.3);
+          })();
+          (function(){
+            var el = document.getElementById("mg-stroke1-line");
+            if(!el) return;
+            tl.fromTo(el,{scaleX:0,opacity:0},{scaleX:1,opacity:1,duration:0.45,ease:"power3.out",immediateRender:false}, 37.0);
+            tl.to(el,{opacity:0,scaleX:0.2,duration:0.28,ease:"power2.in"}, 37.0+1.3-0.3);
+          })();
+          (function(){
+            var host = document.getElementById("mg-sparks1-sparks");
+            if(!host) return;
+            var dots = host.querySelectorAll("i");
+            dots.forEach(function(d, i){
+              var ang = (i / Math.max(1,dots.length)) * Math.PI * 2;
+              var dist = 90 + (i % 3) * 40;
+              tl.fromTo(d,{opacity:0,x:0,y:0,scale:0.4},{opacity:1,x:Math.cos(ang)*dist,y:Math.sin(ang)*dist,scale:1,duration:0.35,ease:"power2.out",immediateRender:false}, 52.44+i*0.02);
+              tl.to(d,{opacity:0,scale:0.2,duration:0.35,ease:"power1.in"}, 52.44+0.4+i*0.02);
+            });
+          })();
+          (function(){
+            var track = document.getElementById("mg-tick1-track");
+            if(!track) return;
+            tl.fromTo("#mg-tick1",{opacity:0,y:12},{opacity:1,y:0,duration:0.28,ease:"power2.out",immediateRender:false}, 66.5);
+            tl.fromTo(track,{x:0},{x:-540,duration:Math.max(2.5,4.2),ease:"none",immediateRender:false}, 66.5);
+            tl.to("#mg-tick1",{opacity:0,duration:0.25,ease:"power1.in"}, 66.5+4.2-0.28);
+          })();
+          (function(){
+            var el = document.getElementById("mg-ul1-ul");
+            if(!el) return;
+            tl.fromTo(el,{scaleX:0,opacity:0},{scaleX:1,opacity:1,duration:0.4,ease:"power3.out",immediateRender:false}, 80.44);
+            tl.to(el,{opacity:0,duration:0.25}, 80.44+2.4-0.28);
+          })();
           var cardIdx = 0;
           document.querySelectorAll(".card-host").forEach(function(host){
             var t = parseFloat(host.getAttribute("data-start")) || 0;

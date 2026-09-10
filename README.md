@@ -2,7 +2,9 @@
 
 Talking-head videoları **HyperFrames 0.8.30** ile paketleyen yerel hat: kesim + altyazı → konu-özel kartlar / b-roll / punch / SFX → Studio preview → MP4 render.
 
-Format: **9:16 · 1080×1920**. Standart: `shared/SHOW_STANDARD.md` + `shared/show-flow.json`. Çalışan örnek paket: `videos/0910` (referans: `videos/0907b`).
+Format: **9:16 · 1080×1920**. Standart: `shared/SHOW_STANDARD.md` + `shared/show-flow.json`.
+
+**Güncel çalışan örnek:** `videos/0909` (Diyanet / TLK). Referans kalıp: `videos/0910`, `videos/0907b`.
 
 Repo: [github.com/001453/editnihatvideo](https://github.com/001453/editnihatvideo)
 
@@ -16,9 +18,10 @@ Repo: [github.com/001453/editnihatvideo](https://github.com/001453/editnihatvide
 | Anton 3D altyazı + keyword pop | Caption zamanları / keyword’ler |
 | Punch, PIP (sol), IG banner, SFX pack | Punch / IG / hero zamanları |
 | `template/build_composition.py` motoru | `cards.html`, `timeline.json`, b-roll |
-| Max 2×8s b-roll kuralı | Konuya özel Labs prompt + dosyalar |
+| Max **2×8s** b-roll (hep 8 sn) | Kelime + start; sen 8 sn clip hazırlarsın |
+| Dashboard sürükle-bırak (kaynak + b-roll) | Slot dosyaları `public/broll/<ad>.mp4` |
 
-Konuya göre ek: drone pull-back, mockup, split A/B, crash zoom vb. (video başına en fazla **1** büyük özel an).
+Konuya göre ek: drone / mockup / split vb. (video başına en fazla **1** büyük özel an).
 
 ---
 
@@ -28,67 +31,84 @@ Konuya göre ek: drone pull-back, mockup, split A/B, crash zoom vb. (video baş�
 - **Python 3.12** (`py -3.12`)
 - **Node.js** + `npx` (HyperFrames CLI)
 - Cursor (agent paketleme için)
-- Kaynak MP4 (talking-head)
+- Kaynak MP4 (talking-head) + isteğe bağlı 2× **8 sn** 9:16 b-roll
 
 NVENC burada yok; encode **libx264**. `--gpu` kullanma.
 
 ---
 
-## Hızlı başlangıç (dashboard)
+## Hızlı başlangıç (önerilen)
 
 ```powershell
 cd <repo>
-py -3.12 scripts\dashboard_server.py
+start_dashboard.bat
+# veya: py -3.12 scripts\dashboard_server.py
 ```
 
-Tarayıcıda:
+Tarayıcı: **http://127.0.0.1:8765/**
 
-1. MP4 **sürükle-bırak**
-2. Video ID ver (örn. `0911`)
-3. **Hazırla** → oluşan cümleyi Cursor’a yapıştır
-4. Agent paketler → **Studio** → Ctrl+F5 → draft / high render
+### Adımlar
+
+1. **Kaynak MP4** sürükle-bırak → Video ID (örn. `0911`) → **Hazırla**
+2. `editor.html` / dashboard ile kesim + caption → `project.json`
+3. Altyazı düzelt: **/captions?id=0911** (Türkçe İ/ç vb.)
+4. Cursor’a paket cümlesini yapıştır → agent `cards.html` + `timeline.json` yazar  
+   *(hazır paket silinmez; `Hazırla` force etmez)*
+5. Agent **2 b-roll kelimesi + başlangıç saniyesi** verir (hep **8 sn**)
+6. Dashboard’da **B-roll sürükle-bırak** kutularına 9:16 MP4 bırak → encode → bağla
+7. İkisi yeşil → rebuild → **Studio** → **Ctrl+F5**
+8. Draft / high render
 
 Agent `videos/<id>/PACKAGE_ME.json` görürse doğrudan paketler.
 
 ---
 
-## CLI akış (adım adım)
+## B-roll kuralı (kilit)
 
-### 1) Yeni video iskeleti
+- En fazla **2** clip
+- Süre **hep 8 saniye** — sen başlangıç cümlesine göre hazırlarsın
+- Agent sadece **kelime + start** verir
+- Dashboard `/api/upload-broll` → `public/broll/<id>.mp4` (9:16, muted, `-t 8`)
+- Slim chip kartlar b-roll üstüne binebilir; büyük cam kart b-roll penceresine binmez
+
+Örnek (0909):
+
+| Slot | Kelime | Start |
+| --- | --- | --- |
+| 1 | VAKIF | 46.0s |
+| 2 | GETİRİ | 111.0s |
+
+---
+
+## CLI akış (dashboard’suz)
+
+### 1) Yeni video
 
 ```powershell
 cd <repo>
 py -3.12 scripts\new_video.py 0911 --source "D:\path\to\source.mp4" --account nihat
 ```
 
-Hesap: `nihat` veya `mehmet` (altyazı ton renkleri).
+Hesap: `nihat` veya `mehmet`.
 
 ### 2) İnsan: kes + altyazı
 
-`editor.html` aç → kesimleri ve caption’ları ayarla → kaydet.  
-Çıktı: `videos/0911/project.json` (+ transcript).
+`editor.html` → kaydet → `videos/<id>/project.json`  
+Eski `Downloads\project.json` (C0082) kullanma.
 
-**Not:** Eski `C:\Users\...\Downloads\project.json` (C0082) kullanma.
+### 3) Agent paketle
 
-### 3) Agent: paketle (0907 akışı)
+Skill: `.cursor/skills/package-nihat-video/SKILL.md`  
+Kurallar: `.cursor/rules/nihat-pipeline.mdc`
 
-Cursor’da skill: `.cursor/skills/package-nihat-video/SKILL.md`
-
-Agent:
-
-- Transcript’i okur, beat planlar
-- **Bu konuya** `cards.html` yazar (0907 metnini kopyalamaz)
-- `public/broll` + `timeline.json` (punch, IG, hero, special)
-- `build_composition.py` çalıştırır → `index.html`
-
-### 4) Build (manuel gerekirse)
+### 4) Build
 
 ```powershell
 Copy-Item -Force template\build_composition.py videos\0911\build_composition.py
 py -3.12 videos\0911\build_composition.py
 ```
 
-Studio’da **Ctrl+F5** (cache temiz).
+Studio’da **Ctrl+F5**.
 
 ### 5) Preview / render
 
@@ -100,29 +120,30 @@ npx --yes hyperframes@0.8.30 render --quality draft --fps 30 --output renders\09
 npx --yes hyperframes@0.8.30 render --quality high --fps 30 --output renders\0911-high.mp4
 ```
 
-High ~2 dk video için genelde **~15–20 dk** (low-memory / 1 worker). Bitene kadar Studio’yu yenileme.
-
-Çıktı örneği: `videos/0911/renders/0911-high.mp4`
+High ~2 dk video ≈ **15–20 dk**. Bitene kadar Studio’yu yenileme.
 
 ---
 
 ## Klasör yapısı
 
 ```
-scripts/          dashboard, new_video, yardımcılar
-shared/           look, SFX, show-flow, SHOW_STANDARD
-template/         build_composition.py (kaynak)
-videos/0907/      show bible (referans paket)
-videos/<id>/      her bölüm
-  project.json    kesim + caption (editor)
-  cards.html      konu kartları
-  timeline.json   punch / b-roll / IG / special
-  index.html      HyperFrames composition (build çıktısı)
-  public/         input-video, broll, sfx, fonts, IG png
-  renders/        MP4 çıktılar (git’te yok)
-.cursor/          rules + package-nihat-video skill
-editor.html       insan kesim / caption UI
-dashboard.html    sürükle-bırak giriş
+scripts/            dashboard, encode, new_video, TR caption fix
+shared/             look, SFX, show-flow, SHOW_STANDARD
+template/           build_composition.py (kaynak)
+videos/0909/        güncel örnek paket (metadata; MP4 git’te yok)
+videos/0910/        önceki örnek
+videos/<id>/
+  project.json      kesim + caption
+  cards.html        konu kartları
+  timeline.json     punch / b-roll / IG / hero / mg / special
+  index.html        build çıktısı
+  public/           input-video, broll, sfx, fonts, IG png
+  renders/          MP4 (gitignore)
+captions.html       tek sayfa altyazı editörü
+dashboard.html      hub + b-roll drop
+editor.html         kesim / caption
+start_dashboard.bat dashboard başlat
+.cursor/            rules + package-nihat-video skill
 ```
 
 ---
@@ -131,11 +152,12 @@ dashboard.html    sürükle-bırak giriş
 
 - Tek `#caption-host`, Anton 3D; ton `.cap-item` üzerinde
 - Talking-head: unmuted `data-has-audio="true"` — aynı dosyadan ikinci VO yok
-- `#overlays` untimed; kartlar içine nested
-- IG: PNG only, exclusive pencere (~24s ve bitişten ~11s önce, 2.3s)
+- `#overlays` untimed; kartlar nested
+- IG: PNG only, exclusive (~24s ve bitişten ~11s önce, 2.3s)
 - Punch: hold + ease out; soft click in/out
-- Kart in: `pop.mp3` + sheen; b-roll muted 9:16 + PIP + whoosh
-- Full-frame karartma yok; disclaimer şeffaf altta **YATIRIM TAVSİYESİ DEĞİL**
+- Kart in: `pop.mp3` + sheen; b-roll muted 9:16 + PIP sol + whoosh
+- Disclaimer şeffaf altta **YATIRIM TAVSİYESİ DEĞİL**
+- Paketlenmiş klasörü (`cards.html` + `project.json`) prepare **silebilir** — force kullanma
 
 Detay: `shared/SHOW_STANDARD.md`
 
@@ -143,16 +165,21 @@ Detay: `shared/SHOW_STANDARD.md`
 
 ## Git / medya
 
-Repoda **kod + şablon + örnek paket metadata** vardır. Büyük medya genelde **gitignore**:
+Repoda **kod + şablon + paket metadata** vardır. Büyük medya **gitignore**:
 
-- `videos/*/public/input-video.mp4`
+- `*.mp4` (ve `videos/*/public/broll/*.mp4`, `input-video.mp4`)
 - `videos/*/renders/`
-- cache / waveform / thumbnails
+- cache / waveform / thumbnails / `_inbox/`
 
-Klonladıktan sonra her video için kendi kaynak MP4’ünü `new_video.py` / dashboard ile koy.
+Klon sonrası: kendi kaynak MP4 + 2×8s b-roll’ünü dashboard ile koy, rebuild et.
 
 ---
 
-## Sonraki videolar
+## Cursor’a yapıştır (örnek)
 
-Kalıp aynı. Konu değişince agent yeni kart / b-roll / punch yazar; geçiş, mockup, drone vb. konuya uygun **tek** özel jest olarak eklenir.
+```
+videos/0909 hazir. project.json + transcript var. 0907 akisiyla paketle:
+kartlar, b-roll, punch, IG, build. Ctrl+F5 soyle. Kod bilmiyorum; soru sorma, dogrudan uygula.
+```
+
+B-roll ekledikten sonra aynı cümleyi tekrar kullanabilirsin; agent slotları bağlar ve rebuild eder.

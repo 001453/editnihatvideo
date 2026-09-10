@@ -30,7 +30,7 @@ Format: **9:16 · 1080×1920 · yüz önde · üstte kart boşluğu · altyazı 
 
 ### Punch / B-roll / IG / SFX
 - Punch 3–5, hold 6–10s, scale 1.10–1.16, click+sub-hit.
-- B-roll **max 2×8s**, whip + whoosh, PIP sol. Labs prompt dosyası.
+- B-roll **max 2×8s** (sürekli 8 sn; kullanıcı başlangıç cümlesine göre hazırlar), whip + whoosh, PIP sol. Labs prompt dosyası.
 - IG PNG 2.3s, exclusive, swoosh-up.
 - Satır SFX tipine göre (slam dolu, kicker hafif, count → ui-confirm).
 
@@ -48,6 +48,10 @@ Look: `shared/`. Recipe: `shared/show-flow.json`.
 - Keyword listesi transcript’e göre genişler  
 
 Animasyon **stili kilitli**; içerik **serbest**.
+
+### Motion graphics (`timeline.mg`)
+Kart değil — overlay efektler. Video’da **2–5** yeter.
+Tipler: `sparkline` | `stroke` | `sparks` | `flash` | `ticker` | `underline`
 
 ---
 

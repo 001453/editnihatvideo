@@ -52,7 +52,7 @@ Full notes: `shared/SHOW_STANDARD.md` · machine recipe: `shared/show-flow.json`
 - Face full-bleed; cards **top band** (transparent glass, no heavy black); captions mid-lower + **keyword pop**; PIP **left**.
 - Card enter/exit: each card a **unique** mode from slam/soft/glitch/tilt/wipe/pop/rise/flip/snap/drift/zoom/fold + mid-hold progress. One hero 3D (`timeline.hero`).
 - Punch: hold + click/sub-hit; scales 1.10–1.16; not on IG window.
-- B-roll: **max 2×8s**, whip + whoosh, muted, PIP left. Labs: `public/broll/LABS_PROMPTS.md`.
+- B-roll: **max 2×8s (sürekli 8 sn — kullanıcı başlangıç cümlesine göre hazırlar)**, whip + whoosh, muted, PIP left. Labs: `public/broll/LABS_PROMPTS.md`.
 - Line SFX by type (slam louder, kicker softer, count → ui-confirm).
 - Disclaimer: transparent centered **YATIRIM TAVSİYESİ DEĞİL** bottom; no NİHAT bar.
 - IG: PNG only, 2.3s, exclusive.

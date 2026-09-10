@@ -30,6 +30,7 @@ if not IG_BANNER and DUR > 30:
         {"id": "b", "start": round(max(26.5, DUR - 11.0), 1), "dur": 2.3},
     ]
 CARD_SFX = [tuple(x) for x in (timeline.get("cardSfx") or [])]
+MG = list(timeline.get("mg") or [])
 
 
 def shared_dir():
@@ -41,6 +42,142 @@ def shared_dir():
 
 def q(t):
     return f"{round(float(t) * FPS) / FPS:.4f}"
+
+
+def mg_html_bits():
+    """Motion-graphics overlays from timeline.json mg[] — not cards."""
+    bits = []
+    for i, m in enumerate(MG):
+        mid = re.sub(r"[^a-zA-Z0-9_-]", "", str(m.get("id") or f"m{i}")) or f"m{i}"
+        typ = (m.get("type") or "stroke").lower()
+        at = float(m.get("at") or 0)
+        dur = float(m.get("dur") or 1.2)
+        text = (m.get("text") or "").strip()
+        y = int(m.get("y") or (520 if typ == "sparkline" else 640 if typ == "ticker" else 480))
+        if typ == "sparkline":
+            bits.append(
+                f'''      <div class="clip mg-host" id="mg-{mid}" data-mg="{typ}" data-start="{q(at)}" data-duration="{q(dur)}" data-track-index="7" style="left:60px;top:{y}px;width:960px;height:160px;">
+        <svg class="mg-sparkline" viewBox="0 0 960 160" preserveAspectRatio="none">
+          <path id="mg-{mid}-path" d="M20 120 C120 110,180 40,280 70 S420 140,520 90 S700 20,820 55 S920 100,940 88"/>
+          <circle class="mg-dot" id="mg-{mid}-dot" cx="20" cy="120" r="6"/>
+        </svg>
+      </div>'''
+            )
+        elif typ == "stroke":
+            bits.append(
+                f'''      <div class="clip mg-host" id="mg-{mid}" data-mg="{typ}" data-start="{q(at)}" data-duration="{q(dur)}" data-track-index="7" style="left:40px;top:{y}px;width:1000px;height:24px;">
+        <div class="mg-stroke" id="mg-{mid}-line"></div>
+      </div>'''
+            )
+        elif typ == "sparks":
+            dots = "".join("<i></i>" for _ in range(12))
+            bits.append(
+                f'''      <div class="clip mg-host" id="mg-{mid}" data-mg="{typ}" data-start="{q(at)}" data-duration="{q(dur)}" data-track-index="7" style="left:240px;top:{y}px;width:600px;height:400px;">
+        <div class="mg-sparks" id="mg-{mid}-sparks">{dots}</div>
+      </div>'''
+            )
+        elif typ == "flash":
+            bits.append(
+                f'''      <div class="clip mg-host" id="mg-{mid}" data-mg="{typ}" data-start="{q(at)}" data-duration="{q(max(dur, 0.2))}" data-track-index="9" style="left:0;top:0;width:1080px;height:1920px;">
+        <div class="mg-flash" id="mg-{mid}-flash"></div>
+      </div>'''
+            )
+        elif typ == "ticker":
+            label = escape(text or "· MOTION ·")
+            bits.append(
+                f'''      <div class="clip mg-host" id="mg-{mid}" data-mg="{typ}" data-start="{q(at)}" data-duration="{q(dur)}" data-track-index="7" style="left:0;top:{y}px;width:1080px;height:56px;">
+        <div class="mg-ticker"><div class="mg-ticker-track" id="mg-{mid}-track"><span>{label}</span><span>{label}</span><span>{label}</span><span>{label}</span></div></div>
+      </div>'''
+            )
+        elif typ == "underline":
+            bits.append(
+                f'''      <div class="clip mg-host" id="mg-{mid}" data-mg="{typ}" data-start="{q(at)}" data-duration="{q(dur)}" data-track-index="7" style="left:40px;top:{y}px;width:920px;height:40px;">
+        <div class="mg-underline" id="mg-{mid}-ul"></div>
+      </div>'''
+            )
+        else:
+            continue
+    return "\n".join(bits)
+
+
+def mg_js_bits():
+    lines = ["          /* Motion graphics from timeline.mg */"]
+    for i, m in enumerate(MG):
+        mid = re.sub(r"[^a-zA-Z0-9_-]", "", str(m.get("id") or f"m{i}")) or f"m{i}"
+        typ = (m.get("type") or "").lower()
+        at = float(m.get("at") or 0)
+        dur = float(m.get("dur") or 1.2)
+        if typ == "sparkline":
+            lines.append(
+                f'''          (function(){{
+            var path = document.getElementById("mg-{mid}-path");
+            var dot = document.getElementById("mg-{mid}-dot");
+            if(!path || !dot) return;
+            var len = path.getTotalLength();
+            var t0 = {at + 0.08:.3f};
+            tl.set(path,{{strokeDasharray:len,strokeDashoffset:len}}, Math.max(0,t0-0.05));
+            tl.to(path,{{strokeDashoffset:0,duration:Math.min(2.2,{dur}*0.7),ease:"power2.inOut"}}, t0);
+            var obj = {{p:0}};
+            tl.to(obj,{{p:1,duration:Math.min(2.2,{dur}*0.7),ease:"power2.inOut",onUpdate:function(){{
+              var pt = path.getPointAtLength(obj.p * len);
+              dot.setAttribute("cx", pt.x); dot.setAttribute("cy", pt.y);
+            }}}}, t0);
+            tl.fromTo("#mg-{mid}",{{opacity:0}},{{opacity:1,duration:0.2,immediateRender:false}}, {at});
+            tl.to("#mg-{mid}",{{opacity:0,duration:0.28,ease:"power1.in"}}, {at}+{dur}-0.3);
+          }})();'''
+            )
+        elif typ == "stroke":
+            lines.append(
+                f'''          (function(){{
+            var el = document.getElementById("mg-{mid}-line");
+            if(!el) return;
+            tl.fromTo(el,{{scaleX:0,opacity:0}},{{scaleX:1,opacity:1,duration:0.45,ease:"power3.out",immediateRender:false}}, {at});
+            tl.to(el,{{opacity:0,scaleX:0.2,duration:0.28,ease:"power2.in"}}, {at}+{dur}-0.3);
+          }})();'''
+            )
+        elif typ == "sparks":
+            lines.append(
+                f'''          (function(){{
+            var host = document.getElementById("mg-{mid}-sparks");
+            if(!host) return;
+            var dots = host.querySelectorAll("i");
+            dots.forEach(function(d, i){{
+              var ang = (i / Math.max(1,dots.length)) * Math.PI * 2;
+              var dist = 90 + (i % 3) * 40;
+              tl.fromTo(d,{{opacity:0,x:0,y:0,scale:0.4}},{{opacity:1,x:Math.cos(ang)*dist,y:Math.sin(ang)*dist,scale:1,duration:0.35,ease:"power2.out",immediateRender:false}}, {at}+i*0.02);
+              tl.to(d,{{opacity:0,scale:0.2,duration:0.35,ease:"power1.in"}}, {at}+0.4+i*0.02);
+            }});
+          }})();'''
+            )
+        elif typ == "flash":
+            lines.append(
+                f'''          (function(){{
+            var el = document.getElementById("mg-{mid}-flash");
+            if(!el) return;
+            tl.fromTo(el,{{opacity:0}},{{opacity:1,duration:0.06,ease:"none",immediateRender:false}}, {at});
+            tl.to(el,{{opacity:0,duration:0.22,ease:"power2.out"}}, {at}+0.06);
+          }})();'''
+            )
+        elif typ == "ticker":
+            lines.append(
+                f'''          (function(){{
+            var track = document.getElementById("mg-{mid}-track");
+            if(!track) return;
+            tl.fromTo("#mg-{mid}",{{opacity:0,y:12}},{{opacity:1,y:0,duration:0.28,ease:"power2.out",immediateRender:false}}, {at});
+            tl.fromTo(track,{{x:0}},{{x:-540,duration:Math.max(2.5,{dur}),ease:"none",immediateRender:false}}, {at});
+            tl.to("#mg-{mid}",{{opacity:0,duration:0.25,ease:"power1.in"}}, {at}+{dur}-0.28);
+          }})();'''
+            )
+        elif typ == "underline":
+            lines.append(
+                f'''          (function(){{
+            var el = document.getElementById("mg-{mid}-ul");
+            if(!el) return;
+            tl.fromTo(el,{{scaleX:0,opacity:0}},{{scaleX:1,opacity:1,duration:0.4,ease:"power3.out",immediateRender:false}}, {at});
+            tl.to(el,{{opacity:0,duration:0.25}}, {at}+{dur}-0.28);
+          }})();'''
+            )
+    return "\n".join(lines) if len(lines) > 1 else ""
 
 
 CAP_KW_RE = re.compile(
@@ -345,6 +482,17 @@ for m in re.finditer(r"<[^>]*\bdata-count=[^>]*>", cards_html):
 for ig in IG_BANNER:
     sfx_bits.append(sfx_el(f"sfx-ig-{ig['id']}", "sfx/swoosh-up.mp3", ig["start"], 0.42, "0.13", 20))
 
+for i, m in enumerate(MG):
+    typ = (m.get("type") or "").lower()
+    at = float(m.get("at") or 0)
+    mid = re.sub(r"[^a-zA-Z0-9_-]", "", str(m.get("id") or f"m{i}")) or f"m{i}"
+    if typ in ("sparks", "flash"):
+        sfx_bits.append(sfx_el(f"sfx-mg-{mid}", "sfx/tick.mp3", at, 0.12, "0.08", 21))
+    elif typ in ("sparkline", "stroke", "underline"):
+        sfx_bits.append(sfx_el(f"sfx-mg-{mid}", "sfx/whoosh-short.mp3", at, 0.28, "0.08", 21))
+    elif typ == "ticker":
+        sfx_bits.append(sfx_el(f"sfx-mg-{mid}", "sfx/swoosh-up.mp3", at, 0.35, "0.09", 21))
+
 sfx_html = "\n".join(sfx_bits)
 
 css = (shared_dir() / "composition.css").read_text(encoding="utf-8")
@@ -585,6 +733,7 @@ js = f'''
 {punch_js}
 {hero_js}
 {special_js}
+{mg_js_bits()}
           var cardIdx = 0;
           document.querySelectorAll(".card-host").forEach(function(host){{
             var t = parseFloat(host.getAttribute("data-start")) || 0;
@@ -692,6 +841,7 @@ html_doc = f'''<!doctype html>
       <div id="overlays">
 {cards_html}
 {ig_html}
+{mg_html_bits()}
       <div class="clip cap-stage" id="caption-host" data-start="0" data-duration="{DUR}" data-track-index="5" style="left:{int(cap['x'])}px;top:{int(cap['y'])}px;width:{int(cap['w'])}px;height:{int(cap['h'])}px;">
 {caption_items()}
       </div>
@@ -731,4 +881,6 @@ print(
     len(captions),
     "special",
     (SPECIAL.get("type") if SPECIAL else None),
+    "mg",
+    len(MG),
 )

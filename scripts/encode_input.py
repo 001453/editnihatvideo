@@ -20,10 +20,14 @@ def encode(src: Path, dst: Path, broll: bool = False, quality: str = "draft") ->
     else:
         preset, crf = "veryfast", "20"
 
+    same = src.resolve() == dst.resolve()
+    out = dst.with_suffix(dst.suffix + ".tmp.mp4") if same else dst
+
     cmd = ["ffmpeg", "-y", "-i", str(src)]
     if broll:
-        # B-roll must be 9:16 canvas; talking-head keeps source pixels
+        # Always 8s · muted 9:16 crop (show lock — user prepares from start sentence)
         cmd += [
+            "-t", "8",
             "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920",
             "-an",
         ]
@@ -34,17 +38,19 @@ def encode(src: Path, dst: Path, broll: bool = False, quality: str = "draft") ->
         "-c:v", "libx264", "-preset", preset, "-crf", crf,
         "-g", "15", "-bf", "0", "-tune", "fastdecode", "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
-        str(dst),
+        str(out),
     ]
     print("+", " ".join(cmd), flush=True)
     subprocess.run(cmd, check=True)
+    if same:
+        out.replace(dst)
 
 
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("src")
     p.add_argument("dst")
-    p.add_argument("--broll", action="store_true", help="muted 9:16 crop, no audio")
+    p.add_argument("--broll", action="store_true", help="muted 9:16 crop / 8s, no audio")
     p.add_argument("--quality", choices=["draft", "final"], default="draft")
     args = p.parse_args()
     encode(Path(args.src), Path(args.dst), broll=args.broll, quality=args.quality)
