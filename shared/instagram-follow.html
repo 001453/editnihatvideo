@@ -1,0 +1,119 @@
+<!-- hyperframes-registry-item: instagram-follow · Nihat branded · LOCKED -->
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="../public/vendor/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: transparent; overflow: hidden; }
+      body { width: 1080px; height: 1920px; font-family: "Segoe UI", system-ui, sans-serif; }
+      /* Outer wrap owns centering — GSAP must not fight translateX(-50%) */
+      [data-composition-id="instagram-follow"] .ig-wrap {
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 2;
+      }
+      [data-composition-id="instagram-follow"] .lower-third {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: rgba(18, 18, 18, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 80px;
+        padding: 16px 26px 16px 16px;
+        box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+        width: max-content;
+        max-width: 920px;
+      }
+      [data-composition-id="instagram-follow"] .avatar {
+        width: 104px; height: 104px; border-radius: 50%;
+        object-fit: cover; flex-shrink: 0;
+        border: 3px solid rgba(250, 204, 21, 0.65);
+        background: #222;
+      }
+      [data-composition-id="instagram-follow"] .profile-info {
+        display: flex; flex-direction: column; gap: 2px; margin-right: 10px; min-width: 0;
+      }
+      [data-composition-id="instagram-follow"] .name-row {
+        display: flex; align-items: center; gap: 8px;
+      }
+      [data-composition-id="instagram-follow"] .display-name {
+        font-size: 34px; font-weight: 800; color: #fff; line-height: 1.15;
+        letter-spacing: -0.02em; white-space: nowrap;
+      }
+      [data-composition-id="instagram-follow"] .verified-badge { width: 26px; height: 26px; flex-shrink: 0; }
+      [data-composition-id="instagram-follow"] .verified-badge svg { width: 26px; height: 26px; display: block; }
+      [data-composition-id="instagram-follow"] .handle {
+        font-size: 22px; font-weight: 500; color: #b8b8b8; line-height: 1.25; white-space: nowrap;
+      }
+      [data-composition-id="instagram-follow"] .follower-count { display: none; }
+      [data-composition-id="instagram-follow"] .follow-btn {
+        position: relative; width: 200px; height: 68px; border-radius: 40px;
+        background: #0095f6; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; overflow: hidden;
+      }
+      [data-composition-id="instagram-follow"] .btn-text {
+        position: absolute; font-size: 26px; font-weight: 800; color: #fff;
+        letter-spacing: 0.01em; white-space: nowrap;
+      }
+      [data-composition-id="instagram-follow"] .btn-text-follow { opacity: 1; }
+      [data-composition-id="instagram-follow"] .btn-text-following {
+        opacity: 0; display: flex; align-items: center; gap: 6px;
+      }
+      [data-composition-id="instagram-follow"] .chevron-icon { display: inline-block; width: 16px; height: 16px; }
+      [data-composition-id="instagram-follow"] .chevron-icon svg { width: 16px; height: 16px; display: block; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="instagram-follow" data-width="1080" data-height="1920" data-start="0" data-duration="4.5">
+      <div class="ig-wrap">
+        <div id="card" class="clip lower-third" data-start="0" data-duration="4.5" data-track-index="0">
+          <img class="avatar" src="IG_AVATAR_SRC" alt="Nihat Çetinkaya" />
+          <div class="profile-info">
+            <div class="name-row">
+              <div class="display-name">Nihat Çetinkaya</div>
+              <span class="verified-badge"><svg viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="20" fill="#0095F6" />
+                <path d="M17.5 27.5L10 20l2.5-2.5 5 5 10-10L30 15 17.5 27.5z" fill="#fff" />
+              </svg></span>
+            </div>
+            <div class="handle">@nihatcetinkayafinans</div>
+          </div>
+          <div id="follow-btn" class="follow-btn">
+            <span id="btn-follow" class="btn-text btn-text-follow">Takip Et</span>
+            <span id="btn-following" class="btn-text btn-text-following">
+              <span>Takip</span>
+              <span class="chevron-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg></span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var card = document.getElementById("card");
+      var btn = document.getElementById("follow-btn");
+      var textFollow = document.getElementById("btn-follow");
+      var textFollowing = document.getElementById("btn-following");
+      /* IG Reels lock: expo enter/exit — no bounce; button press soft */
+      gsap.set(card, { y: -160, opacity: 0 });
+      tl.to(card, { y: 0, opacity: 1, duration: 0.42, ease: "expo.out" }, 0.06);
+      tl.to(btn, { scale: 0.92, duration: 0.12, ease: "power2.out" }, 1.15);
+      tl.to(btn, { scale: 1, duration: 0.28, ease: "expo.out" }, 1.28);
+      tl.to(btn, { backgroundColor: "#2f2f2f", duration: 0.1, ease: "none" }, 1.28);
+      tl.to(textFollow, { opacity: 0, duration: 0.08, ease: "none" }, 1.28);
+      tl.to(textFollowing, { opacity: 1, duration: 0.08, ease: "none" }, 1.31);
+      tl.to(card, { y: -140, opacity: 0, duration: 0.36, ease: "power2.in" }, 3.9);
+      window.__timelines["instagram-follow"] = tl;
+    </script>
+  </body>
+</html>

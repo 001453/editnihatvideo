@@ -14,12 +14,13 @@ Repo: [github.com/001453/editnihatvideo](https://github.com/001453/editnihatvide
 
 | Sabit (kalıp) | Her videoda yeni |
 | --- | --- |
-| Kart tipleri, cam look, enter anim havuzu | Transcript’ten kart metni |
-| Anton 3D altyazı + keyword pop | Caption zamanları / keyword’ler |
-| Punch, PIP (sol), IG banner, SFX pack | Punch / IG / hero zamanları |
-| `template/build_composition.py` motoru | `cards.html`, `timeline.json`, b-roll |
-| Max **2×8s** b-roll (hep 8 sn) | Kelime + start; sen 8 sn clip hazırlarsın |
-| Dashboard sürükle-bırak (kaynak + b-roll) | Slot dosyaları `public/broll/<ad>.mp4` |
+| Face-safe layout + cam kart look | Transcript’ten kart metni |
+| Montserrat karaoke altyazı | Caption zamanları |
+| IG Follow anim (mid+end) | Punch / IG / hero zamanları |
+| Kart motion ailesi `soft\|rise\|slide\|scale` | Enter çeşidi + geçişler |
+| `template/build_composition.py` motoru | `cards.html`, `timeline.json` |
+| Max **2×8s** b-roll (sen eklersin) | Kelime + start; dashboard drop |
+| Dashboard sürükle-bırak | Slot dosyaları `public/broll/<ad>.mp4` |
 
 Konuya göre ek: drone / mockup / split vb. (video başına en fazla **1** büyük özel an).
 

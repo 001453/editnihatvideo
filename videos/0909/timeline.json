@@ -18,23 +18,119 @@
     }
   ],
   "punches": [
-    [12.0, 7.5, 1.12],
-    [69.68, 8.0, 1.14],
-    [79.16, 7.5, 1.16],
-    [134.52, 8.0, 1.12]
+    [
+      12.0,
+      7.5,
+      1.12
+    ],
+    [
+      69.68,
+      8.0,
+      1.14
+    ],
+    [
+      79.16,
+      7.5,
+      1.16
+    ],
+    [
+      134.52,
+      8.0,
+      1.12
+    ]
   ],
-  "hero": {"id": "kap", "at": 76.74},
-  "special": {"type": "drone", "at": 99.28, "dur": 1.5, "card": "why"},
+  "hero": {
+    "id": "kap",
+    "at": 76.74
+  },
+  "special": {
+    "type": "drone",
+    "at": 99.28,
+    "dur": 1.5,
+    "card": "why"
+  },
   "igBanner": [
-    {"id": "a", "start": 24.0, "dur": 2.3},
-    {"id": "b", "start": 143.9, "dur": 2.3}
+    {"id": "mid", "start": 88.0, "dur": 4.5},
+    {"id": "end", "start": 138.5, "dur": 4.5}
   ],
   "mg": [
-    {"id": "flash1", "type": "flash", "at": 12.0, "dur": 0.25},
-    {"id": "line1", "type": "sparkline", "at": 55.5, "dur": 5.0, "y": 560},
-    {"id": "stroke1", "type": "stroke", "at": 76.74, "dur": 1.3, "y": 780},
-    {"id": "tick1", "type": "ticker", "at": 112.2, "dur": 4.0, "y": 1000, "text": "%25-29 · AYLIK %3 · TLK · GETİRİ"},
-    {"id": "sparks1", "type": "sparks", "at": 134.52, "dur": 0.95, "y": 700}
+    {
+      "id": "flash1",
+      "type": "flash",
+      "at": 12.0,
+      "dur": 0.25
+    },
+    {
+      "id": "line1",
+      "type": "sparkline",
+      "at": 55.5,
+      "dur": 5.0,
+      "y": 200
+    },
+    {
+      "id": "stroke1",
+      "type": "stroke",
+      "at": 76.74,
+      "dur": 1.3,
+      "y": 250
+    },
+    {
+      "id": "tick1",
+      "type": "ticker",
+      "at": 112.2,
+      "dur": 4.0,
+      "y": 220,
+      "text": "%25-29 · AYLIK %3 · TLK · GETİRİ"
+    },
+    {
+      "id": "sparks1",
+      "type": "sparks",
+      "at": 134.52,
+      "dur": 0.95,
+      "y": 120
+    }
+  ],
+  "proCards": [
+    {
+      "id": "gelir-stat",
+      "block": "mk-progress-stat",
+      "start": 54.9,
+      "dur": 7.0,
+      "scale": 0.34,
+      "x": -400,
+      "y": 40,
+      "copy": {
+        "scheme": "dark",
+        "value": 20.2,
+        "suffix": "",
+        "label": "MİLYAR TL GELİR",
+        "caption": "2025 mali tablo · nakdi bağış ağırlıklı",
+        "max": 25,
+        "trackWidth": 520,
+        "x": 220,
+        "y": 160
+      }
+    },
+    {
+      "id": "getiri-stat",
+      "block": "mk-progress-stat",
+      "start": 119.5,
+      "dur": 7.0,
+      "scale": 0.34,
+      "x": -400,
+      "y": 40,
+      "copy": {
+        "scheme": "dark",
+        "value": 27,
+        "suffix": "%",
+        "label": "BİRİM FİYAT",
+        "caption": "2026 başından · aylık ~%3",
+        "max": 40,
+        "trackWidth": 520,
+        "x": 220,
+        "y": 160
+      }
+    }
   ],
   "brollPending": false
 }

@@ -9,5 +9,12 @@
   "media": {
     "autoProxy": true
   },
-  "authoringSkill": "talking-head-recut"
+  "authoringSkill": "talking-head-recut",
+  "registryItems": [
+    {
+      "name": "caption-clip-wipe",
+      "type": "hyperframes:component",
+      "target": "compositions/components/caption-clip-wipe.html"
+    }
+  ]
 }

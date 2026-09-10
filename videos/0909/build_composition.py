@@ -27,7 +27,18 @@ captions = proj.get("captions") or []
 ACCOUNT = proj.get("account") or "nihat"
 DUR = round(float(proj.get("duration") or 0), 2) or 1.0
 FPS = 30
-cap = layout.get("caption") or {"x": 20, "y": 1208, "w": 1060, "h": 320, "fontSize": 62}
+WORDS = proj.get("words") or []
+cap = layout.get("caption") or {"x": 48, "y": 1180, "w": 860, "h": 360, "fontSize": 60}
+# Enforce IG right-rail safe box (like/comment) — never full-bleed captions
+cap["x"] = int(cap.get("x") if cap.get("x") is not None else 48)
+cap["w"] = int(cap.get("w") if cap.get("w") is not None else 860)
+cap["y"] = int(cap.get("y") if cap.get("y") is not None else 1180)
+cap["h"] = int(cap.get("h") if cap.get("h") is not None else 360)
+cap["fontSize"] = int(cap.get("fontSize") if cap.get("fontSize") is not None else 60)
+# Clamp into safe zone: left≥40, right margin≥150 → width ≤ 1080-40-150
+cap["x"] = max(40, min(cap["x"], 120))
+cap["w"] = min(cap["w"], 1080 - cap["x"] - 150)
+cap["w"] = max(720, cap["w"])
 
 BROLL = list(timeline.get("broll") or [])
 for _b in BROLL:
@@ -36,11 +47,12 @@ PUNCHES = [tuple(p) for p in (timeline.get("punches") or [])]
 IG_BANNER = list(timeline.get("igBanner") or [])
 if not IG_BANNER and DUR > 30:
     IG_BANNER = [
-        {"id": "a", "start": 24.0, "dur": 2.3},
-        {"id": "b", "start": round(max(26.5, DUR - 11.0), 1), "dur": 2.3},
+        {"id": "mid", "start": round(max(40.0, DUR * 0.55), 1), "dur": 4.5},
+        {"id": "end", "start": round(max(50.0, DUR - 11.0), 1), "dur": 4.5},
     ]
 CARD_SFX = [tuple(x) for x in (timeline.get("cardSfx") or [])]
 MG = list(timeline.get("mg") or [])
+PRO_CARDS = list(timeline.get("proCards") or [])
 
 
 def shared_dir():
@@ -50,8 +62,82 @@ def shared_dir():
     raise SystemExit("shared/ yok")
 
 
+def sync_shared_fonts():
+    """Copy Montserrat/Anton from shared/fonts → public/fonts on every build."""
+    import shutil
+
+    src = shared_dir() / "fonts"
+    dst = ROOT / "public" / "fonts"
+    if not src.exists():
+        return
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in src.glob("*.woff2"):
+        shutil.copy2(f, dst / f.name)
+
+
+sync_shared_fonts()
+
+
 def q(t):
     return f"{round(float(t) * FPS) / FPS:.4f}"
+
+
+def _patch_pro_config(html: str, copy: dict) -> str:
+    """Patch registry CONFIG object fields from timeline proCards[].copy."""
+    if not copy:
+        return html
+    for key, val in copy.items():
+        if isinstance(val, bool):
+            lit = "true" if val else "false"
+            html = re.sub(rf"({re.escape(key)}\s*:\s*)(true|false)", rf"\g<1>{lit}", html)
+        elif isinstance(val, (int, float)):
+            html = re.sub(rf"({re.escape(key)}\s*:\s*)(-?\d+(?:\.\d+)?)", rf"\g<1>{val}", html, count=1)
+        else:
+            lit = json.dumps(str(val), ensure_ascii=False)
+            html = re.sub(
+                rf"({re.escape(key)}\s*:\s*)(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*')",
+                rf"\g<1>{lit}",
+                html,
+                count=1,
+            )
+    # Nihat talking-head: prefer dark scheme on face footage
+    if "scheme" not in copy and "scheme:" in html:
+        html = re.sub(r'(scheme\s*:\s*)"(light|dark)"', r'\1"dark"', html, count=1)
+    return html
+
+
+def pro_cards_html():
+    """Mount 1–3 curated registry blocks (shared/PRO_CARDS.md) into top band."""
+    if not PRO_CARDS:
+        return ""
+    reg = shared_dir() / "registry" / "compositions"
+    dest = ROOT / "compositions"
+    dest.mkdir(parents=True, exist_ok=True)
+    bits = []
+    for i, p in enumerate(PRO_CARDS):
+        block = (p.get("block") or p.get("id") or "").strip()
+        if not block:
+            continue
+        src = reg / f"{block}.html"
+        if not src.is_file():
+            src = reg / "components" / f"{block}.html"
+        if not src.is_file():
+            print("pro card yok:", block)
+            continue
+        cid = re.sub(r"[^\w\-]+", "-", (p.get("id") or block).strip()) or f"pro{i}"
+        local_name = f"pro-{cid}.html"
+        local = dest / local_name
+        local.write_text(_patch_pro_config(src.read_text(encoding="utf-8"), p.get("copy") or {}), encoding="utf-8")
+        start = float(p.get("start") or 0)
+        dur = float(p.get("dur") or 7)
+        left = int(p.get("x", -420))
+        top = int(p.get("y", 60))
+        scale = float(p.get("scale", 0.52))
+        # path relative to public/index.html → ../compositions/
+        bits.append(
+            f'''      <div class="clip pro-card" id="pro-{cid}" data-composition-id="{escape(block)}" data-composition-src="../compositions/{local_name}" data-start="{q(start)}" data-duration="{q(dur)}" data-track-index="11" data-width="1920" data-height="1080" style="left:{left}px;top:{top}px;width:1920px;height:1080px;transform:scale({scale});transform-origin:top center;z-index:12;pointer-events:none;"></div>'''
+        )
+    return "\n".join(bits)
 
 
 def mg_html_bits():
@@ -198,6 +284,15 @@ CAP_KW_RE = re.compile(
 )
 
 
+CAP_ANIMS = ("rise", "soft", "lift")
+TONE_ACCENT = {
+    "yumusak": "#FACC15",
+    "sert": "#FF2A2A",
+    "yukselis": "#C8FF00",
+    "fixed": "#FFFFFF",
+}
+
+
 def wrap_cap_keywords(text):
     if not text:
         return ""
@@ -213,45 +308,59 @@ def wrap_cap_keywords(text):
     return "".join(parts) if parts else escape(text)
 
 
+def assign_word_times(n_display, timed, cap_start, cap_end):
+    """Map N on-screen words onto transcript word timings (AI Video Studio karaoke)."""
+    if n_display <= 0:
+        return []
+    if not timed:
+        span = max(0.2, float(cap_end) - float(cap_start))
+        step = span / n_display
+        return [
+            (float(cap_start) + i * step, float(cap_start) + (i + 1) * step)
+            for i in range(n_display)
+        ]
+    m = len(timed)
+    out = []
+    for i in range(n_display):
+        i0 = int(i * m / n_display)
+        i1 = max(i0, int((i + 1) * m / n_display) - 1)
+        out.append((float(timed[i0]["start"]), float(timed[i1]["end"])))
+    return out
+
+
+def wrap_cap_words_timed(text, times):
+    """Each word → .cap-w with data-ws/data-we for karaoke light-up."""
+    text = " ".join((text or "").split())
+    if not text:
+        return ""
+    toks = text.split(" ")
+    out = []
+    for i, w in enumerate(toks):
+        cls = "cap-w cap-kw" if CAP_KW_RE.search(w) else "cap-w"
+        ws, we = times[i] if i < len(times) else (0.0, 0.0)
+        out.append(
+            f'<span class="{cls}" data-ws="{q(ws)}" data-we="{q(we)}">{escape(w)}</span>'
+        )
+    return " ".join(out)
+
+
+def wrap_cap_words(text):
+    return wrap_cap_words_timed(text, [])
+
+
 def cap_line_scale(longest_chars):
-    """Shrink long caption lines so Anton 3D stays inside safe margins."""
-    if longest_chars >= 26:
-        return 0.62
-    if longest_chars >= 22:
-        return 0.70
-    if longest_chars >= 18:
-        return 0.78
-    if longest_chars >= 15:
-        return 0.88
-    return 1.0
+    """AI Video Studio HookCaptions: size ~= width*0.055 * min(1, 20/chars)."""
+    if longest_chars <= 0:
+        return 1.0
+    return max(0.55, min(1.0, 20.0 / float(longest_chars)))
 
 
-def fit_caption_line(text, soft_max=15):
-    """Split long caption into up to 2 lines + return scale for that block."""
+def fit_caption_line(text, soft_max=22):
+    """One visual line only (top OR bottom). Never insert <br> — max 2 rows total."""
     text = " ".join((text or "").split())
     if not text:
         return "", 1.0
-    words = text.split()
-    if len(text) <= soft_max and len(words) <= 3:
-        return wrap_cap_keywords(text), cap_line_scale(len(text))
-    if len(words) == 1:
-        return wrap_cap_keywords(text), cap_line_scale(len(text))
-    # Prefer ~equal two lines by character count
-    best_i, best_score = 1, None
-    for i in range(1, len(words)):
-        a = " ".join(words[:i])
-        b = " ".join(words[i:])
-        score = abs(len(a) - len(b))
-        if len(a) > soft_max + 6:
-            score += (len(a) - soft_max) * 2
-        if len(b) > soft_max + 6:
-            score += (len(b) - soft_max) * 2
-        if best_score is None or score < best_score:
-            best_score, best_i = score, i
-    a = " ".join(words[:best_i])
-    b = " ".join(words[best_i:])
-    html = wrap_cap_keywords(a) + "<br>" + wrap_cap_keywords(b)
-    return html, cap_line_scale(max(len(a), len(b)))
+    return wrap_cap_words(text), cap_line_scale(len(text))
 
 
 def caption_items():
@@ -260,15 +369,28 @@ def caption_items():
         start = float(c["start"])
         end = min(float(c["end"]), DUR)
         tone = "fixed" if ACCOUNT == "mehmet" else (c.get("tone") or "yumusak")
+        accent = TONE_ACCENT.get(tone, "#FACC15")
+        anim = CAP_ANIMS[i % len(CAP_ANIMS)]
         top = caption_display((c.get("top") or "").strip())
         bot = caption_display((c.get("bottom") or c.get("text") or "").strip())
-        top_html, top_scale = fit_caption_line(top)
-        bot_html, bot_scale = fit_caption_line(bot)
+        top_toks = top.split() if top else []
+        bot_toks = bot.split() if bot else []
+        n_vis = len(top_toks) + len(bot_toks)
+        w0 = int(c.get("wordStart") if c.get("wordStart") is not None else 0)
+        w1 = int(c.get("wordEnd") if c.get("wordEnd") is not None else w0)
+        timed = WORDS[w0 : w1 + 1] if WORDS else []
+        times = assign_word_times(n_vis, timed, start, end)
+        top_times = times[: len(top_toks)]
+        bot_times = times[len(top_toks) :]
+        top_html = wrap_cap_words_timed(top, top_times) if top else ""
+        bot_html = wrap_cap_words_timed(bot, bot_times)
+        top_scale = cap_line_scale(len(top)) if top else 1.0
+        bot_scale = cap_line_scale(len(bot)) if bot else 1.0
         cid = f"cap-{i:03d}"
         top_style = f' style="--lineScale:{top_scale:.2f}"' if top_html else ""
         bot_style = f' style="--lineScale:{bot_scale:.2f}"'
         parts.append(
-            f'''        <div class="cap-item tone-{tone}" id="{cid}" data-cap-start="{q(start)}" data-cap-end="{q(end)}">
+            f'''        <div class="cap-item tone-{tone}" id="{cid}" data-cap-start="{q(start)}" data-cap-end="{q(end)}" data-accent="{accent}" data-anim="{anim}">
           <div class="cap-top" id="{cid}-top"{top_style}>{top_html}</div>
           <div class="cap-bot" id="{cid}-bot"{bot_style}>{bot_html}</div>
         </div>'''
@@ -277,16 +399,52 @@ def caption_items():
 
 
 def caption_js():
-    # Shell fade + keyword pop on .cap-kw only (keeps Studio editable hosts unlocked).
-    return '''          document.querySelectorAll(".cap-item").forEach(function(el){
+    # Professional karaoke (AI Video Studio HookCaptions, softened):
+    # dim → accent + micro-rise → spoken white. Seek-safe GSAP only.
+    return r'''          document.querySelectorAll(".cap-item").forEach(function(el){
             var s = parseFloat(el.getAttribute("data-cap-start"));
             var e = parseFloat(el.getAttribute("data-cap-end"));
-            tl.set(el, {autoAlpha:1}, s);
-            var kws = el.querySelectorAll(".cap-kw");
-            kws.forEach(function(kw, i){
-              tl.fromTo(kw,{scale:1,filter:"brightness(1)"},{scale:1.14,filter:"brightness(1.25)",duration:0.22,yoyo:true,repeat:1,ease:"power2.out",immediateRender:false}, s+0.06+i*0.05);
+            var accent = el.getAttribute("data-accent") || "#FACC15";
+            var anim = el.getAttribute("data-anim") || "rise";
+            var words = el.querySelectorAll(".cap-w");
+            var outline = "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 3px 10px rgba(0,0,0,.55)";
+            var glow = "0 0 14px "+accent+"B3, 0 0 28px "+accent+"59, "+outline;
+            // Block enter — soft, consistent (no bounce / whip)
+            if(anim === "soft"){
+              tl.fromTo(el,{autoAlpha:0,scale:0.97},{autoAlpha:1,scale:1,duration:0.32,ease:"power3.out",immediateRender:false}, s);
+            } else if(anim === "lift"){
+              tl.fromTo(el,{autoAlpha:0,y:14},{autoAlpha:1,y:0,duration:0.34,ease:"power3.out",immediateRender:false}, s);
+            } else {
+              tl.fromTo(el,{autoAlpha:0,y:10,scale:0.985},{autoAlpha:1,y:0,scale:1,duration:0.32,ease:"power3.out",immediateRender:false}, s);
+            }
+            words.forEach(function(w, i){
+              var ws = parseFloat(w.getAttribute("data-ws"));
+              var we = parseFloat(w.getAttribute("data-we"));
+              if(!isFinite(ws)) ws = s + i * 0.14;
+              if(!isFinite(we)) we = ws + 0.28;
+              ws = Math.max(s, Math.min(e - 0.05, ws));
+              we = Math.max(ws + 0.08, Math.min(e, we));
+              var next = words[i+1];
+              var handoff = next ? parseFloat(next.getAttribute("data-ws")) : we;
+              if(!isFinite(handoff)) handoff = we;
+              handoff = Math.max(ws + 0.1, Math.min(e, handoff));
+              var hold = Math.max(0.1, Math.min(0.42, (handoff - ws) * 0.55));
+              var settleAt = Math.min(handoff - 0.02, ws + hold);
+              // Resting: silik
+              tl.set(w,{opacity:0.25,color:"#ffffff",scale:1,y:6,filter:"brightness(1)",textShadow:outline}, s);
+              // Speak: rise + accent glow
+              tl.to(w,{
+                opacity:1,y:0,color:accent,scale:1.045,filter:"brightness(1.12)",textShadow:glow,
+                duration:0.16,ease:"power3.out"
+              }, ws);
+              // Settle: crisp spoken white (crossfade, not snap)
+              tl.to(w,{
+                color:"#ffffff",scale:1,filter:"brightness(1)",textShadow:outline,
+                duration:0.22,ease:"power2.inOut"
+              }, settleAt);
             });
-            tl.set(el, {autoAlpha:0}, e);
+            // Exit — short dissolve
+            tl.to(el,{autoAlpha:0,y:-4,duration:0.2,ease:"power2.in"}, Math.max(s+0.4, e-0.2));
           });
 '''
 
@@ -342,8 +500,8 @@ def sync_cards_from_index():
             m = re.search(rf'{name}="([^"]*)"', tag)
             return m.group(1) if m else None
 
-        # Timing/position only — never overwrite card inner markup from Studio.
-        for attr in ("data-start", "data-duration", "style"):
+        # Timing only — layout (style) stays in cards.html (face-safe band).
+        for attr in ("data-start", "data-duration"):
             iv, cv = get(i_tag, attr), get(c_open.group(0), attr)
             if iv is not None and iv != cv:
                 if cv is None:
@@ -393,10 +551,46 @@ broll_html = "\n".join(
     for b in BROLL
 )
 
-ig_html = "\n".join(
-    f'''      <img id="ig-ban-{ig["id"]}" class="clip ig-banner" src="follow_banner.png" data-start="{q(ig["start"])}" data-duration="{q(ig["dur"])}" data-track-index="8" style="left:0;top:36px;width:1080px;height:310px;" alt="banner"/>'''
-    for ig in IG_BANNER
-)
+def ensure_ig_follow_composition():
+    """Write branded animated Instagram Follow (Nihat) — one file per banner window (unique ids)."""
+    src = shared_dir() / "instagram-follow.html"
+    if not src.is_file():
+        return False
+    dest_dir = ROOT / "compositions"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    av_src = shared_dir() / "ig_avatar.png"
+    if av_src.is_file():
+        (ROOT / "public").mkdir(parents=True, exist_ok=True)
+        (ROOT / "public" / "ig_avatar.png").write_bytes(av_src.read_bytes())
+    base = src.read_text(encoding="utf-8")
+    base = base.replace("IG_AVATAR_SRC", "../public/ig_avatar.png")
+    for ig in IG_BANNER:
+        iid = re.sub(r"[^\w\-]+", "", str(ig.get("id") or "a")) or "a"
+        cid = f"instagram-follow-{iid}"
+        html = base.replace('data-composition-id="instagram-follow"', f'data-composition-id="{cid}"')
+        html = html.replace('window.__timelines["instagram-follow"]', f'window.__timelines["{cid}"]')
+        html = html.replace(
+            '[data-composition-id="instagram-follow"]',
+            f'[data-composition-id="{cid}"]',
+        )
+        (dest_dir / f"{cid}.html").write_text(html, encoding="utf-8")
+    return True
+
+
+ensure_ig_follow_composition()
+
+ig_html_bits = []
+for ig in IG_BANNER:
+    dur = float(ig.get("dur") or 4.5)
+    if dur < 3.5:
+        dur = 4.5
+    iid = re.sub(r"[^\w\-]+", "", str(ig.get("id") or "a")) or "a"
+    cid = f"instagram-follow-{iid}"
+    start = float(ig["start"])
+    ig_html_bits.append(
+        f'''      <div class="clip ig-follow-host" id="ig-ban-{iid}" data-composition-id="{cid}" data-composition-src="../compositions/{cid}.html" data-start="{q(start)}" data-duration="{q(dur)}" data-track-index="8" data-width="1080" data-height="1920" style="left:0;top:0;width:1080px;height:1920px;z-index:18;pointer-events:none;"></div>'''
+    )
+ig_html = "\n".join(ig_html_bits)
 
 def card_kind(cid, block):
     if "hook" in cid or 'class="root hook' in block or "root hook" in block:
@@ -559,11 +753,11 @@ for b in BROLL:
     cam = f"#broll-{b['id']}-cam"
     # Whip in/out: lateral blur-ish motion + PIP settle left
     broll_js.append(f'''
-          tl.fromTo("{cam}",{{opacity:0,x:140,scale:1.14}},{{opacity:1,x:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}}, {s});
-          tl.to("{cam}",{{opacity:0,x:-100,scale:1.06,duration:0.3,ease:"power2.in"}}, {e - 0.3:.2f});
-          tl.fromTo("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0}},{{scale:0.30,x:-350,y:-20,borderRadius:"36px",rotation:-1.5,duration:0.36,ease:"power3.inOut",immediateRender:false}}, {s});
-          tl.to("#video-wrap",{{rotation:0,duration:0.2,ease:"power1.out"}}, {s + 0.36:.2f});
-          tl.to("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,duration:0.36,ease:"power3.inOut"}}, {e - 0.36:.2f});
+          tl.fromTo("{cam}",{{opacity:0,x:100,scale:1.08}},{{opacity:1,x:0,scale:1,duration:0.42,ease:"expo.out",immediateRender:false}}, {s});
+          tl.to("{cam}",{{opacity:0,x:-72,scale:1.04,duration:0.36,ease:"power2.in"}}, {e - 0.36:.2f});
+          tl.fromTo("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0}},{{scale:0.30,x:-350,y:-20,borderRadius:"36px",rotation:-1.0,duration:0.42,ease:"power3.inOut",immediateRender:false}}, {s});
+          tl.to("#video-wrap",{{rotation:0,duration:0.22,ease:"power1.out"}}, {s + 0.42:.2f});
+          tl.to("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,duration:0.42,ease:"power3.inOut"}}, {e - 0.42:.2f});
 ''')
 broll_js_txt = "".join(broll_js)
 
@@ -631,29 +825,45 @@ js = f'''
           const tl = window.gsap.timeline({{paused:true}});
           const cam = "#video-cam";
           function punchHold(t, hold, scale){{
-            var sc = scale || 1.12;
-            tl.set(cam, {{scale:sc, immediateRender:false}}, t);
-            tl.to(cam, {{scale:1, duration:0.48, ease:"power2.inOut"}}, t+hold);
+            var sc = Math.min(scale || 1.12, 1.14);
+            tl.to(cam, {{scale:sc, duration:0.34, ease:"power3.out", immediateRender:false}}, t);
+            tl.to(cam, {{scale:1, duration:0.55, ease:"power2.inOut"}}, t+hold);
           }}
+          /* Instagram Reels motion lock (AI Video Studio tokens):
+             enter ~0.42s expo.out, exit ~0.38s, soft land — no bounce/glitch. */
+          var EASE_IN = "expo.out";
+          var EASE_OUT = "power2.in";
+          var ENTER_SEC = 0.42;
+          var EXIT_SEC = 0.38;
           function enterMode(host){{
             var forced = host.getAttribute("data-enter");
-            if(forced) return forced;
+            if(forced) return normalizeEnter(forced);
             var root = host.querySelector(".root");
-            if(!root) return "pop";
-            if(root.classList.contains("hook")) return "slam";
-            if(root.classList.contains("punch") || root.querySelector(".warn-badge")) return "glitch";
+            if(!root) return "soft";
+            if(root.classList.contains("punch") || root.querySelector(".warn-badge")) return "rise";
             if(root.classList.contains("slim")) return "soft";
-            if(root.classList.contains("levels") || root.classList.contains("graph-card")) return "tilt";
-            if(root.classList.contains("stats")) return "wipe";
-            return "pop";
+            if(root.classList.contains("levels") || root.classList.contains("graph-card")) return "slide";
+            return "soft";
           }}
-          var ENTER_POOL = ["slam","soft","glitch","tilt","wipe","pop","rise","flip","snap","drift","zoom","fold"];
+          function normalizeEnter(mode){{
+            // Map legacy gimmick names → IG-pro family
+            if(mode === "glitch" || mode === "slam" || mode === "snap" || mode === "zoom") return "rise";
+            if(mode === "tilt" || mode === "flip" || mode === "fold" || mode === "drift") return "slide";
+            if(mode === "wipe" || mode === "pop" || mode === "zoom") return "scale";
+            if(mode === "soft" || mode === "rise" || mode === "slide" || mode === "scale") return mode;
+            return "soft";
+          }}
+          var ENTER_POOL = ["soft","rise","slide","scale"];
           var enterUsed = {{}};
           function uniqueEnter(host, idx){{
             var forced = host.getAttribute("data-enter");
-            if(forced && !enterUsed[forced]){{
-              enterUsed[forced] = 1;
-              return forced;
+            if(forced){{
+              forced = normalizeEnter(forced);
+              host.setAttribute("data-enter", forced);
+              if(!enterUsed[forced]){{
+                enterUsed[forced] = 1;
+                return forced;
+              }}
             }}
             for(var i=0;i<ENTER_POOL.length;i++){{
               var m = ENTER_POOL[(idx+i) % ENTER_POOL.length];
@@ -667,77 +877,45 @@ js = f'''
           }}
           function exitMode(host){{
             var forced = host.getAttribute("data-exit");
-            if(forced) return forced;
+            if(forced === "scale" || forced === "slide" || forced === "fade") return forced;
             var mode = host.getAttribute("data-enter") || enterMode(host);
-            if(mode === "soft" || mode === "wipe" || mode === "drift") return "fade";
-            if(mode === "glitch" || mode === "slam" || mode === "snap" || mode === "zoom") return "scale";
-            if(mode === "tilt" || mode === "flip" || mode === "fold") return "slide";
+            if(mode === "slide") return "slide";
+            if(mode === "scale" || mode === "rise") return "scale";
             return "fade";
           }}
           function exitCard(fxSel, host, tEnd){{
             var mode = exitMode(host);
-            var t = tEnd - 0.34;
-            if(t < (parseFloat(host.getAttribute("data-start")) || 0) + 0.5) return;
+            var t = tEnd - EXIT_SEC;
+            if(t < (parseFloat(host.getAttribute("data-start")) || 0) + 0.55) return;
             if(mode === "scale"){{
-              tl.to(fxSel,{{opacity:0,scale:0.88,y:-16,duration:0.32,ease:"power2.in"}}, t);
+              tl.to(fxSel,{{opacity:0,scale:0.94,y:-8,filter:"blur(4px)",duration:EXIT_SEC,ease:EASE_OUT}}, t);
             }} else if(mode === "slide"){{
-              tl.to(fxSel,{{opacity:0,x:48,rotateY:8,duration:0.34,ease:"power2.in"}}, t);
+              tl.to(fxSel,{{opacity:0,x:28,y:-4,filter:"blur(4px)",duration:EXIT_SEC,ease:EASE_OUT}}, t);
             }} else {{
-              tl.to(fxSel,{{opacity:0,y:-8,duration:0.3,ease:"power1.in"}}, t);
+              tl.to(fxSel,{{opacity:0,y:-6,filter:"blur(3px)",duration:EXIT_SEC,ease:EASE_OUT}}, t);
             }}
           }}
           function progressCard(fxSel, t, dur, mode){{
-            if(dur < 2.2) return;
-            var mid = t + Math.min(dur * 0.4, 2.8);
-            if(mode === "tilt" || mode === "flip" || mode === "fold"){{
-              tl.to(fxSel,{{rotateY:7,duration:Math.min(dur*0.35,2.2),ease:"sine.inOut",yoyo:true,repeat:1}}, mid);
-            }} else if(mode === "drift" || mode === "soft" || mode === "rise"){{
-              tl.to(fxSel,{{y:-12,duration:Math.min(dur*0.4,2.4),ease:"sine.inOut",yoyo:true,repeat:1}}, t+0.55);
-            }} else if(mode === "wipe" || mode === "zoom" || mode === "pop"){{
-              tl.to(fxSel,{{scale:1.035,duration:0.85,ease:"sine.inOut",yoyo:true,repeat:1}}, mid);
-            }} else if(mode === "slam" || mode === "snap" || mode === "glitch"){{
-              tl.to(fxSel,{{x:6,duration:0.35,ease:"sine.inOut",yoyo:true,repeat:1}}, mid);
-            }}
+            if(dur < 3.2) return;
+            // IG: only a whisper of life — no shake/pulse/nudge
+            tl.to(fxSel,{{y:-5,duration:Math.min(dur*0.42,2.6),ease:"sine.inOut",yoyo:true,repeat:1}}, t+0.7);
           }}
-          /* Motion on .card-fx / accents only — never .card-host (Studio left/top). */
+          /* Shell enters soft — content pieces animate on data-at. */
           function popCard(fxSel, t, mode){{
+            mode = normalizeEnter(mode || "soft");
             var from, to;
-            if(mode === "slam"){{
-              from = {{opacity:0,y:48,scale:1.22,rotateX:0,rotateZ:0}};
-              to = {{opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,duration:0.4,ease:"back.out(2.1)",immediateRender:false}};
-            }} else if(mode === "soft"){{
-              from = {{opacity:0,y:14,scale:0.98,rotateX:4,rotateZ:0}};
-              to = {{opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,duration:0.5,ease:"power2.out",immediateRender:false}};
-            }} else if(mode === "glitch"){{
-              from = {{opacity:0,y:10,scale:0.94,rotateX:6,rotateZ:-2,x:-16}};
-              to = {{opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,x:0,duration:0.42,ease:"power3.out",immediateRender:false}};
-            }} else if(mode === "tilt"){{
-              from = {{opacity:0,y:20,scale:0.92,rotateY:-18,rotateX:6}};
-              to = {{opacity:1,y:0,scale:1,rotateY:0,rotateX:0,duration:0.55,ease:"power3.out",immediateRender:false}};
-            }} else if(mode === "wipe"){{
-              from = {{opacity:0,y:0,scale:1,rotateX:0,clipPath:"inset(0 0 100% 0)"}};
-              to = {{opacity:1,y:0,scale:1,rotateX:0,clipPath:"inset(0 0 0% 0)",duration:0.48,ease:"power2.inOut",immediateRender:false}};
-            }} else if(mode === "rise"){{
-              from = {{opacity:0,y:60,scale:0.9,rotateX:12}};
-              to = {{opacity:1,y:0,scale:1,rotateX:0,duration:0.55,ease:"power3.out",immediateRender:false}};
-            }} else if(mode === "flip"){{
-              from = {{opacity:0,rotateY:85,scale:0.88}};
-              to = {{opacity:1,rotateY:0,scale:1,duration:0.58,ease:"power3.out",immediateRender:false}};
-            }} else if(mode === "snap"){{
-              from = {{opacity:0,scale:1.35,y:-8}};
-              to = {{opacity:1,scale:1,y:0,duration:0.32,ease:"back.out(2.4)",immediateRender:false}};
-            }} else if(mode === "drift"){{
-              from = {{opacity:0,x:-40,y:10,rotateZ:-3}};
-              to = {{opacity:1,x:0,y:0,rotateZ:0,duration:0.6,ease:"power2.out",immediateRender:false}};
-            }} else if(mode === "zoom"){{
-              from = {{opacity:0,scale:0.55,rotateX:8}};
-              to = {{opacity:1,scale:1,rotateX:0,duration:0.5,ease:"power4.out",immediateRender:false}};
-            }} else if(mode === "fold"){{
-              from = {{opacity:0,rotateX:70,y:-24}};
-              to = {{opacity:1,rotateX:0,y:0,duration:0.52,ease:"power3.out",immediateRender:false}};
+            if(mode === "rise"){{
+              from = {{opacity:0,y:26,scale:0.94,filter:"blur(6px)"}};
+              to = {{opacity:1,y:0,scale:1,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false}};
+            }} else if(mode === "slide"){{
+              from = {{opacity:0,x:40,y:8,scale:0.94,filter:"blur(6px)"}};
+              to = {{opacity:1,x:0,y:0,scale:1,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false}};
+            }} else if(mode === "scale"){{
+              from = {{opacity:0,scale:0.9,y:10,filter:"blur(5px)"}};
+              to = {{opacity:1,scale:1,y:0,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false}};
             }} else {{
-              from = {{opacity:0,y:36,scale:0.88,rotateX:10,rotateZ:-1.2}};
-              to = {{opacity:1,y:0,scale:1,rotateX:0,rotateZ:0,duration:0.52,ease:"power3.out",immediateRender:false}};
+              from = {{opacity:0,y:14,scale:0.96,filter:"blur(5px)"}};
+              to = {{opacity:1,y:0,scale:1,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false}};
             }}
             tl.fromTo(fxSel, from, to, t);
             var host = document.querySelector(fxSel);
@@ -745,30 +923,48 @@ js = f'''
             var accent = host.querySelector(".card-accent");
             var sheen = host.querySelector(".card-sheen");
             var warn = host.querySelector(".warn-badge");
-            var ring = host.querySelector(".warn-ring");
-            var chapter = host.querySelector(".chapter");
-            var quote = host.querySelector(".quote-mark");
             if(accent){{
-              tl.fromTo(accent,{{scaleY:0}},{{scaleY:1,duration:0.55,ease:"power3.out",immediateRender:false}}, t+0.04);
+              tl.fromTo(accent,{{scaleY:0}},{{scaleY:1,duration:0.48,ease:EASE_IN,immediateRender:false}}, t+0.05);
             }}
             if(sheen){{
-              tl.fromTo(sheen,{{x:-520,opacity:0}},{{x:900,opacity:1,duration:0.6,ease:"power2.out",immediateRender:false}}, t+0.08);
-              tl.to(sheen,{{opacity:0,duration:0.22,ease:"power1.in"}}, t+0.62);
+              tl.fromTo(sheen,{{x:-420,opacity:0}},{{x:860,opacity:0.85,duration:0.62,ease:"power2.out",immediateRender:false}}, t+0.12);
+              tl.to(sheen,{{opacity:0,duration:0.28,ease:EASE_OUT}}, t+0.7);
             }}
             if(warn){{
-              tl.fromTo(warn,{{opacity:0,scale:0.45,rotation:-40}},{{opacity:1,scale:1,rotation:0,duration:0.48,ease:"back.out(2)",immediateRender:false}}, t+0.1);
-              tl.to(warn,{{scale:1.08,duration:0.18,yoyo:true,repeat:1,ease:"power1.inOut"}}, t+0.55);
+              tl.fromTo(warn,{{opacity:0,scale:0.82}},{{opacity:1,scale:1,duration:0.4,ease:EASE_IN,immediateRender:false}}, t+0.14);
             }}
-            if(ring){{
-              var end = t + (parseFloat(host.closest(".card-host").getAttribute("data-duration")) || 4);
-              tl.fromTo(ring,{{rotation:0}},{{rotation:720,duration:Math.max(3, end-t),ease:"none",immediateRender:false}}, t+0.18);
+            host.querySelectorAll(".kicker,.title,.q,.note,.chapter,.lvl,.chip").forEach(function(el){{
+              if(!el.hasAttribute("data-at")) return;
+              gsap.set(el, {{opacity:0}});
+            }});
+          }}
+          function explodeCardWords(el){{
+            if(el.getAttribute("data-in") !== "words") return false;
+            if(el.querySelector(".cw")) return true;
+            var raw = (el.textContent || "").trim();
+            if(!raw) return false;
+            var parts = raw.split(/\\s+/).filter(Boolean);
+            if(parts.length < 2) return false;
+            el.innerHTML = parts.map(function(w){{ return '<span class="cw">'+w+'</span>'; }}).join(" ");
+            return true;
+          }}
+          function animCardPiece(el, t, kind){{
+            if(kind === "words" && explodeCardWords(el)){{
+              gsap.set(el, {{opacity:1}});
+              var words = el.querySelectorAll(".cw");
+              words.forEach(function(w, i){{
+                tl.fromTo(w,
+                  {{opacity:0,y:10}},
+                  {{opacity:1,y:0,duration:0.28,ease:EASE_IN,immediateRender:false}},
+                  t + i * 0.055);
+              }});
+              return;
             }}
-            if(chapter){{
-              tl.fromTo(chapter,{{opacity:0,x:-18}},{{opacity:1,x:0,duration:0.36,ease:"power3.out",immediateRender:false}}, t+0.06);
-            }}
-            if(quote){{
-              tl.fromTo(quote,{{opacity:0,scale:0.6}},{{opacity:1,scale:1,duration:0.4,ease:"back.out(1.8)",immediateRender:false}}, t+0.08);
-            }}
+            // All piece kinds → same IG-pro rise (spin/slam/back demoted)
+            tl.fromTo(el,
+              {{opacity:0,y:12,scale:0.97}},
+              {{opacity:1,y:0,scale:1,duration:0.36,ease:EASE_IN,immediateRender:false}},
+              t);
           }}
           function countNum(el, t, end, dur, decimals){{
             var obj = {{v:0}};
@@ -810,17 +1006,7 @@ js = f'''
             if(el.classList.contains("banner")) return;
             var t = parseFloat(el.getAttribute("data-at"));
             var kind = el.getAttribute("data-in") || "";
-            if(kind === "back"){{
-              tl.fromTo(el,{{opacity:0,scale:0.82,y:22,rotateZ:-2}},{{opacity:1,scale:1,y:0,rotateZ:0,duration:0.5,ease:"back.out(1.8)",immediateRender:false}}, t);
-            }} else if(kind === "drop"){{
-              tl.fromTo(el,{{opacity:0,y:-18,scale:0.96}},{{opacity:1,y:0,scale:1,duration:0.34,ease:"power3.out",immediateRender:false}}, t);
-            }} else if(kind === "spin"){{
-              tl.fromTo(el,{{opacity:0,scale:0.7,rotation:-18,y:10}},{{opacity:1,scale:1,rotation:0,y:0,duration:0.4,ease:"back.out(1.9)",immediateRender:false}}, t);
-            }} else if(kind === "slam"){{
-              tl.fromTo(el,{{opacity:0,scale:1.28,y:28}},{{opacity:1,scale:1,y:0,duration:0.36,ease:"back.out(2.2)",immediateRender:false}}, t);
-            }} else {{
-              tl.fromTo(el,{{opacity:0,y:18,scale:0.96}},{{opacity:1,y:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}}, t);
-            }}
+            animCardPiece(el, t, kind);
           }});
           document.querySelectorAll("[data-out]").forEach(function(el){{
             var kind = el.getAttribute("data-out-kind") || "fade";
@@ -867,7 +1053,7 @@ js = f'''
 '''
 
 vars_json = json.dumps([
-    {"id": "capSize", "type": "number", "label": "Altyazı punto", "default": 58, "min": 40, "max": 78, "step": 2},
+    {"id": "capSize", "type": "number", "label": "Altyazı punto", "default": int(cap["fontSize"]), "min": 48, "max": 78, "step": 2},
 ], ensure_ascii=False)
 
 n_cards = len(re.findall(r'class="card-host', cards_html))
@@ -895,9 +1081,10 @@ html_doc = f'''<!doctype html>
       <div class="legibility"></div>
       <div id="overlays">
 {cards_html}
+{pro_cards_html()}
 {ig_html}
 {mg_html_bits()}
-      <div class="clip cap-stage" id="caption-host" data-start="0" data-duration="{DUR}" data-track-index="5" style="left:{int(cap['x'])}px;top:{int(cap['y'])}px;width:{int(cap['w'])}px;height:{int(cap['h'])}px;">
+      <div class="clip cap-stage" id="caption-host" data-start="0" data-duration="{DUR}" data-track-index="12" style="left:{int(cap['x'])}px;top:{int(cap['y'])}px;width:{int(cap['w'])}px;height:{int(cap['h'])}px;z-index:30;--capSize:{int(cap['fontSize'])};">
 {caption_items()}
       </div>
       </div>
@@ -921,6 +1108,7 @@ root_html = (
     .replace('src="sfx/', 'src="public/sfx/')
     .replace('src="follow_banner.', 'src="public/follow_banner.')
     .replace("url('fonts/", "url('public/fonts/")
+    .replace('data-composition-src="../compositions/', 'data-composition-src="compositions/')
 )
 (ROOT / "index.html").write_text(root_html, encoding="utf-8")
 print(
@@ -928,6 +1116,8 @@ print(
     ROOT.name,
     "kart",
     n_cards,
+    "pro",
+    len(PRO_CARDS),
     "broll",
     [b["id"] for b in BROLL],
     "ig",

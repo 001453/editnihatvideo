@@ -5,7 +5,13 @@ description: Analyze a new Nihat/Mehmet talking-head like video 0907 and package
 
 # Package like 0907
 
-**Show is LOCKED** (`shared/SHOW_STANDARD.md`, `shared/show-flow.json`). Same transparent cards, unique enters, keyword captions, whip b-roll, SFX, PIP left, hero 3D. **New topic → new copy / times / b-roll only.** Optional: at most **one** `special` moment per video (drone pull-back, crash zoom, mockup, split…).
+**Show is LOCKED** (`shared/SHOW_STANDARD.md`, `shared/show-flow.json`). This is the production flow for every new video.
+
+- Captions: Montserrat Black karaoke (dim → accent → white)
+- Cards: face-safe top band y56–280 + IG-pro motion `soft|rise|slide|scale`
+- IG Follow: animated mid + end (4.5s), exclusive
+- B-roll: **user drops** max 2×8s in dashboard; agent only plans keyword + start
+- Per video: new card copy, punch times, motion variety within the locked families
 
 0907 is the show bible (`videos/0907/`). Do not copy 0907 faiz/CDS copy. Do not leave empty `cards.html`.
 
@@ -40,7 +46,18 @@ Map:
 | Alternate scenario | `.root.glass.punch` | fade title |
 | End | `.banner` transparent | **YATIRIM TAVSİYESİ DEĞİL** only, bottom, `data-in="drop"` |
 
-Clone structure from `videos/0907/cards.html`. Change ids, copy, times. Keep `card-accent` + `card-sheen` on glass cards.
+### Pro variety (registry — not every beat)
+
+Pick **1–3** from `shared/PRO_CARDS.md` when the beat fits. Write `timeline.json` → `proCards[]`. Do **not** use Captions-tab styles or Liquid Glass VFX.
+
+| Beat | Prefer block |
+| --- | --- |
+| Big number / % / milyar | `mk-progress-stat` or `number-wheel` |
+| Level / ratio story | `animated-bar-chart` / `data-chart` |
+| Quote / highlight line | `mk-callout-highlight` |
+| Section title | `lt-dark-card` / `lt-kicker-name` |
+
+Clone structure from `videos/0907/cards.html` for the glass majority. Change ids, copy, times. Keep `card-accent` + `card-sheen` on glass cards.
 
 Time `data-start` / `data-duration` to the spoken beat. Inner `data-at` = the word time for that line.
 
@@ -48,14 +65,14 @@ Time `data-start` / `data-duration` to the spoken beat. Inner `data-at` = the wo
 
 Full notes: `shared/SHOW_STANDARD.md` · machine recipe: `shared/show-flow.json`.
 
-- Captions from editor; Anton 3D. No full-frame video darkening.
+- Captions from editor; Montserrat Black social-hook outline. No full-frame video darkening.
 - Face full-bleed; cards **top band** (transparent glass, no heavy black); captions mid-lower + **keyword pop**; PIP **left**.
 - Card enter/exit: each card a **unique** mode from slam/soft/glitch/tilt/wipe/pop/rise/flip/snap/drift/zoom/fold + mid-hold progress. One hero 3D (`timeline.hero`).
 - Punch: hold + click/sub-hit; scales 1.10–1.16; not on IG window.
 - B-roll: **max 2×8s (sürekli 8 sn — kullanıcı başlangıç cümlesine göre hazırlar)**, whip + whoosh, muted, PIP left. Labs: `public/broll/LABS_PROMPTS.md`.
 - Line SFX by type (slam louder, kicker softer, count → ui-confirm).
 - Disclaimer: transparent centered **YATIRIM TAVSİYESİ DEĞİL** bottom; no NİHAT bar.
-- IG: PNG only, 2.3s, exclusive.
+- IG: animated Instagram Follow (Nihat brand) mid + near end, ~4.5s, exclusive — not frozen PNG.
 - `#overlays` untimed. Unmuted talking-head only.
 
 ## B-roll değiştir (Google Labs / elle)

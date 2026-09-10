@@ -25,14 +25,14 @@ Agent: read transcript → plan beats → `cards.html` + `public/broll` + `timel
 
 ## Locked
 
-- Captions: one `#caption-host`, Anton 3D. Top solid white. Bottom carries tone + 3D (Nihat yellow/red/green, Mehmet white). Tone on `.cap-item`. No 72 caption clips. No `paintCap` onUpdate. No full-frame video darkening.
-- Layout: face full-bleed; **cards in top band**; captions mid-lower; IG right rail clear; PIP **left**.
+- Captions: one `#caption-host`, **Montserrat Black karaoke** (AI Video Studio). Words dim → accent `#FACC15`/red/lime on speak → white. Enter: word-rise/pop/snap/slide-up/pulse. Safe right ~150px. No 72 caption clips. No `paintCap` onUpdate. No full-frame video darkening.
+- Layout: face full-bleed; **cards only y56–280 (above forehead)**; face clear y300–1100; captions mid-chest; IG right rail clear; PIP **left**.
 - Talking-head: unmuted `<video data-has-audio="true">`. No second VO from the same file.
 - `#overlays` has no `data-start`. Root clips `top:0;left:0`. Cards nested in untimed `#overlays`.
-- IG follow banner: PNG only, no banner `m4a`. Exclusive window. Default ~24s and ~11s before end, 2.3s.
+- IG follow: animated Instagram Follow (Nihat / @nihatcetinkayafinans / avatar) — mid + near end, ~4.5s, exclusive. No frozen PNG; no banner `m4a`.
 - Punch: hold then ease out. Soft `click-soft` + `sub-hit` on zoom in; click out. Scales 1.10–1.16.
 - Cards: **transparent glass** (no heavy black plate). Unique `data-enter` per card from pool slam/soft/glitch/tilt/wipe/pop/rise/flip/snap/drift/zoom/fold + matching exit + mid-hold progress motion. One hero 3D per video.
-- Captions: Anton 3D + **keyword pop** (`.cap-kw` scale/brightness on emphasis words/numbers).
+- Captions: Montserrat Black karaoke + **keyword timing**. Card motion: IG-pro `soft|rise|slide|scale` (no bounce/glitch).
 - B-roll: muted 9:16, **max 2×8s**, PIP left, whip + whoosh. Labs prompts in `public/broll/LABS_PROMPTS.md`.
 - Disclaimer: transparent, centered **YATIRIM TAVSİYESİ DEĞİL** only, bottom (~y1580), no NİHAT plate.
 - Standard notes: `shared/SHOW_STANDARD.md` + `shared/show-flow.json`.

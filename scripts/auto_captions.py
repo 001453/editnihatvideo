@@ -21,43 +21,55 @@ def classify_tone(text):
     return "yumusak"
 
 
-def chunk_words(words, max_words=4, min_words=2):
+def chunk_words(words, max_words=6, min_words=3):
+    """Bigger chunks → longer on-screen holds (speech-synced, not flashy)."""
     chunks, cur = [], []
     for w in words:
         cur.append(w)
         ends = bool(re.search(r"[.!?]$", w["text"]))
-        if (ends and len(cur) >= min_words) or len(cur) >= max_words:
+        dur = float(cur[-1]["end"]) - float(cur[0]["start"])
+        if ends and len(cur) >= min_words:
+            chunks.append(cur)
+            cur = []
+        elif len(cur) >= max_words:
             chunks.append(cur)
             cur = []
         elif ends and len(cur) < min_words:
             continue
+        elif dur >= 2.4 and len(cur) >= min_words:
+            chunks.append(cur)
+            cur = []
     if cur:
-        chunks.append(cur)
+        if chunks and len(cur) < min_words:
+            chunks[-1].extend(cur)
+        else:
+            chunks.append(cur)
     return chunks
 
 
 def split_top_bottom(ch):
-    """Keep each caption line short (~2–3 words / ~15 chars)."""
+    """Always aim for 2 lines (reference: longer top, punch word(s) on bottom)."""
     n = len(ch)
-    if n <= 2:
-        return "", caption_display(" ".join(w["text"] for w in ch))
-    if n == 3:
+    if n == 1:
+        return "", caption_display(ch[0]["text"])
+    if n == 2:
         return (
-            caption_display(" ".join(w["text"] for w in ch[:1])),
-            caption_display(" ".join(w["text"] for w in ch[1:])),
+            caption_display(ch[0]["text"]),
+            caption_display(ch[1]["text"]),
         )
-    # Balance by characters into two halves, max 3 words on top
     best_i, best_score = 1, None
-    for i in range(1, min(3, n) + 1):
-        if i >= n:
-            break
+    for i in range(1, n):
         a = " ".join(w["text"] for w in ch[:i])
         b = " ".join(w["text"] for w in ch[i:])
-        score = abs(len(a) - len(b))
-        if len(a) > 16:
-            score += len(a) - 16
-        if len(b) > 18:
-            score += len(b) - 18
+        ratio = len(a) / max(1, len(a) + len(b))
+        score = abs(ratio - 0.62) * 30 + abs(len(a) - len(b)) * 0.1
+        # Reference: longer top, short bottom (last 1–2 words)
+        if i >= n - 2 and n >= 3:
+            score -= 6
+        if i == n - 1 and n >= 4:
+            score -= 4
+        if len(b) > 22:
+            score += (len(b) - 22) * 0.8
         if best_score is None or score < best_score:
             best_score, best_i = score, i
     top = caption_display(" ".join(w["text"] for w in ch[:best_i]))
@@ -90,11 +102,17 @@ def main():
             "top": top,
             "bottom": bottom,
             "tone": "fixed" if args.account == "mehmet" else classify_tone(text),
-            "format": "B" if n <= 2 else "A",
+            "format": "A" if top else "B",
             "account": args.account,
             "wordStart": ch[0]["idx"],
             "wordEnd": ch[-1]["idx"],
         })
+    # Min hold ~2s so captions don't flash; stay speech-synced without overlap
+    MIN_HOLD, GAP = 2.05, 0.04
+    for i, c in enumerate(captions):
+        target = c["start"] + MIN_HOLD
+        limit = (captions[i + 1]["start"] - GAP) if i + 1 < len(captions) else (float(words[-1]["end"]) + 0.4)
+        c["end"] = round(min(max(c["end"], target), max(c["start"] + 0.6, limit)), 3)
     duration = round(float(words[-1]["end"]) + 0.4, 3) if words else 0
     project = {
         "version": 1,

@@ -1,0 +1,12 @@
+{
+  "assets/avatar.jpg": "a300f59c31d2ea16195a2ff9a9af50b29c6aecc05d505d69f2a2132a53b99032",
+  "compositions/components/animated-bar-chart.html": "ceae5ee442ace07edfc115ed509982805c311e0c57a07517d3c95e1d60c898f2",
+  "compositions/components/chart-story.html": "d65180b77637521ea98676c9af1d59395f1e70ce0d0d5e1f604d02bee2821310",
+  "compositions/components/number-wheel.html": "04e3b1d13a044f9e8ad88b701b27315fc69eded6e951ab99b046ab760dc91110",
+  "compositions/data-chart.html": "de7c99255100819cc38ed0207a74cfa8736cf31e0dea941e3380430777ae6a5c",
+  "compositions/instagram-follow.html": "88af01bf9f4d90c956254c7b0373757194c2b508fcabafee8492e71b8ec2f68c",
+  "compositions/lt-dark-card.html": "a222e6098eb2ac3ea7ab65650f2ffddaa3a8e7a0d1c62c6c9c4639c09d95fdc9",
+  "compositions/lt-kicker-name.html": "ca0737e073c880c076089d5388897432981a7b8ba4d6d6a23cee630caae63e81",
+  "compositions/mk-callout-highlight.html": "3d6d7c73a18ec660af2ae6c428fcbd1041b7a7a72dd4eb577438d9241f84e8e3",
+  "compositions/mk-progress-stat.html": "c96ce0d1f7a149067af874e8fca841b4a15ba49a3d832c99f65aa89a16b594b0"
+}

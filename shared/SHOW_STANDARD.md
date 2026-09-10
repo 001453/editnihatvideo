@@ -9,29 +9,42 @@ Format: **9:16 · 1080×1920 · yüz önde · üstte kart boşluğu · altyazı 
 ## A) Her videoda zorunlu
 
 ### Çerçeve
-- Talking-head full-bleed, sesli, tek VO.
-- Üst bant kartlar (~y 120–600); orta yüz/punch; alt Anton altyazı (~y 1208).
-- **Full-frame karartma yok.** Sağ ~120px IG rail boş. PIP **sol**. Kart max ~920px.
+- Talking-head full-bleed, sesli, tek VO. **Çekim dili:** göğüs üstü, yüz orta-üst.
+- **Face-safe layout (1080×1920):**
+  - Kart bandı: **y 56–280** (alın üstü) — chip `h≤100`, data kart `h≤230`, `face-safe` dense
+  - Yüz boş: **y 300–1100** (alın/göz/yüz) — kart / MG yok
+  - Altyazı: **y ~1208** göğüs
+  - Disclaimer: **y ~1580**
+  - Sağ ~150px IG rail boş. PIP **sol**. Kart max ~880px.
+- Kartlar: cam kit + video başına **1–3 pro registry kart** (üst bant, scale ≤0.34). Captions sekmesi / Liquid Glass VFX yok.
+- **Full-frame karartma yok.**
 
 ### Altyazı
-- Anton 3D; üst beyaz, alt ton (Nihat sarı/kırmızı/yeşil).
-- **Keyword pop** (`.cap-kw`): sayı / faiz / altın / risk vb. scale+brightness.
+- **AI Video Studio social-hook karaoke**: Montserrat Black 900; kelimeler silik (≈%22) → konuşulunca accent (`#FACC15`/kırmızı/lime) → sonra beyaz. 4 köşe siyah outline. En fazla **2 satır**.
+- Giriş: yumuşak `rise | soft | lift` (bounce/snap yok). Karaoke: silik → accent glow → beyaz settle.
+- Punto varsayılan **~60**; uzun satırda `min(1, 20/chars)` scale. Sağda IG rail payı (~150px).
+- Zamanlama: `project.json` `words[]` + caption `wordStart`/`wordEnd`.
 - Metin sadece editor transcript’inden.
 
 ### Kartlar (şeffaf cam — siyah kutu yok)
 - `rgba` cam + text-shadow; punch kartlarda hafif kırmızı tint.
-- **Her kart farklı enter** (havuzdan unique):  
-  `slam | soft | glitch | tilt | wipe | pop | rise | flip | snap | drift | zoom | fold`
-- Exit: fade / scale / slide (enter’a göre).
-- Hold’da **progress** (hafif drift / tilt / scale).
+- **IG Reels motion lock** (AI Video Studio): enter **0.42s `expo.out`**, exit **0.38s**, soft blur land — **bounce / glitch / snap yok**.
+- Enter ailesi (unique): `soft | rise | slide | scale` — eski slam/glitch/tilt otomatik map edilir.
+- Hold: sadece hafif breathe (`y:-5`). Shake/pulse/nudge yok.
+- Parça girişleri: yumuşak rise + kelime stagger — spin/back.out yok.
 - Video başına **1 hero 3D** (`timeline.hero`).
 - Disclaimer: şeffaf, ortalı **YATIRIM TAVSİYESİ DEĞİL**, alt (~y 1580), NİHAT yok.
 - Kopya: **sadece bu transcript**; 0907 faiz/CDS metni kopyalanmaz.
 
 ### Punch / B-roll / IG / SFX
-- Punch 3–5, hold 6–10s, scale 1.10–1.16, click+sub-hit.
-- B-roll **max 2×8s** (sürekli 8 sn; kullanıcı başlangıç cümlesine göre hazırlar), whip + whoosh, PIP sol. Labs prompt dosyası.
-- IG PNG 2.3s, exclusive, swoosh-up.
+- Punch 3–5, hold 6–10s, scale 1.10–1.14, click+sub-hit.
+- B-roll **max 2×8s** — **kullanıcı ekler** (dashboard drop); agent sadece keyword + start. Whip + whoosh, PIP sol.
+- **IG Follow (KİLİT):** animated banner `shared/instagram-follow.html`
+  - Brand: Nihat Çetinkaya · `@nihatcetinkayafinans` · `shared/ig_avatar.png`
+  - **2 kez:** mid (~video ortası, kart boşluğunda) + end (sona yakın, kartlarla çakışmaz)
+  - Süre **4.5s**, exclusive (kart/b-roll üstünde değil)
+  - Motion: üstten expo slide-in → Takip Et press → Takip → slide-out
+  - SFX: `swoosh-up` · frozen PNG / banner m4a **yasak**
 - Satır SFX tipine göre (slam dolu, kicker hafif, count → ui-confirm).
 
 ### Build

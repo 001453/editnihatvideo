@@ -5,10 +5,12 @@
   "locked": true,
   "format": {
     "canvas": "1080x1920",
-    "layout": "face-forward, transparent cards top band, captions mid-lower, no full-frame darken",
+    "layout": "chest-up talking-head; cards ABOVE forehead only; captions on chest; no face cover",
     "face": "full-bleed talking-head unmuted",
-    "topBand": "cards/chapter ~y120-600",
-    "captionBand": "~y1208 Anton 3D + keyword pop",
+    "topBand": "cards y56–280 face-safe (chip h≤100, data h≤230)",
+    "faceClear": "y300–1100 no overlays",
+    "captionBand": "~y1180 Montserrat Black social-hook + keyword pop (max 2 lines)",
+    "captionStyle": "pro karaoke — soft rise/soft/lift enter; dim→accent glow→white settle",
     "pipSide": "left",
     "cards": "transparent glass, never opaque black plates"
   },
@@ -19,9 +21,28 @@
     "hero3d": "exactly 1 per video",
     "specialMoment": "at most 1 per video (drone|crash|mockup|split|scrub|stamp)"
   },
-  "cardEnter": ["slam", "soft", "glitch", "tilt", "wipe", "pop", "rise", "flip", "snap", "drift", "zoom", "fold"],
+  "cardEnter": ["soft", "rise", "slide", "scale"],
   "cardExit": ["fade", "scale", "slide"],
-  "cardRule": "Every card-host gets a unique data-enter from cardEnter pool; progress motion on hold; topic-specific copy only",
+  "cardRule": "IG Reels motion: unique soft|rise|slide|scale; enter 0.42s expo.out + blur land; exit 0.38s; breathe only — no bounce/glitch",
+  "proCards": {
+    "enabled": true,
+    "doc": "shared/PRO_CARDS.md",
+    "registryDir": "shared/registry/compositions",
+    "perVideo": "1-3",
+    "timelineKey": "proCards",
+    "allow": [
+      "mk-progress-stat",
+      "data-chart",
+      "animated-bar-chart",
+      "chart-story",
+      "number-wheel",
+      "mk-callout-highlight",
+      "lt-dark-card",
+      "lt-kicker-name"
+    ],
+    "forbid": ["liquid-glass-*", "caption-*", "full-screen VFX that covers face"],
+    "note": "Variety layer on top of locked glass kit — captions stay Montserrat social-hook"
+  },
   "captionKeywords": true,
   "slots": [
     {"type": "hook", "class": "root hook", "when": "opening questions"},
@@ -33,7 +54,24 @@
     {"type": "chapter", "class": "chapter", "when": "01/02 section"},
     {"type": "disclaimer", "class": "banner transparent", "when": "end YATIRIM TAVSİYESİ DEĞİL only"}
   ],
-  "igBanner": {"dur": 2.3, "first": 24.0, "lastOffset": 11.0, "exclusive": true, "sfx": "swoosh-up"},
+  "igBanner": {
+    "style": "instagram-follow-pro",
+    "template": "shared/instagram-follow.html",
+    "brand": {
+      "name": "Nihat Çetinkaya",
+      "handle": "@nihatcetinkayafinans",
+      "avatar": "shared/ig_avatar.png",
+      "cta": "Takip Et"
+    },
+    "dur": 4.5,
+    "first": "mid (~half)",
+    "lastOffset": 11.0,
+    "exclusive": true,
+    "sfx": "swoosh-up",
+    "motion": "centered wrap + expo slide-in → Takip Et press → Takip → slide-out",
+    "template": "shared/instagram-follow.html",
+    "note": "Never frozen PNG; avatar shared/ig_avatar.png; rebuild writes compositions/instagram-follow-{mid,end}.html"
+  },
   "broll": {
     "muted": true,
     "maxClips": 2,
@@ -77,7 +115,7 @@
     "ig": "swoosh-up",
     "hero": "whoosh+sub-hit"
   },
-  "safeZone": {"left": 40, "right": 120, "top": 120, "bottom": 280, "cardMaxW": 920},
+  "safeZone": {"left": 40, "right": 150, "top": 56, "cardBandBottom": 280, "faceTop": 300, "faceBottom": 1100, "bottom": 280, "cardMaxW": 880, "cardMaxH": 230},
   "videoGrade": {"legibilityOverlay": false},
   "researchBacklog": [
     "special.drone pull-back once per video",
