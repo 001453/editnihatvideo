@@ -1,0 +1,110 @@
+{
+  "broll": [
+    {
+      "id": "borsa",
+      "file": "broll/borsa.mp4",
+      "start": 48.0,
+      "dur": 8.0,
+      "keyword": "BORSA",
+      "hint": "328 milyar hacim / nakit geçiş (~48s) — 8s clip"
+    },
+    {
+      "id": "fed",
+      "file": "broll/fed.mp4",
+      "start": 69.0,
+      "dur": 8.0,
+      "keyword": "FED",
+      "hint": "FED faiz kararı (~69s) — 8s clip"
+    }
+  ],
+  "punches": [
+    [
+      1.12,
+      7.5,
+      1.12
+    ],
+    [
+      41.26,
+      8.0,
+      1.14
+    ],
+    [
+      57.7,
+      7.5,
+      1.12
+    ],
+    [
+      114.62,
+      8.0,
+      1.14
+    ]
+  ],
+  "hero": {
+    "id": "volume",
+    "at": 41.26
+  },
+  "special": {
+    "type": "drone",
+    "at": 114.62,
+    "dur": 1.4,
+    "card": "verdict"
+  },
+  "igBanner": [
+    {
+      "id": "mid",
+      "start": 28.5,
+      "dur": 4.5
+    },
+    {
+      "id": "end",
+      "start": 116.68,
+      "dur": 4.5
+    }
+  ],
+  "mg": [
+    {
+      "id": "flash1",
+      "type": "flash",
+      "at": 1.12,
+      "dur": 0.25
+    },
+    {
+      "id": "tick1",
+      "type": "ticker",
+      "at": 41.5,
+      "dur": 4.0,
+      "y": 200,
+      "text": "328 MİLYAR · REKOR HACİM · BIST"
+    },
+    {
+      "id": "sparks1",
+      "type": "sparks",
+      "at": 57.7,
+      "dur": 0.95,
+      "y": 120
+    }
+  ],
+  "proCards": [
+    {
+      "id": "hacim-stat",
+      "block": "mk-progress-stat",
+      "start": 41.5,
+      "dur": 6.0,
+      "scale": 0.34,
+      "x": -400,
+      "y": 40,
+      "copy": {
+        "scheme": "dark",
+        "value": 328,
+        "suffix": "",
+        "label": "MİLYAR TL HACİM",
+        "caption": "Günlük işlem · tarihi rekor",
+        "max": 400,
+        "trackWidth": 520,
+        "x": 220,
+        "y": 160
+      }
+    }
+  ],
+  "brollPending": false
+}

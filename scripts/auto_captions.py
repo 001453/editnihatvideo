@@ -48,7 +48,7 @@ def chunk_words(words, max_words=6, min_words=3):
 
 
 def split_top_bottom(ch):
-    """Always aim for 2 lines (reference: longer top, punch word(s) on bottom)."""
+    """Always 2 lines — minimize longest line so punto stays near standard."""
     n = len(ch)
     if n == 1:
         return "", caption_display(ch[0]["text"])
@@ -61,15 +61,7 @@ def split_top_bottom(ch):
     for i in range(1, n):
         a = " ".join(w["text"] for w in ch[:i])
         b = " ".join(w["text"] for w in ch[i:])
-        ratio = len(a) / max(1, len(a) + len(b))
-        score = abs(ratio - 0.62) * 30 + abs(len(a) - len(b)) * 0.1
-        # Reference: longer top, short bottom (last 1–2 words)
-        if i >= n - 2 and n >= 3:
-            score -= 6
-        if i == n - 1 and n >= 4:
-            score -= 4
-        if len(b) > 22:
-            score += (len(b) - 22) * 0.8
+        score = max(len(a), len(b)) * 10 + abs(len(a) - len(b))
         if best_score is None or score < best_score:
             best_score, best_i = score, i
     top = caption_display(" ".join(w["text"] for w in ch[:best_i]))

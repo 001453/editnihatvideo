@@ -16,6 +16,20 @@
   .brand{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 8px;}
   h1{font-size:1.8rem;margin:0 0 8px;}
   .lead{color:var(--muted);margin:0 0 22px;line-height:1.45;}
+  .lead{color:var(--muted);margin:0 0 22px;line-height:1.45;}
+  .pad{
+    display:grid;grid-template-columns:56px 56px 56px;grid-template-rows:56px 56px 56px;
+    gap:8px;width:max-content;margin:0 18px 0 0;
+  }
+  .pad button{width:56px;height:56px;font-size:22px;padding:0;}
+  .pad .sp{visibility:hidden;}
+  .posbox{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+    padding:14px 16px;margin-bottom:18px;border:1px solid var(--line);
+    border-radius:14px;background:rgba(0,0,0,.25);
+  }
+  .posbox .xy{font-variant-numeric:tabular-nums;font-size:18px;min-width:160px;}
+  .posbox input.num{width:88px;}
   .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px;}
   label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
   select,input,textarea{
@@ -52,7 +66,24 @@
   <div class="wrap">
     <p class="brand">Nihat pipeline</p>
     <h1>Altyazı yazım düzelt</h1>
-    <p class="lead">Tüm altyazılar tek sayfada. İ/ı, ç, ğ, ş, ü, ö doğru büyük harf. Kaydet → project.json + rebuild. Panel: <a href="/">Dashboard</a></p>
+    <p class="lead">Tüm altyazılar <b>tek konumda</b>. Oklarla taşı → Studio’da Ctrl+F5. Yazım düzeltmesi aşağıda. Panel: <a href="/">Dashboard</a></p>
+
+    <div class="posbox" id="posBox">
+      <div class="pad" aria-label="konum">
+        <button type="button" class="sp">·</button>
+        <button type="button" data-dy="-1" title="Yukarı">↑</button>
+        <button type="button" class="sp">·</button>
+        <button type="button" data-dx="-1" title="Sol">←</button>
+        <button type="button" data-dy="1" title="Aşağı">↓</button>
+        <button type="button" data-dx="1" title="Sağ">→</button>
+      </div>
+      <div>
+        <div class="xy">X <input class="num" id="posX" type="number" step="10" /> · Y <input class="num" id="posY" type="number" step="10" /></div>
+        <div class="status" style="margin-top:6px;">Adım 40px · klavye: ok tuşları</div>
+      </div>
+      <button type="button" id="posApply" class="primary">Konumu uygula</button>
+      <span class="status" id="posStatus"></span>
+    </div>
 
     <div class="bar">
       <div style="min-width:140px;flex:0 0 160px;">
@@ -85,10 +116,60 @@
 const $ = id => document.getElementById(id);
 let captions = [];
 let project = null;
+let moving = false;
 
 function trUpper(s){
   return String(s||'').replace(/i/g,'İ').replace(/ı/g,'I').toLocaleUpperCase('tr-TR');
 }
+
+function syncPosInputs(){
+  const cap = (project && project.layout && project.layout.caption) || {x:40,y:1208};
+  $('posX').value = cap.x ?? 40;
+  $('posY').value = cap.y ?? 1208;
+}
+
+async function moveCaption(body){
+  const id = $('vid').value;
+  if(!id || moving) return;
+  moving = true;
+  $('posStatus').textContent = 'taşınıyor…';
+  $('posStatus').className = 'status';
+  try{
+    const r = await fetch('/api/caption-pos', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, rebuild:true, step:40, ...body })
+    });
+    const j = await r.json();
+    if(!r.ok){ $('posStatus').textContent = j.error||'hata'; $('posStatus').className='status err'; return; }
+    if(!project.layout) project.layout = {};
+    project.layout.caption = j.caption || { ...(project.layout.caption||{}), x:j.x, y:j.y };
+    syncPosInputs();
+    $('posStatus').textContent = j.msg || (`x=${j.x} y=${j.y}`);
+    $('posStatus').className = 'status ok';
+  } finally {
+    moving = false;
+  }
+}
+
+document.querySelectorAll('.pad [data-dx], .pad [data-dy]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const body = {};
+    if(btn.dataset.dx!=null) body.dx = Number(btn.dataset.dx);
+    if(btn.dataset.dy!=null) body.dy = Number(btn.dataset.dy);
+    moveCaption(body);
+  });
+});
+$('posApply').onclick = ()=> moveCaption({
+  x: Number($('posX').value)||0,
+  y: Number($('posY').value)||0
+});
+window.addEventListener('keydown', (e)=>{
+  if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
+  if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && e.target.id!=='posX' && e.target.id!=='posY') return;
+  e.preventDefault();
+  const map = {ArrowUp:{dy:-1},ArrowDown:{dy:1},ArrowLeft:{dx:-1},ArrowRight:{dx:1}};
+  moveCaption(map[e.key]);
+});
 
 async function listVideos(){
   const r = await fetch('/api/videos');
@@ -162,6 +243,7 @@ $('loadBtn').onclick = async () => {
   history.replaceState(null,'', '?id='+id);
   $('status').textContent = captions.length + ' altyazı';
   $('status').className = 'status ok';
+  syncPosInputs();
   paint();
 };
 

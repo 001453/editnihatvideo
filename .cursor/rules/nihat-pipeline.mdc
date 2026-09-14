@@ -25,14 +25,13 @@ Agent: read transcript → plan beats → `cards.html` + `public/broll` + `timel
 
 ## Locked
 
-- Captions: one `#caption-host`, **Montserrat Black karaoke** (AI Video Studio). Words dim → accent `#FACC15`/red/lime on speak → white. Enter: word-rise/pop/snap/slide-up/pulse. Safe right ~150px. No 72 caption clips. No `paintCap` onUpdate. No full-frame video darkening.
-- Layout: face full-bleed; **cards only y56–280 (above forehead)**; face clear y300–1100; captions mid-chest; IG right rail clear; PIP **left**.
+- Captions: **Montserrat Black karaoke** (dim → accent → white). Max 2 lines. Soft **opacity-only** enter. **Tek ortak konum** `layout.caption` — dashboard `/captions` ok tuşları veya `/api/caption-pos` (40px) → rebuild → Ctrl+F5. Studio’da altyazı sürükleme **yasak**. Satır `captions[i].x/y` yok. No `paintCap` onUpdate. No full-frame darkening.
+- Layout: face full-bleed; **cards only y56–280 (above forehead)**; face clear y300–1100; captions mid-chest (~y1208 default); IG right rail clear; PIP **left**.
 - Talking-head: unmuted `<video data-has-audio="true">`. No second VO from the same file.
 - `#overlays` has no `data-start`. Root clips `top:0;left:0`. Cards nested in untimed `#overlays`.
-- IG follow: animated Instagram Follow (Nihat / @nihatcetinkayafinans / avatar) — mid + near end, ~4.5s, exclusive. No frozen PNG; no banner `m4a`.
+- IG follow: animated Instagram Follow (Nihat / @cetin.finans / avatar) — mid + near end, ~4.5s, exclusive. No frozen PNG; no banner `m4a`.
 - Punch: hold then ease out. Soft `click-soft` + `sub-hit` on zoom in; click out. Scales 1.10–1.16.
-- Cards: **transparent glass** (no heavy black plate). Unique `data-enter` per card from pool slam/soft/glitch/tilt/wipe/pop/rise/flip/snap/drift/zoom/fold + matching exit + mid-hold progress motion. One hero 3D per video.
-- Captions: Montserrat Black karaoke + **keyword timing**. Card motion: IG-pro `soft|rise|slide|scale` (no bounce/glitch).
+- **Kart geçiş (kilit):** cam kit; enter `soft|rise|slide|scale` ~0.42s `expo.out` + `pop.mp3` + sheen; exit ~0.38s; hold breathe only. Opening **hook** kapalı. Bounce/glitch/slam yok. 1 hero 3D / video.
 - B-roll: muted 9:16, **max 2×8s**, PIP left, whip + whoosh. Labs prompts in `public/broll/LABS_PROMPTS.md`.
 - Disclaimer: transparent, centered **YATIRIM TAVSİYESİ DEĞİL** only, bottom (~y1580), no NİHAT plate.
 - Standard notes: `shared/SHOW_STANDARD.md` + `shared/show-flow.json`.

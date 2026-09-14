@@ -6,7 +6,7 @@
       :root{
         --bg:#0b0d12; --text:#f4f4f6;
         --accent-0:#FACC15; --accent-1:#ff4646; --accent-2:#6ee68c; --accent-3:#5ab0ff; --accent-4:#fb923c;
-        --cap-size:60px;
+        --cap-size:69px;
         --cap-outline:-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 3px 10px rgba(0,0,0,.55);
         /* IG Reels safe zone (1080×1920) — right rail: like/comment */
         --safe-right:150px;
@@ -22,8 +22,8 @@
       }
       *{box-sizing:border-box;}
       html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:"Segoe UI","Inter",Arial,sans-serif;color:var(--text);}
-      #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#000;contain:layout style;}
-      #broll-layer{position:absolute;inset:0;z-index:1;pointer-events:none;contain:layout style;}
+      #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#000;}
+      #broll-layer{position:absolute;inset:0;z-index:1;pointer-events:none;}
       .broll-cam{position:absolute;inset:0;overflow:hidden;opacity:0;}
       .broll-vid{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;display:block;}
       .video-wrapper{
@@ -38,20 +38,24 @@
       #overlays{position:absolute;inset:0;z-index:5;pointer-events:none;}
       .card-host,.cap-stage,.ig-banner{position:absolute;z-index:5;overflow:visible;pointer-events:auto;}
       .ig-banner{z-index:9;object-fit:contain;object-position:left top;background:transparent;}
-      .cap-stage{z-index:30;overflow:hidden;}
+      .cap-stage{z-index:30;overflow:visible;pointer-events:auto;}
+      /* Host: ONLY left/top — Studio drag anlık algılasın (transform yok) */
+      .cap-host{overflow:visible;will-change:left,top;}
+      .cap-scale{width:100%;height:100%;transform:scale(var(--capScale, 1));transform-origin:50% 100%;pointer-events:none;}
       .card-host .card,.card-host .card-fx,.card-host .root,.banner{width:100%;height:100%;}
       .card-fx{transform-origin:50% 40%;transform-style:preserve-3d;perspective:1200px;will-change:transform,opacity;}
-      .cap-item{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;pointer-events:auto;opacity:0;visibility:hidden;gap:10px;overflow:hidden;padding:8px 12px 24px;box-sizing:border-box;}
+      /* CapCut-style: centered stack — overflow visible; GSAP sadece .cap-item */
+      .cap-item{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:auto;opacity:0;visibility:hidden;gap:8px;overflow:visible;padding:12px 16px 16px;box-sizing:border-box;}
       .cap-top,.cap-bot{
         width:100%;max-width:100%;cursor:text;user-select:text;
         font-family:Montserrat,"Arial Black",Impact,sans-serif;font-weight:900;
-        letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:clip;line-height:1.08;
-        text-transform:uppercase;display:block;transform-origin:50% 50%;box-sizing:border-box;
-        font-size:calc(var(--capSize, 60) * var(--lineMul, 1) * var(--lineScale, 1) * 1px);
+        letter-spacing:-.04em;white-space:nowrap;overflow:visible;text-overflow:clip;line-height:1.12;
+        text-transform:uppercase;display:block;text-align:center;margin-left:auto;margin-right:auto;transform-origin:50% 50%;box-sizing:border-box;
+        font-size:calc(var(--capSize, 69) * var(--lineMul, 1) * var(--lineScale, 1) * 1px);
         text-shadow:var(--cap-outline);
         -webkit-text-stroke:0;
       }
-      .cap-w{display:inline-block;margin:0 .2em 0 0;opacity:.25;color:#ffffff;transform-origin:50% 80%;will-change:transform,opacity,filter;text-shadow:var(--cap-outline);}
+      .cap-w{display:inline-block;margin:0 .12em 0 0;opacity:.62;color:#ffffff;transform-origin:50% 80%;will-change:transform,opacity,filter;text-shadow:var(--cap-outline);}
       .cap-w:last-child{margin-right:0;}
       .root{
         display:flex;flex-direction:column;justify-content:center;padding:22px 26px;border-radius:22px;

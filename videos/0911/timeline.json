@@ -1,0 +1,102 @@
+{
+  "broll": [
+    {
+      "id": "fed",
+      "file": "broll/fed.mp4",
+      "start": 55.0,
+      "dur": 8.0,
+      "keyword": "FED",
+      "hint": "FED / TÜFE / faiz (~55s) — tek b-roll"
+    }
+  ],
+  "punches": [
+    [
+      12.12,
+      7.5,
+      1.12
+    ],
+    [
+      32.92,
+      8.0,
+      1.14
+    ],
+    [
+      66.42,
+      7.5,
+      1.12
+    ],
+    [
+      74.24,
+      8.0,
+      1.16
+    ]
+  ],
+  "hero": {
+    "id": "path",
+    "at": 32.92
+  },
+  "special": {
+    "type": "drone",
+    "at": 81.92,
+    "dur": 1.4,
+    "card": "pressure"
+  },
+  "igBanner": [
+    {
+      "id": "mid",
+      "start": 38.0,
+      "dur": 4.5
+    },
+    {
+      "id": "end",
+      "start": 95.26,
+      "dur": 4.5
+    }
+  ],
+  "mg": [
+    {
+      "id": "flash1",
+      "type": "flash",
+      "at": 2.68,
+      "dur": 0.25
+    },
+    {
+      "id": "tick1",
+      "type": "ticker",
+      "at": 55.2,
+      "dur": 4.0,
+      "y": 200,
+      "text": "FED · TÜFE · CORE 0.3 · FAİZ"
+    },
+    {
+      "id": "sparks1",
+      "type": "sparks",
+      "at": 74.24,
+      "dur": 0.95,
+      "y": 120
+    }
+  ],
+  "proCards": [
+    {
+      "id": "core-stat",
+      "block": "mk-progress-stat",
+      "start": 63.5,
+      "dur": 6.5,
+      "scale": 0.34,
+      "x": -400,
+      "y": 40,
+      "copy": {
+        "scheme": "dark",
+        "value": 0.3,
+        "suffix": "",
+        "label": "CORE AYLIK",
+        "caption": "Gıda + enerji hariç enflasyon",
+        "max": 1,
+        "trackWidth": 520,
+        "x": 220,
+        "y": 160
+      }
+    }
+  ],
+  "brollPending": false
+}

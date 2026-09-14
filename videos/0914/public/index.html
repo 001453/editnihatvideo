@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="tr" data-resolution="portrait" data-composition-variables='[{"id": "capSize", "type": "number", "label": "Altyazı punto", "default": 58, "min": 48, "max": 86, "step": 1}, {"id": "capX", "type": "number", "label": "Altyazı X (kaydır)", "default": 40, "min": 0, "max": 200, "step": 2}, {"id": "capY", "type": "number", "label": "Altyazı Y (kaydır)", "default": 1208, "min": 900, "max": 1550, "step": 4}, {"id": "capScale", "type": "number", "label": "Altyazı scale", "default": 1.0, "min": 0.7, "max": 1.35, "step": 0.02}]'>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>0914</title>
+    <style>
+      @font-face{font-family:Anton;font-style:normal;font-weight:400;font-display:block;src:url('fonts/Anton-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+      @font-face{font-family:Anton;font-style:normal;font-weight:400;font-display:block;src:url('fonts/Anton-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+      /* AI Video Studio social-hook captions — Montserrat Black 900 */
+      @font-face{font-family:Montserrat;font-style:normal;font-weight:900;font-display:block;src:url('fonts/Montserrat-Black-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+      @font-face{font-family:Montserrat;font-style:normal;font-weight:900;font-display:block;src:url('fonts/Montserrat-Black-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+      :root{
+        --bg:#0b0d12; --text:#f4f4f6;
+        --accent-0:#FACC15; --accent-1:#ff4646; --accent-2:#6ee68c; --accent-3:#5ab0ff; --accent-4:#fb923c;
+        --cap-size:69px;
+        --cap-outline:-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 3px 10px rgba(0,0,0,.55);
+        /* IG Reels safe zone (1080×1920) — right rail: like/comment */
+        --safe-right:150px;
+        --safe-left:48px;
+        --safe-top:64px;
+        --safe-bottom:280px;
+        --card-max-w:920px;
+        --cap-max-w:860px;
+        /* Nihat chest-up framing — face clear band */
+        --face-top:300px;
+        --face-bottom:1100px;
+        --card-band-bottom:280px;
+      }
+      *{box-sizing:border-box;}
+      html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:"Segoe UI","Inter",Arial,sans-serif;color:var(--text);}
+      #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#000;}
+      #broll-layer{position:absolute;inset:0;z-index:1;pointer-events:none;}
+      .broll-cam{position:absolute;inset:0;overflow:hidden;opacity:0;}
+      .broll-vid{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;display:block;}
+      .video-wrapper{
+        position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;z-index:3;
+        transform-origin:50% 50%;border-radius:0;
+        box-shadow:none;
+      }
+      #video-cam{width:100%;height:100%;transform-origin:50% 38%;}
+      .video-wrapper video{width:100%;height:100%;object-fit:cover;display:block;}
+      /* No full-frame video darkening — captions carry their own stroke/3D */
+      .legibility{display:none;pointer-events:none;}
+      #overlays{position:absolute;inset:0;z-index:5;pointer-events:none;}
+      .card-host,.cap-stage,.ig-banner{position:absolute;z-index:5;overflow:visible;pointer-events:auto;}
+      .ig-banner{z-index:9;object-fit:contain;object-position:left top;background:transparent;}
+      .cap-stage{z-index:30;overflow:visible;pointer-events:auto;}
+      /* Host: ONLY left/top — Studio drag anlık algılasın (transform yok) */
+      .cap-host{overflow:visible;will-change:left,top;}
+      .cap-scale{width:100%;height:100%;transform:scale(var(--capScale, 1));transform-origin:50% 100%;pointer-events:none;}
+      .card-host .card,.card-host .card-fx,.card-host .root,.banner{width:100%;height:100%;}
+      .card-fx{transform-origin:50% 40%;transform-style:preserve-3d;perspective:1200px;will-change:transform,opacity;}
+      /* CapCut-style: centered stack — overflow visible; GSAP sadece .cap-item */
+      .cap-item{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:auto;opacity:0;visibility:hidden;gap:8px;overflow:visible;padding:12px 16px 16px;box-sizing:border-box;}
+      .cap-top,.cap-bot{
+        width:100%;max-width:100%;cursor:text;user-select:text;
+        font-family:Montserrat,"Arial Black",Impact,sans-serif;font-weight:900;
+        letter-spacing:-.04em;white-space:nowrap;overflow:visible;text-overflow:clip;line-height:1.12;
+        text-transform:uppercase;display:block;text-align:center;margin-left:auto;margin-right:auto;transform-origin:50% 50%;box-sizing:border-box;
+        font-size:calc(var(--capSize, 69) * var(--lineMul, 1) * var(--lineScale, 1) * 1px);
+        text-shadow:var(--cap-outline);
+        -webkit-text-stroke:0;
+      }
+      .cap-w{display:inline-block;margin:0 .12em 0 0;opacity:.62;color:#ffffff;transform-origin:50% 80%;will-change:transform,opacity,filter;text-shadow:var(--cap-outline);}
+      .cap-w:last-child{margin-right:0;}
+      .root{
+        display:flex;flex-direction:column;justify-content:center;padding:22px 26px;border-radius:22px;
+        background:rgba(255,255,255,.07);
+        border:1px solid rgba(255,255,255,.32);
+        box-shadow:0 10px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.22);
+        position:relative;
+        text-shadow:0 2px 10px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.75);
+      }
+      .root.glass{overflow:hidden;padding-left:32px;background:rgba(255,255,255,.08);}
+      .root.punch{padding-left:28px;padding-right:28px;padding-top:36px;background:rgba(255,70,70,.10);border-color:rgba(255,120,120,.40);}
+      .card-accent{position:absolute;left:0;top:16px;bottom:16px;width:5px;border-radius:0 6px 6px 0;background:linear-gradient(180deg,#ffdd4f,#ff4646);transform-origin:50% 0%;z-index:2;pointer-events:none;box-shadow:0 0 12px rgba(255,221,79,.45);}
+      .card-sheen{position:absolute;top:-30%;left:0;width:160px;height:160%;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.28) 50%,transparent 80%);z-index:4;pointer-events:none;opacity:0;}
+      /* Warn badge: top-left — clear of IG like/comment rail */
+      .warn-badge{
+        position:absolute;left:22px;top:14px;margin-top:0;width:56px;height:56px;
+        border-radius:50%;display:flex;align-items:center;justify-content:center;
+        background:radial-gradient(circle at 35% 30%,#ff6b6b,#c41818 70%);
+        box-shadow:0 8px 20px rgba(255,50,50,.35), inset 0 1px 0 rgba(255,255,255,.25);
+        z-index:5;pointer-events:none;opacity:0;will-change:transform;
+      }
+      .warn-badge .warn-ico{
+        font-family:Anton,"Arial Black",sans-serif;font-size:30px;color:#fff;line-height:1;
+        text-shadow:0 2px 0 rgba(0,0,0,.35);position:relative;z-index:2;
+      }
+      .warn-badge .warn-ring{
+        position:absolute;inset:-8px;border-radius:50%;
+        border:2px dashed rgba(255,220,80,.85);
+        box-shadow:0 0 0 1px rgba(255,70,70,.25);
+      }
+      .warn-badge.warn-soft{
+        background:radial-gradient(circle at 35% 30%,#ffe08a,#d4a017 72%);
+      }
+      .warn-badge.warn-soft .warn-ring{border-color:rgba(255,255,255,.55);}
+      .root.hook{background:transparent;border:0;box-shadow:none;padding:10px 18px;justify-content:flex-start;overflow:visible;text-shadow:0 3px 14px rgba(0,0,0,.7);}
+      .root.slim{flex-direction:row;align-items:center;justify-content:center;gap:8px;padding:10px 16px 10px 32px;background:rgba(255,255,255,.10);border-color:rgba(255,221,79,.35);}
+      .chapter{
+        display:inline-flex;align-items:center;gap:10px;margin-bottom:10px;
+        font-size:18px;letter-spacing:.18em;font-weight:800;color:#ffdd4f;text-transform:uppercase;
+        text-shadow:0 2px 8px rgba(0,0,0,.65);
+      }
+      .chapter i{
+        display:inline-block;min-width:34px;height:34px;line-height:34px;text-align:center;
+        border-radius:10px;background:rgba(255,221,79,.22);border:1px solid rgba(255,221,79,.65);
+        font-style:normal;font-size:16px;letter-spacing:0;
+      }
+      .quote-mark{
+        font-family:Anton,"Arial Black",sans-serif;font-size:72px;line-height:.7;color:rgba(255,221,79,.55);
+        margin:0 0 4px;transform-origin:0% 50%;
+        text-shadow:0 4px 16px rgba(0,0,0,.5);
+      }
+      .cap-kw{display:inline-block;transform-origin:50% 50%;will-change:transform,filter;}
+      .title,.q,.note,.kicker,.lvl b,.stat b,.hero-num{text-shadow:0 2px 10px rgba(0,0,0,.55);}
+      .cap-top,.cap-bot{
+        --lineMul:1;
+        color:#ffffff;
+      }
+      .cap-top:empty{display:none;}
+      /* Karaoke accent per tone — words light up via GSAP; lines stay white */
+      .cap-item.tone-yumusak{--cap-accent:#FACC15;}
+      .cap-item.tone-sert{--cap-accent:#FF2A2A;}
+      .cap-item.tone-yukselis{--cap-accent:#C8FF00;}
+      .cap-item.tone-fixed{--cap-accent:#FFFFFF;}
+      .cap-item.cap-punch .cap-bot{filter:none;}
+      .banner{
+        display:flex;align-items:center;justify-content:center;padding:0 20px;
+        background:transparent;border:0;border-radius:0;box-shadow:none;
+        font-weight:800;
+      }
+      .banner span{display:none;}
+      .banner b{
+        color:#ffffff;font-size:36px;letter-spacing:.04em;text-align:center;
+        text-shadow:
+          0 2px 0 #1a1a1a,
+          0 4px 0 #000,
+          0 8px 18px rgba(0,0,0,.75);
+        -webkit-text-stroke:2px #000;
+        paint-order:stroke fill;
+      }
+      .kicker{font-size:18px;letter-spacing:.18em;color:#ffdd4f;font-weight:700;margin-bottom:14px;}
+      .title{font-size:44px;font-weight:800;line-height:1.18;margin:0 0 14px;letter-spacing:.02em;}
+      .title.red{color:#ff4646;font-size:52px;letter-spacing:.01em;}
+      .q{font-size:34px;font-weight:800;margin:8px 0;color:#fff;}
+      .q.danger{color:#ff4646;}
+      .note{font-size:24px;color:#d5d5dc;margin-top:12px;font-weight:650;line-height:1.35;letter-spacing:.02em;}
+      .note.warn{color:#ffdd4f;}
+      .cw{display:inline-block;margin:0 .14em 0 0;transform-origin:50% 80%;opacity:0;will-change:transform,opacity;}
+      .cw:last-child{margin-right:0;}
+      .root.pro-pill{border-radius:28px;padding:16px 22px 16px 30px;}
+      .root.pro-rail{border-radius:18px;border-left:0;padding-left:36px;}
+      .root.pro-rail .card-accent{width:7px;border-radius:0 8px 8px 0;}
+      .root.pro-stack{border-radius:26px;gap:4px;}
+      .root.pro-alert{border-color:rgba(255,70,70,.55);background:rgba(255,70,70,.12);border-radius:20px;}
+      .root.pro-compact{border-radius:24px;padding:20px 24px 20px 32px;}
+      /* Face-safe top band — dense, stays above forehead (~y300) */
+      .root.face-safe{padding:14px 18px 14px 28px;justify-content:flex-start;gap:2px;}
+      .root.face-safe .chapter{margin-bottom:4px;font-size:15px;}
+      .root.face-safe .chapter i{min-width:28px;height:28px;line-height:28px;font-size:14px;border-radius:8px;}
+      .root.face-safe .kicker{font-size:15px;margin-bottom:4px;letter-spacing:.14em;}
+      .root.face-safe .title{font-size:32px;margin:0 0 6px;line-height:1.1;}
+      .root.face-safe .title.red{font-size:34px;}
+      .root.face-safe .note{font-size:18px;margin-top:4px;line-height:1.25;}
+      .root.face-safe .lvl{padding:4px 2px;}
+      .root.face-safe .lvl span{font-size:15px;}
+      .root.face-safe .lvl b{font-size:34px;}
+      .root.face-safe .lvl-track{height:6px;margin:0 2px 6px;}
+      .root.face-safe .warn-badge{width:44px;height:44px;left:14px;top:10px;}
+      .root.face-safe .warn-badge .warn-ico{font-size:22px;}
+      .root.face-safe.punch{padding-top:18px;}
+      .chip-alt{background:rgba(255,70,70,.18);border-color:#ff4646;color:#ff8a8a;}
+      .chip-blue{background:rgba(90,176,255,.18);border-color:#5ab0ff;color:#8ecfff;}
+      .chip-green{background:rgba(110,230,140,.18);border-color:#6ee68c;color:#9af0b0;}
+      .lvl{display:flex;justify-content:space-between;align-items:baseline;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.12);}
+      .lvl span{font-size:20px;letter-spacing:.12em;color:#9aa0ae;}
+      .lvl b{font-size:52px;}
+      .lvl.up b{color:#6ee68c;}
+      .lvl.dn b{color:#ff4646;}
+      .lvl-track{height:10px;margin:0 4px 12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;}
+      .lvl-track i{display:block;width:100%;height:100%;border-radius:99px;transform-origin:0% 50%;background:#ffdd4f;will-change:transform;}
+      .lvl.up + .lvl-track i{background:#6ee68c;}
+      .lvl.dn + .lvl-track i{background:#ff4646;}
+      .chip{display:inline-block;margin:6px 8px 6px 0;padding:10px 18px;border-radius:999px;background:rgba(255,221,79,.20);border:1px solid #ffdd4f;color:#ffdd4f;font-size:28px;font-weight:800;letter-spacing:.04em;transform-origin:50% 50%;box-shadow:0 6px 16px rgba(0,0,0,.25);text-shadow:0 2px 8px rgba(0,0,0,.55);}
+      .stat{display:flex;align-items:baseline;gap:12px;margin:6px 0;}
+      .stat b{font-size:64px;color:#ffdd4f;font-variant-numeric:tabular-nums;}
+      .stat span{font-size:24px;color:#c8cad1;}
+      .hero-num{font-size:96px;font-weight:800;color:#5ab0ff;line-height:1;font-variant-numeric:tabular-nums;display:inline-block;transform-origin:0% 50%;text-shadow:0 8px 24px rgba(90,176,255,.35);}
+      .graph-card svg{width:100%;height:auto;max-height:280px;}
+      .kicker,.title,.q,.note,.banner,.lvl b,.lvl span,.stat b,.stat span,.hero-num,.chip,.cap-top,.cap-bot,.chapter{cursor:text;user-select:text;-webkit-user-select:text;}
+      /* Motion graphics overlays (timeline.json "mg") */
+      .mg-host{pointer-events:none;overflow:visible;}
+      .mg-sparkline{width:100%;height:100%;display:block;}
+      .mg-sparkline path{fill:none;stroke:#ffdd4f;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(255,221,79,.55));}
+      .mg-sparkline .mg-dot{fill:#ffdd4f;filter:drop-shadow(0 0 6px rgba(255,221,79,.8));}
+      .mg-stroke{position:absolute;left:0;top:50%;height:3px;width:100%;border-radius:99px;background:linear-gradient(90deg,transparent,#ffdd4f 20%,#fff 50%,#ffdd4f 80%,transparent);box-shadow:0 0 18px rgba(255,221,79,.65);transform-origin:0% 50%;}
+      .mg-sparks{position:absolute;inset:0;}
+      .mg-sparks i{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:50%;background:#ffdd4f;box-shadow:0 0 12px rgba(255,221,79,.9);opacity:0;}
+      .mg-sparks i:nth-child(odd){background:#5ab0ff;box-shadow:0 0 12px rgba(90,176,255,.85);}
+      .mg-sparks i:nth-child(3n){background:#ff4646;box-shadow:0 0 12px rgba(255,70,70,.8);}
+      .mg-flash{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(255,221,79,.55),rgba(255,255,255,.12) 45%,transparent 70%);opacity:0;}
+      .mg-ticker{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,.15) 40%,rgba(0,0,0,.35));border-top:1px solid rgba(255,221,79,.35);border-bottom:1px solid rgba(255,221,79,.35);}
+      .mg-ticker-track{display:flex;white-space:nowrap;will-change:transform;}
+      .mg-ticker-track span{font-family:Anton,sans-serif;font-size:28px;letter-spacing:.12em;color:#ffdd4f;padding:0 48px;text-shadow:0 2px 10px rgba(0,0,0,.75);}
+      .mg-underline{position:absolute;left:80px;bottom:18px;height:4px;width:320px;border-radius:99px;background:#ffdd4f;box-shadow:0 0 14px rgba(255,221,79,.7);transform-origin:0% 50%;}
+
+    </style>
+  </head>
+  <body>
+    <div id="stage" data-composition-id="talking-head-recut" data-start="0" data-duration="127.68" data-fps="30" data-width="1080" data-height="1920">
+      <div id="broll-layer">
+      <div class="broll-cam" id="broll-borsa-cam">
+        <video id="broll-borsa" class="clip broll-vid" src="broll/borsa.mp4" muted playsinline data-start="48.0000" data-duration="8.0000" data-track-index="4"></video>
+      </div>
+      <div class="broll-cam" id="broll-fed-cam">
+        <video id="broll-fed" class="clip broll-vid" src="broll/fed.mp4" muted playsinline data-start="69.0000" data-duration="8.0000" data-track-index="4"></video>
+      </div>
+      </div>
+      <div class="video-wrapper" id="video-wrap">
+        <div id="video-cam">
+          <video id="bg-video" src="input-video.mp4" playsinline data-has-audio="true" data-start="0" data-duration="127.68" data-track-index="1"></video>
+        </div>
+      </div>
+      <div class="legibility"></div>
+      <div id="overlays">
+
+
+      <div class="card-host clip" id="card-path-host" data-card-id="card-path" data-enter="slide" data-exit="fade" data-loop="breathe" data-start="3.9000" data-duration="10.5000" data-track-index="2" style="left:40px;top:56px;width:880px;height:230px;">
+        <div class="card" data-card-id="card-path">
+          <div class="card-fx" id="card-path-fx">
+            <div class="root glass levels graph-card pro-stack face-safe" id="card-path-root">
+              <span class="card-accent" id="card-path-accent"></span>
+              <span class="card-sheen" id="card-path-sheen"></span>
+              <div class="chapter" id="pt-ch" data-at="3.92" data-in="rise"><i>02</i> SEVİYE</div>
+              <div class="lvl" id="pt-1" data-at="4.66" data-in="rise"><span>ŞİMDİ</span><b>14.400</b></div>
+              <div class="lvl-track"><i data-fill="0.70" data-fill-at="4.80"></i></div>
+              <div class="lvl dn" id="pt-2" data-at="6.28" data-in="rise"><span>~1.000 PUAN</span><b>↓</b></div>
+              <div class="lvl-track"><i data-fill="0.45" data-fill-at="6.40" style="background:#ff4646"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-peak-host" data-card-id="card-peak" data-enter="soft" data-exit="fade" data-loop="breathe" data-start="9.0000" data-duration="6.5000" data-track-index="2" style="left:40px;top:64px;width:880px;height:100px;">
+        <div class="card" data-card-id="card-peak">
+          <div class="card-fx" id="card-peak-fx">
+            <div class="root glass chips slim pro-pill face-safe" id="card-peak-root">
+              <span class="card-accent" id="card-peak-accent"></span>
+              <span class="card-sheen" id="card-peak-sheen"></span>
+              <div class="chip chip-alt" id="pk-1" data-at="9.42" data-in="rise">MAYIS</div>
+              <div class="chip" id="pk-2" data-at="11.00" data-in="rise">15.205 ZİRVE</div>
+              <div class="chip chip-blue" id="pk-3" data-at="13.30" data-in="rise">ÇOK YAKIN</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-flow-host" data-card-id="card-flow" data-enter="rise" data-exit="fade" data-loop="breathe" data-start="15.8" data-duration="3.6" data-track-index="2" style="left:40px;top:64px;width:880px;height:100px;">
+        <div class="card" data-card-id="card-flow">
+          <div class="card-fx" id="card-flow-fx">
+            <div class="root glass chips slim pro-rail face-safe" id="card-flow-root">
+              <span class="card-accent" id="card-flow-accent"></span>
+              <span class="card-sheen" id="card-flow-sheen"></span>
+              <div class="chip" id="fl-1" data-at="16.98" data-in="rise">8 HAFTA</div>
+              <div class="chip chip-green" id="fl-2" data-at="17.64" data-in="rise">YABANCI ALIM</div>
+              <div class="chip chip-alt" id="fl-3" data-at="20.50" data-in="rise">GÜÇLÜ YÜKSELİŞ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-warn-host" data-card-id="card-warn" data-enter="soft" data-exit="scale" data-loop="breathe" data-start="24.38" data-duration="2.08" data-track-index="2" style="left:40px;top:56px;width:880px;height:180px;">
+        <div class="card" data-card-id="card-warn">
+          <div class="card-fx" id="card-warn-fx">
+            <div class="root glass punch pro-alert face-safe" id="card-warn-root">
+              <span class="card-accent" id="card-warn-accent"></span>
+              <span class="card-sheen" id="card-warn-sheen"></span>
+              <span class="warn-badge" id="card-warn-warn"><span class="warn-ring"></span><span class="warn-ico">!</span></span>
+              <div class="kicker" id="wn-k" data-at="23.52" data-in="words">TAM DA BU YÜZDEN</div>
+              <div class="title red" id="wn-t" data-at="24.92" data-in="words">DİKKATLİ OLMAK LAZIM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-volume-host" data-card-id="card-volume" data-hero="1" data-enter="rise" data-exit="fade" data-loop="breathe" data-start="41.09" data-duration="2.42" data-track-index="2" style="left:40px;top:56px;width:880px;height:210px;">
+        <div class="card" data-card-id="card-volume">
+          <div class="card-fx" id="card-volume-fx">
+            <div class="root glass stats pro-stack face-safe" id="card-volume-root">
+              <span class="card-accent" id="card-volume-accent"></span>
+              <span class="card-sheen" id="card-volume-sheen"></span>
+              <div class="chapter" id="vo-ch" data-at="35.60" data-in="rise"><i>03</i> HACİM</div>
+              <div class="kicker" id="vo-k" data-at="39.12" data-in="words">TARİHİ REKOR</div>
+              <div class="title" id="vo-t" data-at="41.26" data-in="words"><span class="hero-num" data-count="328" data-scale-in="1">328</span> MİLYAR TL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-cash-host" data-card-id="card-cash" data-enter="slide" data-exit="fade" data-loop="breathe" data-start="58.07" data-duration="3.9" data-track-index="2" style="left:40px;top:56px;width:880px;height:200px;">
+        <div class="card" data-card-id="card-cash">
+          <div class="card-fx" id="card-cash-fx">
+            <div class="root glass punch pro-rail face-safe" id="card-cash-root">
+              <span class="card-accent" id="card-cash-accent"></span>
+              <span class="card-sheen" id="card-cash-sheen"></span>
+              <div class="kicker" id="cs-k" data-at="57.70" data-in="words">İKİNCİ İHTİMAL</div>
+              <div class="title" id="cs-t" data-at="58.50" data-in="words">BÜYÜK OYUNCULAR → NAKİT</div>
+              <div class="note" id="cs-n" data-at="61.82" data-in="words">Rekor hacim · zirveye yakın</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-fed-host" data-card-id="card-fed" data-enter="soft" data-exit="fade" data-loop="breathe" data-start="80.08" data-duration="3.65" data-track-index="2" style="left:40px;top:56px;width:880px;height:200px;">
+        <div class="card" data-card-id="card-fed">
+          <div class="card-fx" id="card-fed-fx">
+            <div class="root glass punch pro-alert face-safe" id="card-fed-root">
+              <span class="card-accent" id="card-fed-accent"></span>
+              <span class="card-sheen" id="card-fed-sheen"></span>
+              <span class="warn-badge" id="card-fed-warn"><span class="warn-ring"></span><span class="warn-ico">!</span></span>
+              <div class="kicker" id="fd-k" data-at="78.02" data-in="words">PARA → ABD</div>
+              <div class="title red" id="fd-t" data-at="80.58" data-in="words">BORSAMIZA NEGATİF ETKİ</div>
+              <div class="note" id="fd-n" data-at="85.26" data-in="words">Gelişmekte olan ülke piyasaları</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-rate-host" data-card-id="card-rate" data-enter="rise" data-exit="fade" data-loop="breathe" data-start="90.0000" data-duration="10.0000" data-track-index="2" style="left:40px;top:64px;width:880px;height:100px;">
+        <div class="card" data-card-id="card-rate">
+          <div class="card-fx" id="card-rate-fx">
+            <div class="root glass chips slim pro-pill face-safe" id="card-rate-root">
+              <span class="card-accent" id="card-rate-accent"></span>
+              <span class="card-sheen" id="card-rate-sheen"></span>
+              <div class="chip chip-alt" id="rt-1" data-at="91.46" data-in="rise">TCMB FAİZ</div>
+              <div class="chip" id="rt-2" data-at="94.98" data-in="rise">%37</div>
+              <div class="chip chip-blue" id="rt-3" data-at="93.60" data-in="rise">8 AY SABİT</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-deposit-host" data-card-id="card-deposit" data-enter="soft" data-exit="fade" data-loop="breathe" data-start="102.03" data-duration="4.87" data-track-index="2" style="left:40px;top:56px;width:880px;height:180px;">
+        <div class="card" data-card-id="card-deposit">
+          <div class="card-fx" id="card-deposit-fx">
+            <div class="root glass punch pro-compact face-safe" id="card-deposit-root">
+              <span class="card-accent" id="card-deposit-accent"></span>
+              <span class="card-sheen" id="card-deposit-sheen"></span>
+              <div class="kicker" id="dp-k" data-at="102.02" data-in="words">BORSA DEĞİL</div>
+              <div class="title" id="dp-t" data-at="102.96" data-in="words">MEVDUAT / DİĞER ARAÇLAR</div>
+              <div class="note" id="dp-n" data-at="109.08" data-in="words">Para akışı yavaşlar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-verdict-host" data-card-id="card-verdict" data-enter="rise" data-exit="scale" data-loop="breathe" data-start="110.5000" data-duration="5.9000" data-track-index="2" style="left:40px;top:56px;width:880px;height:230px;">
+        <div class="card" data-card-id="card-verdict">
+          <div class="card-fx" id="card-verdict-fx">
+            <div class="root glass levels pro-stack face-safe" id="card-verdict-root">
+              <span class="card-accent" id="card-verdict-accent"></span>
+              <span class="card-sheen" id="card-verdict-sheen"></span>
+              <div class="chapter" id="vd-ch" data-at="110.42" data-in="rise"><i>04</i> TAKİP</div>
+              <div class="lvl" id="vd-1" data-at="114.12" data-in="rise"><span>ÜST</span><b>14.600</b></div>
+              <div class="lvl-track"><i data-fill="0.65" data-fill-at="114.30"></i></div>
+              <div class="lvl dn" id="vd-2" data-at="115.50" data-in="rise"><span>HEDEF</span><b>13.400</b></div>
+              <div class="lvl-track"><i data-fill="0.55" data-fill-at="115.60" style="background:#ff4646"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-close-host" data-card-id="card-close" data-enter="soft" data-exit="fade" data-loop="breathe" data-start="121.2000" data-duration="2.4000" data-track-index="2" style="left:40px;top:56px;width:880px;height:150px;">
+        <div class="card" data-card-id="card-close">
+          <div class="card-fx" id="card-close-fx">
+            <div class="root glass pro-compact face-safe" id="card-close-root">
+              <span class="card-accent" id="card-close-accent"></span>
+              <span class="card-sheen" id="card-close-sheen"></span>
+              <div class="kicker" id="cl-k" data-at="121.30" data-in="words">KISA VADE</div>
+              <div class="title red" id="cl-t" data-at="121.82" data-in="words">HEDEF 13.400 PUAN</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-host clip" id="card-disclaimer-host" data-card-id="card-disclaimer" data-enter="soft" data-exit="fade" data-start="122.9000" data-duration="4.5000" data-track-index="3" style="left:40px;top:1580px;width:1000px;height:100px;">
+        <div class="card" data-card-id="card-disclaimer">
+          <div class="banner" id="ban-c" data-at="123.00" data-in="rise" data-out="127.20">
+            <b>YATIRIM TAVSİYESİ DEĞİL</b>
+          </div>
+        </div>
+      </div>
+      <div class="clip pro-card" id="pro-hacim-stat" data-composition-id="mk-progress-stat" data-composition-src="../compositions/pro-hacim-stat.html" data-start="41.5000" data-duration="6.0000" data-track-index="11" data-width="1920" data-height="1080" style="left:-400px;top:40px;width:1920px;height:1080px;transform:scale(0.34);transform-origin:top center;z-index:12;pointer-events:none;"></div>
+      <div class="clip ig-follow-host" id="ig-ban-mid" data-composition-id="instagram-follow-mid" data-composition-src="../compositions/instagram-follow-mid.html" data-start="28.5000" data-duration="4.5000" data-track-index="8" data-width="1080" data-height="1920" style="left:0;top:0;width:1080px;height:1920px;z-index:18;pointer-events:none;"></div>
+      <div class="clip ig-follow-host" id="ig-ban-end" data-composition-id="instagram-follow-end" data-composition-src="../compositions/instagram-follow-end.html" data-start="116.6667" data-duration="4.5000" data-track-index="8" data-width="1080" data-height="1920" style="left:0;top:0;width:1080px;height:1920px;z-index:18;pointer-events:none;"></div>
+      <div class="clip mg-host" id="mg-flash1" data-mg="flash" data-start="1.1333" data-duration="0.2667" data-track-index="9" style="left:0;top:0;width:1080px;height:1920px;">
+        <div class="mg-flash" id="mg-flash1-flash"></div>
+      </div>
+      <div class="clip mg-host" id="mg-tick1" data-mg="ticker" data-start="41.5000" data-duration="4.0000" data-track-index="7" style="left:0;top:200px;width:1080px;height:56px;">
+        <div class="mg-ticker"><div class="mg-ticker-track" id="mg-tick1-track"><span>328 MİLYAR · REKOR HACİM · BIST</span><span>328 MİLYAR · REKOR HACİM · BIST</span><span>328 MİLYAR · REKOR HACİM · BIST</span><span>328 MİLYAR · REKOR HACİM · BIST</span></div></div>
+      </div>
+      <div class="clip mg-host" id="mg-sparks1" data-mg="sparks" data-start="57.7000" data-duration="0.9333" data-track-index="7" style="left:240px;top:120px;width:600px;height:400px;">
+        <div class="mg-sparks" id="mg-sparks1-sparks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-000-host" data-start="0.0000" data-duration="1.8667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-sert" id="cap-000" data-cap-start="0.0000" data-cap-end="1.8667" data-accent="#FF2A2A" data-anim="soft">
+          <div class="cap-top" id="cap-000-top" style="--lineScale:1.00"><span class="cap-w cap-kw" data-ws="0.0000" data-we="0.7667">BORSADA</span> <span class="cap-w" data-ws="0.7667" data-we="1.1333">DÜŞÜŞ</span></div>
+          <div class="cap-bot" id="cap-000-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="1.1333" data-we="1.6333">BEKLİYORUM.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-001-host" data-start="1.9333" data-duration="1.9667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-001" data-cap-start="1.9333" data-cap-end="3.8667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-001-top" style="--lineScale:1.00"><span class="cap-w" data-ws="1.9333" data-we="2.3333">BEKLENTİM</span> <span class="cap-w" data-ws="2.3333" data-we="2.6333">İSE</span></div>
+          <div class="cap-bot" id="cap-001-bot" style="--lineScale:1.00"><span class="cap-w cap-kw" data-ws="2.6333" data-we="2.8667">13.400</span> <span class="cap-w" data-ws="2.8667" data-we="3.7667">PUAN.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-002-host" data-start="3.9333" data-duration="2.3333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-002" data-cap-start="3.9333" data-cap-end="6.2333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-002-top" style="--lineScale:1.00"><span class="cap-w" data-ws="3.9333" data-we="4.0667">YANİ</span> <span class="cap-w" data-ws="4.0667" data-we="4.4000">ŞU</span> <span class="cap-w" data-ws="4.4000" data-we="4.6667">ANKİ</span> <span class="cap-w cap-kw" data-ws="4.6667" data-we="4.9667">14.400</span></div>
+          <div class="cap-bot" id="cap-002-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="4.9667" data-we="6.2667">SEVİYESİNDEN</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-003-host" data-start="6.2667" data-duration="1.7333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-sert" id="cap-003" data-cap-start="6.2667" data-cap-end="8.0333" data-accent="#FF2A2A" data-anim="soft">
+          <div class="cap-top" id="cap-003-top" style="--lineScale:1.00"><span class="cap-w cap-kw" data-ws="6.2667" data-we="6.8667">1.000</span> <span class="cap-w" data-ws="6.8667" data-we="7.0667">PUANA</span></div>
+          <div class="cap-bot" id="cap-003-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="7.0667" data-we="7.4000">YAKIN</span> <span class="cap-w" data-ws="7.4000" data-we="7.7000">BİR</span> <span class="cap-w" data-ws="7.7000" data-we="8.0667">DÜŞÜŞ</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-004-host" data-start="8.0667" data-duration="2.9000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-004" data-cap-start="8.0667" data-cap-end="10.9667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-004-top" style="--lineScale:1.00"><span class="cap-w" data-ws="8.0667" data-we="8.5000">BEKLİYORUM.</span> <span class="cap-w cap-kw" data-ws="8.9667" data-we="9.2000">BİST</span> <span class="cap-w cap-kw" data-ws="9.2000" data-we="9.4333">100</span></div>
+          <div class="cap-bot" id="cap-004-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="9.4333" data-we="9.8667">MAYIS</span> <span class="cap-w" data-ws="9.8667" data-we="10.2667">AYINDA</span> <span class="cap-w" data-ws="10.2667" data-we="11.0000">GÖRDÜĞÜ</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-005-host" data-start="11.0000" data-duration="2.4667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-005" data-cap-start="11.0000" data-cap-end="13.4667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-005-top" style="--lineScale:1.00"><span class="cap-w cap-kw" data-ws="11.0000" data-we="11.2667">15.205</span> <span class="cap-w" data-ws="11.2667" data-we="11.9667">PUANLIK</span></div>
+          <div class="cap-bot" id="cap-005-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="11.9667" data-we="12.4333">TARİHİ</span> <span class="cap-w" data-ws="12.4333" data-we="12.7667">ZİRVESİNE</span> <span class="cap-w" data-ws="12.7667" data-we="13.5000">ÇOK</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-006-host" data-start="13.5000" data-duration="1.1333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-006" data-cap-start="13.5000" data-cap-end="14.6333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-006-top" style="--lineScale:1.00"><span class="cap-w" data-ws="13.5000" data-we="13.7667">YAKIN</span> <span class="cap-w" data-ws="13.7667" data-we="13.8667">BİR</span></div>
+          <div class="cap-bot" id="cap-006-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="13.8667" data-we="14.2667">NOKTADA.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-007-host" data-start="14.6667" data-duration="2.2667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-007" data-cap-start="14.6667" data-cap-end="16.9333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-007-top" style="--lineScale:0.98"><span class="cap-w" data-ws="14.6667" data-we="14.8333">BU</span> <span class="cap-w" data-ws="14.8333" data-we="15.2667">SEVİYEYE</span> <span class="cap-w" data-ws="15.2667" data-we="15.5333">GELENE</span></div>
+          <div class="cap-bot" id="cap-007-bot" style="--lineScale:0.98"><span class="cap-w" data-ws="15.5333" data-we="15.8333">KADAR</span> <span class="cap-w" data-ws="15.8333" data-we="16.3667">ENDEKS</span> <span class="cap-w" data-ws="16.3667" data-we="16.9667">KESİNTİSİZ</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-008-host" data-start="16.9667" data-duration="2.4333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-008" data-cap-start="16.9667" data-cap-end="19.4333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-008-top" style="--lineScale:0.94"><span class="cap-w cap-kw" data-ws="16.9667" data-we="17.2667">8</span> <span class="cap-w" data-ws="17.2667" data-we="17.6333">HAFTA</span> <span class="cap-w" data-ws="17.6333" data-we="18.0333">YABANCI</span></div>
+          <div class="cap-bot" id="cap-008-bot" style="--lineScale:0.94"><span class="cap-w cap-kw" data-ws="18.0333" data-we="18.6333">YATIRIMCIDAN</span> <span class="cap-w" data-ws="18.6333" data-we="19.0667">ALIM</span> <span class="cap-w" data-ws="19.0667" data-we="19.4333">GÖRDÜ.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-009-host" data-start="19.9000" data-duration="2.1333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yukselis" id="cap-009" data-cap-start="19.9000" data-cap-end="22.0333" data-accent="#C8FF00" data-anim="soft">
+          <div class="cap-top" id="cap-009-top" style="--lineScale:0.94"><span class="cap-w" data-ws="19.9000" data-we="20.5000">GERÇEKTEN</span> <span class="cap-w" data-ws="20.5000" data-we="20.8333">GÜÇLÜ</span> <span class="cap-w" data-ws="20.8333" data-we="20.9333">BİR</span></div>
+          <div class="cap-bot" id="cap-009-bot" style="--lineScale:0.94"><span class="cap-w" data-ws="20.9333" data-we="21.4000">YÜKSELİŞ</span> <span class="cap-w" data-ws="21.4000" data-we="21.7667">HİKAYESİ</span> <span class="cap-w" data-ws="21.7667" data-we="22.0333">VARDI.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-010-host" data-start="22.3667" data-duration="0.9333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-010" data-cap-start="22.3667" data-cap-end="23.3000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-010-top" style="--lineScale:1.00"><span class="cap-w" data-ws="22.3667" data-we="22.4667">BUNU</span> <span class="cap-w" data-ws="22.4667" data-we="22.6667">KABUL</span></div>
+          <div class="cap-bot" id="cap-010-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="22.6667" data-we="23.0000">EDELİM.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-011-host" data-start="23.3333" data-duration="1.5333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-011" data-cap-start="23.3333" data-cap-end="24.8667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-011-top" style="--lineScale:1.00"><span class="cap-w" data-ws="23.3333" data-we="23.5333">AMA</span> <span class="cap-w" data-ws="23.5333" data-we="23.7667">İŞTE</span> <span class="cap-w" data-ws="23.7667" data-we="24.3667">TAM</span></div>
+          <div class="cap-bot" id="cap-011-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="24.3667" data-we="24.5667">DA</span> <span class="cap-w" data-ws="24.5667" data-we="24.6667">BU</span> <span class="cap-w" data-ws="24.6667" data-we="24.9333">YÜZDEN</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-012-host" data-start="24.9333" data-duration="0.9667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-012" data-cap-start="24.9333" data-cap-end="25.9000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-012-top" style="--lineScale:1.00"><span class="cap-w" data-ws="24.9333" data-we="25.4333">DİKKATLİ</span></div>
+          <div class="cap-bot" id="cap-012-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="25.4333" data-we="25.5667">OLMAK</span> <span class="cap-w" data-ws="25.5667" data-we="25.9333">LAZIM.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-013-host" data-start="25.9333" data-duration="2.2667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-013" data-cap-start="25.9333" data-cap-end="28.2000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-013-top" style="--lineScale:1.00"><span class="cap-w" data-ws="25.9333" data-we="26.3333">ÇÜNKÜ</span> <span class="cap-w" data-ws="26.3333" data-we="26.9333">BU</span> <span class="cap-w" data-ws="26.9333" data-we="27.2000">KADAR</span></div>
+          <div class="cap-bot" id="cap-013-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="27.2000" data-we="27.7333">UZUN</span> <span class="cap-w" data-ws="27.7333" data-we="28.0667">SÜREN</span> <span class="cap-w" data-ws="28.0667" data-we="28.2333">VE</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-014-host" data-start="28.2333" data-duration="2.4333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yukselis" id="cap-014" data-cap-start="28.2333" data-cap-end="30.6667" data-accent="#C8FF00" data-anim="soft">
+          <div class="cap-top" id="cap-014-top" style="--lineScale:0.90"><span class="cap-w" data-ws="28.2333" data-we="28.7333">ZİRVEYE</span> <span class="cap-w" data-ws="28.7333" data-we="28.9000">BU</span> <span class="cap-w" data-ws="28.9000" data-we="29.1000">KADAR</span> <span class="cap-w" data-ws="29.1000" data-we="29.6333">YAKLAŞAN</span></div>
+          <div class="cap-bot" id="cap-014-bot" style="--lineScale:0.90"><span class="cap-w" data-ws="29.6333" data-we="30.3000">YÜKSELİŞLERİN</span> <span class="cap-w" data-ws="30.3000" data-we="30.7000">ARDINDAN</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-015-host" data-start="30.7000" data-duration="2.7667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-015" data-cap-start="30.7000" data-cap-end="33.4667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-015-top" style="--lineScale:1.00"><span class="cap-w" data-ws="30.7000" data-we="31.5333">GEÇMİŞ</span> <span class="cap-w" data-ws="31.5333" data-we="31.9333">VERİLERE</span> <span class="cap-w" data-ws="31.9333" data-we="32.1333">DE</span></div>
+          <div class="cap-bot" id="cap-015-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="32.1333" data-we="32.4667">BAKACAK</span> <span class="cap-w" data-ws="32.4667" data-we="33.5333">OLURSANIZ</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-016-host" data-start="33.5333" data-duration="2.0333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-016" data-cap-start="33.5333" data-cap-end="35.5667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-016-top" style="--lineScale:0.88"><span class="cap-w" data-ws="33.5333" data-we="34.1333">BİR</span> <span class="cap-w" data-ws="33.5333" data-we="34.1333">SOLUKLANMA</span></div>
+          <div class="cap-bot" id="cap-016-bot" style="--lineScale:0.88"><span class="cap-w" data-ws="34.1333" data-we="34.7333">YAŞADIĞIMIZI</span> <span class="cap-w" data-ws="34.7333" data-we="35.3333">GÖRECEKSİNİZ.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-017-host" data-start="35.6000" data-duration="2.5667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-017" data-cap-start="35.6000" data-cap-end="38.1667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-017-top" style="--lineScale:1.00"><span class="cap-w" data-ws="35.6000" data-we="36.2000">ÜSTELİK</span> <span class="cap-w" data-ws="36.2000" data-we="36.9333">GEÇEN</span> <span class="cap-w" data-ws="36.9333" data-we="37.2000">HAFTA</span></div>
+          <div class="cap-bot" id="cap-017-bot" style="--lineScale:1.00"><span class="cap-w cap-kw" data-ws="37.2000" data-we="37.4667">BORSA</span> <span class="cap-w" data-ws="37.4667" data-we="37.6667">DA</span> <span class="cap-w" data-ws="37.6667" data-we="38.2333">TARİHİ</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-018-host" data-start="38.2333" data-duration="1.6667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-018" data-cap-start="38.2333" data-cap-end="39.8667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-018-top" style="--lineScale:1.00"><span class="cap-w" data-ws="38.2333" data-we="38.7333">BİR</span> <span class="cap-w" data-ws="38.7333" data-we="39.1333">REKOR</span></div>
+          <div class="cap-bot" id="cap-018-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="39.1333" data-we="39.3333">DAHA</span> <span class="cap-w" data-ws="39.3333" data-we="39.7667">KIRILDI.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-019-host" data-start="39.9333" data-duration="2.7333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-019" data-cap-start="39.9333" data-cap-end="42.6667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-019-top" style="--lineScale:1.00"><span class="cap-w" data-ws="39.9333" data-we="40.2667">GÜNLÜK</span> <span class="cap-w" data-ws="40.2667" data-we="40.5667">İŞLEM</span></div>
+          <div class="cap-bot" id="cap-019-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="40.5667" data-we="40.9667">HACMİ</span> <span class="cap-w" data-ws="40.9667" data-we="41.2667">OLARAK</span> <span class="cap-w cap-kw" data-ws="41.2667" data-we="42.7000">328</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-020-host" data-start="42.7000" data-duration="2.3333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-020" data-cap-start="42.7000" data-cap-end="45.0333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-020-top" style="--lineScale:1.00"><span class="cap-w" data-ws="42.7000" data-we="43.1333">MİLYAR</span> <span class="cap-w" data-ws="43.1333" data-we="43.4333">LİRA&#x27;YA</span></div>
+          <div class="cap-bot" id="cap-020-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="43.4333" data-we="43.6667">YANİ</span> <span class="cap-w" data-ws="43.6667" data-we="44.3000">ŞİMDİYE</span> <span class="cap-w" data-ws="44.3000" data-we="45.0667">KADAR</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-021-host" data-start="45.0667" data-duration="2.0333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yukselis" id="cap-021" data-cap-start="45.0667" data-cap-end="47.1000" data-accent="#C8FF00" data-anim="soft">
+          <div class="cap-top" id="cap-021-top" style="--lineScale:1.00"><span class="cap-w" data-ws="45.0667" data-we="45.5333">GÖRÜLEN</span> <span class="cap-w" data-ws="45.5333" data-we="45.7667">EN</span> <span class="cap-w" data-ws="45.7667" data-we="46.1000">YÜKSEK</span></div>
+          <div class="cap-bot" id="cap-021-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="46.1000" data-we="46.5333">SEVİYEYE</span> <span class="cap-w" data-ws="46.5333" data-we="46.9333">ULAŞTIK.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-022-host" data-start="47.4333" data-duration="2.1667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-022" data-cap-start="47.4333" data-cap-end="49.6000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-022-top" style="--lineScale:1.00"><span class="cap-w" data-ws="47.4333" data-we="47.7333">BU</span> <span class="cap-w" data-ws="47.7333" data-we="48.2333">GENELDE</span> <span class="cap-w" data-ws="48.2333" data-we="48.7333">İKİ</span></div>
+          <div class="cap-bot" id="cap-022-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="48.7333" data-we="49.0333">ŞEKİLDE</span> <span class="cap-w" data-ws="49.0333" data-we="49.6333">YORUMLANIR.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-023-host" data-start="49.6333" data-duration="2.3333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yukselis" id="cap-023" data-cap-start="49.6333" data-cap-end="51.9667" data-accent="#C8FF00" data-anim="soft">
+          <div class="cap-top" id="cap-023-top" style="--lineScale:1.00"><span class="cap-w" data-ws="49.6333" data-we="50.2000">YA</span> <span class="cap-w" data-ws="49.6333" data-we="50.2000">PİYASAYA</span> <span class="cap-w" data-ws="50.2000" data-we="50.7667">ÇOK</span> <span class="cap-w" data-ws="50.7667" data-we="51.2333">GÜÇLÜ</span></div>
+          <div class="cap-bot" id="cap-023-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="51.2333" data-we="51.6333">BİR</span> <span class="cap-w" data-ws="51.6333" data-we="51.7333">GÜVEN</span> <span class="cap-w" data-ws="51.7333" data-we="52.0333">VARDIR</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-024-host" data-start="52.0333" data-duration="2.4333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-024" data-cap-start="52.0333" data-cap-end="54.4333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-024-top" style="--lineScale:1.00"><span class="cap-w" data-ws="52.0333" data-we="52.3667">YA</span> <span class="cap-w" data-ws="52.3667" data-we="52.9667">DA</span> <span class="cap-w" data-ws="52.9667" data-we="53.1333">BÜYÜK</span></div>
+          <div class="cap-bot" id="cap-024-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="53.1333" data-we="53.3333">OYUNCULAR</span> <span class="cap-w" data-ws="53.3333" data-we="54.4667">SESSİZCE</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-025-host" data-start="54.4667" data-duration="2.9333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-025" data-cap-start="54.4667" data-cap-end="57.4000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-025-top" style="--lineScale:0.86"><span class="cap-w" data-ws="54.4667" data-we="54.8000">NAKİTE</span> <span class="cap-w" data-ws="54.8000" data-we="55.2333">GEÇİP</span> <span class="cap-w" data-ws="55.2333" data-we="55.7333">YENİ</span> <span class="cap-w" data-ws="55.7333" data-we="56.2667">POZİSYON</span></div>
+          <div class="cap-bot" id="cap-025-bot" style="--lineScale:0.86"><span class="cap-w" data-ws="56.2667" data-we="56.7333">ALMAYI</span> <span class="cap-w" data-ws="56.7333" data-we="57.4000">HEDEFLİYORDUR.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-026-host" data-start="57.5667" data-duration="2.2000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yukselis" id="cap-026" data-cap-start="57.5667" data-cap-end="59.7667" data-accent="#C8FF00" data-anim="soft">
+          <div class="cap-top" id="cap-026-top" style="--lineScale:1.00"><span class="cap-w" data-ws="57.5667" data-we="57.7000">BEN</span> <span class="cap-w" data-ws="57.7000" data-we="58.5000">İKİNCİ</span> <span class="cap-w" data-ws="58.5000" data-we="59.1000">İHTİMALİN</span></div>
+          <div class="cap-bot" id="cap-026-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="59.1000" data-we="59.2667">DAHA</span> <span class="cap-w" data-ws="59.2667" data-we="59.5667">GÜÇLÜ</span> <span class="cap-w" data-ws="59.5667" data-we="59.8000">OLDUĞUNU</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-027-host" data-start="59.8000" data-duration="2.4000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-027" data-cap-start="59.8000" data-cap-end="62.2000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-027-top" style="--lineScale:1.00"><span class="cap-w" data-ws="59.8000" data-we="60.3667">DÜŞÜNÜYORUM.</span> <span class="cap-w" data-ws="60.5000" data-we="60.6667">ÇÜNKÜ</span></div>
+          <div class="cap-bot" id="cap-027-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="60.6667" data-we="61.5000">BU</span> <span class="cap-w" data-ws="61.5000" data-we="61.8333">REKOR</span> <span class="cap-w" data-ws="61.8333" data-we="62.2333">HACİM</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-028-host" data-start="62.2333" data-duration="1.6667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-028" data-cap-start="62.2333" data-cap-end="63.9000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-028-top" style="--lineScale:1.00"><span class="cap-w" data-ws="62.2333" data-we="62.6333">TAM</span> <span class="cap-w" data-ws="62.6333" data-we="62.8333">DA</span> <span class="cap-w" data-ws="62.8333" data-we="63.3000">ZİRVEYE</span></div>
+          <div class="cap-bot" id="cap-028-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="63.3000" data-we="63.4000">BU</span> <span class="cap-w" data-ws="63.4000" data-we="63.6000">KADAR</span> <span class="cap-w" data-ws="63.6000" data-we="63.9333">YAKIN</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-029-host" data-start="63.9333" data-duration="1.3333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-029" data-cap-start="63.9333" data-cap-end="65.2667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-029-top" style="--lineScale:1.00"><span class="cap-w" data-ws="63.9333" data-we="64.0333">BİR</span> <span class="cap-w" data-ws="64.0333" data-we="64.4333">NOKTADA</span></div>
+          <div class="cap-bot" id="cap-029-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="64.4333" data-we="65.0000">GELMİŞKEN.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-030-host" data-start="65.3333" data-duration="2.3000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-030" data-cap-start="65.3333" data-cap-end="67.6333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-030-top" style="--lineScale:1.00"><span class="cap-w" data-ws="65.3333" data-we="65.6333">TAKİP</span> <span class="cap-w" data-ws="65.6333" data-we="66.1000">ETTİĞİM</span> <span class="cap-w" data-ws="66.1000" data-we="66.3333">DİĞER</span></div>
+          <div class="cap-bot" id="cap-030-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="66.3333" data-we="66.6667">ÖNEMLİ</span> <span class="cap-w" data-ws="66.6667" data-we="66.8667">BİR</span> <span class="cap-w" data-ws="66.8667" data-we="67.6667">NOKTAYSA</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-031-host" data-start="67.6667" data-duration="2.0000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-031" data-cap-start="67.6667" data-cap-end="69.6667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-031-top" style="--lineScale:1.00"><span class="cap-w" data-ws="67.6667" data-we="68.0333">BU</span> <span class="cap-w" data-ws="68.0333" data-we="68.2667">HAFTA</span> <span class="cap-w" data-ws="68.2667" data-we="68.8333">AÇIKLANACAK</span></div>
+          <div class="cap-bot" id="cap-031-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="68.8333" data-we="69.1000">OLAN</span> <span class="cap-w" data-ws="69.1000" data-we="69.4333">FED</span> <span class="cap-w cap-kw" data-ws="69.4333" data-we="69.7000">-FAİZ</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-032-host" data-start="69.7000" data-duration="2.6667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yukselis" id="cap-032" data-cap-start="69.7000" data-cap-end="72.3667" data-accent="#C8FF00" data-anim="soft">
+          <div class="cap-top" id="cap-032-top" style="--lineScale:0.73"><span class="cap-w" data-ws="69.7000" data-we="70.1000">KARARI.</span> <span class="cap-w" data-ws="70.5667" data-we="71.1000">KÜRESEL</span> <span class="cap-w" data-ws="71.1000" data-we="71.4333">TARAFTA</span> <span class="cap-w cap-kw" data-ws="71.4333" data-we="71.8333">FAİZ&#x27;İN</span></div>
+          <div class="cap-bot" id="cap-032-bot" style="--lineScale:0.73"><span class="cap-w" data-ws="71.8333" data-we="71.9333">ARTTIRILMASI</span> <span class="cap-w" data-ws="71.9333" data-we="72.4000">BEKLENİYOR.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-033-host" data-start="72.4000" data-duration="2.5000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-033" data-cap-start="72.4000" data-cap-end="74.9000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-033-top" style="--lineScale:1.00"><span class="cap-w" data-ws="72.4000" data-we="73.0000">BU</span> <span class="cap-w" data-ws="73.1667" data-we="73.2333">GERÇEKLEŞİRSE</span></div>
+          <div class="cap-bot" id="cap-033-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="73.2333" data-we="74.0667">DÜNYA</span> <span class="cap-w" data-ws="74.0667" data-we="74.9333">GENELİNDE</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-034-host" data-start="74.9333" data-duration="2.5000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-034" data-cap-start="74.9333" data-cap-end="77.4333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-034-top" style="--lineScale:1.00"><span class="cap-w cap-kw" data-ws="74.9333" data-we="75.2333">PARA</span> <span class="cap-w" data-ws="75.2333" data-we="76.3333">GELİŞMEKTE</span> <span class="cap-w" data-ws="76.3333" data-we="76.4667">OLAN</span></div>
+          <div class="cap-bot" id="cap-034-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="76.4667" data-we="77.0667">ÜLKELERDEN</span> <span class="cap-w" data-ws="77.0667" data-we="77.4667">ÇIKIP</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-035-host" data-start="77.4667" data-duration="1.5333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-035" data-cap-start="77.4667" data-cap-end="79.0333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-035-top" style="--lineScale:1.00"><span class="cap-w" data-ws="77.4667" data-we="78.0333">YENİDEN</span> <span class="cap-w" data-ws="78.0333" data-we="78.5667">ABD&#x27;YE</span></div>
+          <div class="cap-bot" id="cap-035-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="78.5667" data-we="79.0667">YÖNELİR.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-036-host" data-start="79.0667" data-duration="2.1667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-036" data-cap-start="79.0667" data-cap-end="81.2333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-036-top" style="--lineScale:1.00"><span class="cap-w" data-ws="79.0667" data-we="79.2667">BU</span> <span class="cap-w" data-ws="79.2667" data-we="79.4000">DA</span> <span class="cap-w" data-ws="79.4000" data-we="79.6000">BİZİM</span> <span class="cap-w cap-kw" data-ws="79.6000" data-we="80.1000">BORSAMIZ</span></div>
+          <div class="cap-bot" id="cap-036-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="80.1000" data-we="80.5667">ÜZERİNDE</span> <span class="cap-w" data-ws="80.5667" data-we="81.2667">NEGATİF</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-037-host" data-start="81.2667" data-duration="2.4667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-037" data-cap-start="81.2667" data-cap-end="83.7333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-037-top" style="--lineScale:0.97"><span class="cap-w" data-ws="81.2667" data-we="81.5333">ETKİ</span> <span class="cap-w" data-ws="81.5333" data-we="81.9667">OLUŞTURUR.</span></div>
+          <div class="cap-bot" id="cap-037-bot" style="--lineScale:0.97"><span class="cap-w" data-ws="82.2667" data-we="82.7667">ÜSTELİK</span> <span class="cap-w" data-ws="82.7667" data-we="83.3000">BU</span> <span class="cap-w" data-ws="83.3000" data-we="83.4667">DURUM</span> <span class="cap-w" data-ws="83.4667" data-we="83.7667">SADECE</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-038-host" data-start="83.7667" data-duration="2.5667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-038" data-cap-start="83.7667" data-cap-end="86.3667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-038-top" style="--lineScale:1.00"><span class="cap-w" data-ws="83.7667" data-we="84.3667">BİZLERİ</span> <span class="cap-w" data-ws="84.3667" data-we="84.6333">DEĞİL,</span> <span class="cap-w" data-ws="85.1000" data-we="85.2667">TÜM</span></div>
+          <div class="cap-bot" id="cap-038-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="85.2667" data-we="85.8333">GELİŞMEKTE</span> <span class="cap-w" data-ws="85.8333" data-we="85.9667">OLAN</span> <span class="cap-w" data-ws="85.9667" data-we="86.4000">ÜLKE</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-039-host" data-start="86.4000" data-duration="2.0333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-039" data-cap-start="86.4000" data-cap-end="88.4333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-039-top" style="--lineScale:1.00"><span class="cap-w" data-ws="86.4000" data-we="87.0333">PİYASALARI</span> <span class="cap-w" data-ws="87.0333" data-we="87.2667">AYNI</span></div>
+          <div class="cap-bot" id="cap-039-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="87.2667" data-we="87.5667">ŞEKİLDE</span> <span class="cap-w" data-ws="87.5667" data-we="87.9333">ETKİLER.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-040-host" data-start="88.4667" data-duration="1.5667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-040" data-cap-start="88.4667" data-cap-end="90.0333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-040-top" style="--lineScale:1.00"><span class="cap-w" data-ws="88.4667" data-we="88.8667">KONU</span> <span class="cap-w" data-ws="88.8667" data-we="89.0667">SADECE</span></div>
+          <div class="cap-bot" id="cap-040-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="89.0667" data-we="89.3667">BU</span> <span class="cap-w" data-ws="89.3667" data-we="89.5000">DA</span> <span class="cap-w" data-ws="89.5000" data-we="89.6667">DEĞİL.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-041-host" data-start="90.0667" data-duration="1.8000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-041" data-cap-start="90.0667" data-cap-end="91.8667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-041-top" style="--lineScale:1.00"><span class="cap-w" data-ws="90.0667" data-we="90.4333">KENDİ</span> <span class="cap-w" data-ws="90.4333" data-we="90.7667">MERKEZ</span></div>
+          <div class="cap-bot" id="cap-041-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="90.7667" data-we="91.4667">BANKAMIZDA</span> <span class="cap-w cap-kw" data-ws="91.4667" data-we="91.9333">FAİZ&#x27;İ</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-042-host" data-start="91.9333" data-duration="1.4667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-042" data-cap-start="91.9333" data-cap-end="93.3667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-042-top" style="--lineScale:1.00"><span class="cap-w" data-ws="91.9333" data-we="92.2667">HALA</span> <span class="cap-w" data-ws="92.2667" data-we="92.6000">YÜKSEK</span></div>
+          <div class="cap-bot" id="cap-042-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="92.6000" data-we="92.9667">TUTUYOR.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-043-host" data-start="93.4333" data-duration="1.5333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-043" data-cap-start="93.4333" data-cap-end="94.9333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-043-top" style="--lineScale:1.00"><span class="cap-w" data-ws="93.4333" data-we="93.6000">TAM</span> <span class="cap-w cap-kw" data-ws="93.6000" data-we="93.9000">8</span> <span class="cap-w" data-ws="93.9000" data-we="94.2333">AYDIR</span></div>
+          <div class="cap-bot" id="cap-043-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="94.2333" data-we="94.7000">İNDİRMİYOR.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-044-host" data-start="94.9667" data-duration="2.5000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-044" data-cap-start="94.9667" data-cap-end="97.4667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-044-top" style="--lineScale:1.00"><span class="cap-w cap-kw" data-ws="94.9667" data-we="95.6000">%37</span> <span class="cap-w" data-ws="95.6000" data-we="96.4000">SEVİYESİNDE</span></div>
+          <div class="cap-bot" id="cap-044-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="96.4000" data-we="97.0667">SABİT</span> <span class="cap-w" data-ws="97.0667" data-we="97.2667">BİR</span> <span class="cap-w" data-ws="97.2667" data-we="97.5333">ŞEKİLDE</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-045-host" data-start="97.5333" data-duration="2.4667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-045" data-cap-start="97.5333" data-cap-end="100.0000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-045-top" style="--lineScale:1.00"><span class="cap-w" data-ws="97.5333" data-we="98.2333">İLERLİYORUZ.</span> <span class="cap-w cap-kw" data-ws="98.5000" data-we="98.9333">FAİZ</span> <span class="cap-w" data-ws="98.9333" data-we="99.0667">BU</span></div>
+          <div class="cap-bot" id="cap-045-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="99.0667" data-we="99.3000">KADAR</span> <span class="cap-w" data-ws="99.3000" data-we="99.6667">YÜKSEK</span> <span class="cap-w" data-ws="99.6667" data-we="100.0333">KALDIĞI</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-046-host" data-start="100.0333" data-duration="2.4333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-046" data-cap-start="100.0333" data-cap-end="102.4667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-046-top" style="--lineScale:0.94"><span class="cap-w" data-ws="100.0333" data-we="100.3333">SÜRECE</span> <span class="cap-w" data-ws="100.3333" data-we="100.7333">BAZI</span> <span class="cap-w cap-kw" data-ws="100.7333" data-we="101.3000">YATIRIMCILAR</span></div>
+          <div class="cap-bot" id="cap-046-bot" style="--lineScale:0.94"><span class="cap-w cap-kw" data-ws="101.3000" data-we="102.0333">PARASINI</span> <span class="cap-w cap-kw" data-ws="102.0333" data-we="102.5333">BORSA&#x27;YA</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-047-host" data-start="102.5333" data-duration="2.4000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-047" data-cap-start="102.5333" data-cap-end="104.9333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-047-top" style="--lineScale:1.00"><span class="cap-w" data-ws="102.5333" data-we="102.7333">DEĞİL,</span> <span class="cap-w cap-kw" data-ws="102.9667" data-we="103.8333">MEVDUATA</span></div>
+          <div class="cap-bot" id="cap-047-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="103.8333" data-we="104.1667">VEYA</span> <span class="cap-w" data-ws="104.1667" data-we="104.5000">BAŞKA</span> <span class="cap-w cap-kw" data-ws="104.5000" data-we="104.9667">YATIRIM</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-048-host" data-start="104.9667" data-duration="1.9333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-048" data-cap-start="104.9667" data-cap-end="106.9000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-048-top" style="--lineScale:0.85"><span class="cap-w" data-ws="104.9667" data-we="105.6000">ARAÇLARINDA</span> <span class="cap-w" data-ws="105.6000" data-we="106.4333">DEĞERLENDİRMEYİ</span></div>
+          <div class="cap-bot" id="cap-048-bot" style="--lineScale:0.85"><span class="cap-w" data-ws="106.4333" data-we="106.7667">TERCİH</span> <span class="cap-w" data-ws="106.7667" data-we="106.9333">EDER.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-049-host" data-start="106.9333" data-duration="2.3667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-049" data-cap-start="106.9333" data-cap-end="109.3333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-049-top" style="--lineScale:1.00"><span class="cap-w" data-ws="106.9333" data-we="107.6333">BU</span> <span class="cap-w" data-ws="107.6333" data-we="107.8333">DA</span> <span class="cap-w cap-kw" data-ws="107.8333" data-we="108.6333">BORSA&#x27;YA</span></div>
+          <div class="cap-bot" id="cap-049-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="108.6333" data-we="108.8000">GİREN</span> <span class="cap-w cap-kw" data-ws="108.8000" data-we="109.3667">PARA</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-050-host" data-start="109.3667" data-duration="2.6667" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-050" data-cap-start="109.3667" data-cap-end="112.0333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-050-top" style="--lineScale:1.00"><span class="cap-w" data-ws="109.3667" data-we="109.7333">AKIŞINI</span> <span class="cap-w" data-ws="109.7333" data-we="110.3000">YAVAŞLATIR.</span></div>
+          <div class="cap-bot" id="cap-050-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="110.4333" data-we="111.0000">TOPARLAYACAK</span> <span class="cap-w" data-ws="111.0000" data-we="112.0667">OLURSAK,</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-051-host" data-start="112.0667" data-duration="2.5000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-051" data-cap-start="112.0667" data-cap-end="114.5667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-051-top" style="--lineScale:1.00"><span class="cap-w" data-ws="112.0667" data-we="112.3333">ŞU</span> <span class="cap-w" data-ws="112.3333" data-we="113.3000">AN</span> <span class="cap-w" data-ws="113.3000" data-we="113.6667">TAKİP</span></div>
+          <div class="cap-bot" id="cap-051-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="113.6667" data-we="114.1333">EDECEĞİM</span> <span class="cap-w" data-ws="114.1333" data-we="114.6333">FİYAT</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-052-host" data-start="114.6333" data-duration="3.0000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-052" data-cap-start="114.6333" data-cap-end="117.6333" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-052-top" style="--lineScale:0.90"><span class="cap-w cap-kw" data-ws="114.6333" data-we="115.0667">14.600</span> <span class="cap-w" data-ws="115.0667" data-we="115.5000">PUAN.</span> <span class="cap-w" data-ws="115.9333" data-we="116.0333">BU</span> <span class="cap-w" data-ws="116.0333" data-we="116.5667">SEVİYENİN</span></div>
+          <div class="cap-bot" id="cap-052-bot" style="--lineScale:0.90"><span class="cap-w" data-ws="116.5667" data-we="116.8667">ÜZERİNE</span> <span class="cap-w" data-ws="116.8667" data-we="117.6667">ÇIKMADIĞI</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-053-host" data-start="117.6667" data-duration="2.0333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-053" data-cap-start="117.6667" data-cap-end="119.6667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-053-top" style="--lineScale:1.00"><span class="cap-w" data-ws="117.6667" data-we="118.0333">SÜRECE</span> <span class="cap-w" data-ws="118.0333" data-we="118.6000">GÖRÜŞÜM</span></div>
+          <div class="cap-bot" id="cap-053-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="118.6000" data-we="119.3333">DEĞİŞMEZ.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-054-host" data-start="119.7333" data-duration="2.4333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-054" data-cap-start="119.7333" data-cap-end="122.1667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-054-top" style="--lineScale:1.00"><span class="cap-w" data-ws="119.7333" data-we="119.9333">KISA</span> <span class="cap-w" data-ws="119.9333" data-we="120.4000">VADEDE</span> <span class="cap-w" data-ws="120.4000" data-we="120.8333">HEDEFİM</span></div>
+          <div class="cap-bot" id="cap-054-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="120.8333" data-we="121.1667">HALA</span> <span class="cap-w cap-kw" data-ws="121.1667" data-we="121.8333">13.400</span> <span class="cap-w" data-ws="121.8333" data-we="122.2000">PUAN.</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-055-host" data-start="122.2000" data-duration="2.5000" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-055" data-cap-start="122.2000" data-cap-end="124.7000" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-055-top" style="--lineScale:1.00"><span class="cap-w" data-ws="122.2000" data-we="122.6667">ANLATTIKLARIM</span></div>
+          <div class="cap-bot" id="cap-055-bot" style="--lineScale:1.00"><span class="cap-w" data-ws="122.9000" data-we="123.6333">TAMAMEN</span> <span class="cap-w" data-ws="123.6333" data-we="124.0667">KENDİ</span> <span class="cap-w" data-ws="124.0667" data-we="124.7333">TAKİP</span></div>
+        </div>
+        </div>
+      </div>
+      <div class="clip cap-stage cap-host" id="cap-056-host" data-start="124.7333" data-duration="2.5333" data-track-index="12" style="left:40px;top:1208px;width:1000px;height:400px;z-index:30;--capSize:58;--capScale:1.00;">
+        <div class="cap-scale">
+        <div class="cap-item tone-yumusak" id="cap-056" data-cap-start="124.7333" data-cap-end="127.2667" data-accent="#FACC15" data-anim="soft">
+          <div class="cap-top" id="cap-056-top" style="--lineScale:0.92"><span class="cap-w" data-ws="124.7333" data-we="125.0667">SEVİYEM</span> <span class="cap-w" data-ws="125.0667" data-we="125.1333">OLUP</span> <span class="cap-w cap-kw" data-ws="125.1333" data-we="125.5667">YATIRIM</span></div>
+          <div class="cap-bot" id="cap-056-bot" style="--lineScale:0.92"><span class="cap-w" data-ws="125.5667" data-we="126.0000">TAVSİYESİ</span> <span class="cap-w" data-ws="126.0000" data-we="127.2667">İÇERMEMEKTEDİR.</span></div>
+        </div>
+        </div>
+      </div>
+      </div>
+      <audio id="sfx-whoosh-borsa" src="sfx/whoosh-short.mp3" data-start="48.0000" data-duration="0.3667" data-track-index="13" data-volume="0.16"></audio>
+      <audio id="sfx-whoosh-out-borsa" src="sfx/whoosh-long.mp3" data-start="55.5333" data-duration="0.4667" data-track-index="13" data-volume="0.12"></audio>
+      <audio id="sfx-whoosh-fed" src="sfx/whoosh-short.mp3" data-start="69.0000" data-duration="0.3667" data-track-index="13" data-volume="0.16"></audio>
+      <audio id="sfx-whoosh-out-fed" src="sfx/whoosh-long.mp3" data-start="76.5333" data-duration="0.4667" data-track-index="13" data-volume="0.12"></audio>
+      <audio id="sfx-cam-in-0" src="sfx/click-soft.mp3" data-start="1.1333" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio id="sfx-cam-sub-0" src="sfx/sub-hit.mp3" data-start="1.1333" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio id="sfx-cam-out-0" src="sfx/click-soft.mp3" data-start="8.6333" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio id="sfx-cam-in-1" src="sfx/click-soft.mp3" data-start="41.2667" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio id="sfx-cam-sub-1" src="sfx/sub-hit.mp3" data-start="41.2667" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio id="sfx-cam-out-1" src="sfx/click-soft.mp3" data-start="49.2667" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio id="sfx-cam-in-2" src="sfx/click-soft.mp3" data-start="57.7000" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio id="sfx-cam-sub-2" src="sfx/sub-hit.mp3" data-start="57.7000" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio id="sfx-cam-out-2" src="sfx/click-soft.mp3" data-start="65.2000" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio id="sfx-cam-in-3" src="sfx/click-soft.mp3" data-start="114.6333" data-duration="0.3667" data-track-index="14" data-volume="0.14"></audio>
+      <audio id="sfx-cam-sub-3" src="sfx/sub-hit.mp3" data-start="114.6333" data-duration="0.2667" data-track-index="21" data-volume="0.11"></audio>
+      <audio id="sfx-cam-out-3" src="sfx/click-soft.mp3" data-start="122.6333" data-duration="0.3667" data-track-index="15" data-volume="0.10"></audio>
+      <audio id="sfx-card-path" src="sfx/pop.mp3" data-start="3.9000" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio id="sfx-card-click-path" src="sfx/click-soft.mp3" data-start="3.9000" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio id="sfx-card-peak" src="sfx/tick.mp3" data-start="9.0000" data-duration="0.1667" data-track-index="16" data-volume="0.12"></audio>
+      <audio id="sfx-card-flow" src="sfx/tick.mp3" data-start="15.8000" data-duration="0.1667" data-track-index="16" data-volume="0.12"></audio>
+      <audio id="sfx-card-warn" src="sfx/pop.mp3" data-start="24.3667" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio id="sfx-card-warn-warn" src="sfx/alarm-soft.mp3" data-start="24.4667" data-duration="0.2667" data-track-index="17" data-volume="0.14"></audio>
+      <audio id="sfx-card-volume" src="sfx/pop.mp3" data-start="41.1000" data-duration="0.4333" data-track-index="16" data-volume="0.17"></audio>
+      <audio id="sfx-card-click-volume" src="sfx/click-soft.mp3" data-start="41.1000" data-duration="0.3000" data-track-index="17" data-volume="0.11"></audio>
+      <audio id="sfx-card-cash" src="sfx/pop.mp3" data-start="58.0667" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio id="sfx-card-click-cash" src="sfx/click-soft.mp3" data-start="58.0667" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio id="sfx-card-fed" src="sfx/pop.mp3" data-start="80.0667" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio id="sfx-card-warn-fed" src="sfx/alarm-soft.mp3" data-start="80.1667" data-duration="0.2667" data-track-index="17" data-volume="0.14"></audio>
+      <audio id="sfx-card-rate" src="sfx/tick.mp3" data-start="90.0000" data-duration="0.1667" data-track-index="16" data-volume="0.12"></audio>
+      <audio id="sfx-card-deposit" src="sfx/pop.mp3" data-start="102.0333" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio id="sfx-card-click-deposit" src="sfx/click-soft.mp3" data-start="102.0333" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio id="sfx-card-verdict" src="sfx/pop.mp3" data-start="110.5000" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio id="sfx-card-click-verdict" src="sfx/click-soft.mp3" data-start="110.5000" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio id="sfx-card-close" src="sfx/pop.mp3" data-start="121.2000" data-duration="0.4333" data-track-index="16" data-volume="0.18"></audio>
+      <audio id="sfx-card-click-close" src="sfx/click-soft.mp3" data-start="121.2000" data-duration="0.3000" data-track-index="17" data-volume="0.12"></audio>
+      <audio id="sfx-card-disclaimer" src="sfx/paper.mp3" data-start="122.9000" data-duration="0.3000" data-track-index="16" data-volume="0.14"></audio>
+      <audio id="sfx-line-0" src="sfx/tick.mp3" data-start="3.9333" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-1" src="sfx/tick.mp3" data-start="4.6667" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio id="sfx-line-2" src="sfx/tick.mp3" data-start="6.2667" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio id="sfx-line-3" src="sfx/tick.mp3" data-start="9.4333" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-4" src="sfx/tick.mp3" data-start="11.0000" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-5" src="sfx/tick.mp3" data-start="13.3000" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-6" src="sfx/tick.mp3" data-start="16.9667" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-7" src="sfx/tick.mp3" data-start="17.6333" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-8" src="sfx/tick.mp3" data-start="20.5000" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-9" src="sfx/tick.mp3" data-start="23.5333" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-10" src="sfx/click-soft.mp3" data-start="24.9333" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio id="sfx-line-b-10" src="sfx/sub-hit.mp3" data-start="24.9333" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio id="sfx-line-11" src="sfx/tick.mp3" data-start="35.6000" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-12" src="sfx/tick.mp3" data-start="39.1333" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-13" src="sfx/click-soft.mp3" data-start="41.2667" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio id="sfx-line-b-13" src="sfx/sub-hit.mp3" data-start="41.2667" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio id="sfx-line-14" src="sfx/tick.mp3" data-start="57.7000" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-15" src="sfx/click-soft.mp3" data-start="58.5000" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio id="sfx-line-b-15" src="sfx/sub-hit.mp3" data-start="58.5000" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio id="sfx-line-16" src="sfx/tick.mp3" data-start="61.8333" data-duration="0.1333" data-track-index="18" data-volume="0.07"></audio>
+      <audio id="sfx-line-17" src="sfx/tick.mp3" data-start="78.0333" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-18" src="sfx/click-soft.mp3" data-start="80.5667" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio id="sfx-line-b-18" src="sfx/sub-hit.mp3" data-start="80.5667" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio id="sfx-line-19" src="sfx/tick.mp3" data-start="85.2667" data-duration="0.1333" data-track-index="18" data-volume="0.07"></audio>
+      <audio id="sfx-line-20" src="sfx/tick.mp3" data-start="91.4667" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-21" src="sfx/tick.mp3" data-start="94.9667" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-22" src="sfx/tick.mp3" data-start="93.6000" data-duration="0.1333" data-track-index="18" data-volume="0.11"></audio>
+      <audio id="sfx-line-23" src="sfx/tick.mp3" data-start="102.0333" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-24" src="sfx/click-soft.mp3" data-start="102.9667" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio id="sfx-line-b-24" src="sfx/sub-hit.mp3" data-start="102.9667" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio id="sfx-line-25" src="sfx/tick.mp3" data-start="109.0667" data-duration="0.1333" data-track-index="18" data-volume="0.07"></audio>
+      <audio id="sfx-line-26" src="sfx/tick.mp3" data-start="110.4333" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-27" src="sfx/tick.mp3" data-start="114.1333" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio id="sfx-line-28" src="sfx/tick.mp3" data-start="115.5000" data-duration="0.1333" data-track-index="18" data-volume="0.09"></audio>
+      <audio id="sfx-line-29" src="sfx/tick.mp3" data-start="121.3000" data-duration="0.1333" data-track-index="18" data-volume="0.05"></audio>
+      <audio id="sfx-line-30" src="sfx/click-soft.mp3" data-start="121.8333" data-duration="0.2333" data-track-index="18" data-volume="0.13"></audio>
+      <audio id="sfx-line-b-30" src="sfx/sub-hit.mp3" data-start="121.8333" data-duration="0.2000" data-track-index="22" data-volume="0.07"></audio>
+      <audio id="sfx-hero-whoosh" src="sfx/whoosh-short.mp3" data-start="41.2667" data-duration="0.3667" data-track-index="23" data-volume="0.18"></audio>
+      <audio id="sfx-hero-hit" src="sfx/sub-hit.mp3" data-start="41.3333" data-duration="0.2667" data-track-index="25" data-volume="0.14"></audio>
+      <audio id="sfx-drone-whoosh" src="sfx/whoosh-long.mp3" data-start="114.6333" data-duration="0.4667" data-track-index="26" data-volume="0.14"></audio>
+      <audio id="sfx-drone-tick" src="sfx/tick.mp3" data-start="114.7000" data-duration="0.1333" data-track-index="26" data-volume="0.08"></audio>
+      <audio id="sfx-whip-borsa" src="sfx/whoosh-long.mp3" data-start="48.0000" data-duration="0.2667" data-track-index="24" data-volume="0.10"></audio>
+      <audio id="sfx-whip-fed" src="sfx/whoosh-long.mp3" data-start="69.0000" data-duration="0.2667" data-track-index="24" data-volume="0.10"></audio>
+      <audio id="sfx-ig-mid" src="sfx/swoosh-up.mp3" data-start="28.5000" data-duration="0.4333" data-track-index="20" data-volume="0.13"></audio>
+      <audio id="sfx-ig-end" src="sfx/swoosh-up.mp3" data-start="116.6667" data-duration="0.4333" data-track-index="20" data-volume="0.13"></audio>
+      <audio id="sfx-mg-flash1" src="sfx/tick.mp3" data-start="1.1333" data-duration="0.1333" data-track-index="21" data-volume="0.08"></audio>
+      <audio id="sfx-mg-tick1" src="sfx/swoosh-up.mp3" data-start="41.5000" data-duration="0.3333" data-track-index="21" data-volume="0.09"></audio>
+      <audio id="sfx-mg-sparks1" src="sfx/tick.mp3" data-start="57.7000" data-duration="0.1333" data-track-index="21" data-volume="0.08"></audio>
+      <script src="vendor/gsap.min.js"></script>
+      <script>
+
+        (function(){
+          const tl = window.gsap.timeline({paused:true});
+          const cam = "#video-cam";
+          function punchHold(t, hold, scale){
+            var sc = Math.min(scale || 1.12, 1.14);
+            tl.to(cam, {scale:sc, duration:0.34, ease:"power3.out", immediateRender:false}, t);
+            tl.to(cam, {scale:1, duration:0.55, ease:"power2.inOut"}, t+hold);
+          }
+          /* Instagram Reels motion lock (AI Video Studio tokens):
+             enter ~0.42s expo.out, exit ~0.38s, soft land — no bounce/glitch. */
+          var EASE_IN = "expo.out";
+          var EASE_OUT = "power2.in";
+          var ENTER_SEC = 0.42;
+          var EXIT_SEC = 0.38;
+          function enterMode(host){
+            var forced = host.getAttribute("data-enter");
+            if(forced) return normalizeEnter(forced);
+            var root = host.querySelector(".root");
+            if(!root) return "soft";
+            if(root.classList.contains("punch") || root.querySelector(".warn-badge")) return "rise";
+            if(root.classList.contains("slim")) return "soft";
+            if(root.classList.contains("levels") || root.classList.contains("graph-card")) return "slide";
+            return "soft";
+          }
+          function normalizeEnter(mode){
+            // Map legacy gimmick names → IG-pro family
+            if(mode === "glitch" || mode === "slam" || mode === "snap" || mode === "zoom") return "rise";
+            if(mode === "tilt" || mode === "flip" || mode === "fold" || mode === "drift") return "slide";
+            if(mode === "wipe" || mode === "pop" || mode === "zoom") return "scale";
+            if(mode === "soft" || mode === "rise" || mode === "slide" || mode === "scale") return mode;
+            return "soft";
+          }
+          var ENTER_POOL = ["soft","rise","slide","scale"];
+          var enterUsed = {};
+          function uniqueEnter(host, idx){
+            var forced = host.getAttribute("data-enter");
+            if(forced){
+              forced = normalizeEnter(forced);
+              host.setAttribute("data-enter", forced);
+              if(!enterUsed[forced]){
+                enterUsed[forced] = 1;
+                return forced;
+              }
+            }
+            for(var i=0;i<ENTER_POOL.length;i++){
+              var m = ENTER_POOL[(idx+i) % ENTER_POOL.length];
+              if(!enterUsed[m]){
+                enterUsed[m] = 1;
+                host.setAttribute("data-enter", m);
+                return m;
+              }
+            }
+            return forced || ENTER_POOL[idx % ENTER_POOL.length];
+          }
+          function exitMode(host){
+            var forced = host.getAttribute("data-exit");
+            if(forced === "scale" || forced === "slide" || forced === "fade") return forced;
+            var mode = host.getAttribute("data-enter") || enterMode(host);
+            if(mode === "slide") return "slide";
+            if(mode === "scale" || mode === "rise") return "scale";
+            return "fade";
+          }
+          function exitCard(fxSel, host, tEnd){
+            var mode = exitMode(host);
+            var t = tEnd - EXIT_SEC;
+            if(t < (parseFloat(host.getAttribute("data-start")) || 0) + 0.55) return;
+            if(mode === "scale"){
+              tl.to(fxSel,{opacity:0,scale:0.94,y:-8,filter:"blur(4px)",duration:EXIT_SEC,ease:EASE_OUT}, t);
+            } else if(mode === "slide"){
+              tl.to(fxSel,{opacity:0,x:28,y:-4,filter:"blur(4px)",duration:EXIT_SEC,ease:EASE_OUT}, t);
+            } else {
+              tl.to(fxSel,{opacity:0,y:-6,filter:"blur(3px)",duration:EXIT_SEC,ease:EASE_OUT}, t);
+            }
+          }
+          function progressCard(fxSel, t, dur, mode){
+            if(dur < 3.2) return;
+            // IG: only a whisper of life — no shake/pulse/nudge
+            tl.to(fxSel,{y:-5,duration:Math.min(dur*0.42,2.6),ease:"sine.inOut",yoyo:true,repeat:1}, t+0.7);
+          }
+          /* Shell enters soft — content pieces animate on data-at. */
+          function popCard(fxSel, t, mode){
+            mode = normalizeEnter(mode || "soft");
+            var from, to;
+            if(mode === "rise"){
+              from = {opacity:0,y:26,scale:0.94,filter:"blur(6px)"};
+              to = {opacity:1,y:0,scale:1,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false};
+            } else if(mode === "slide"){
+              from = {opacity:0,x:40,y:8,scale:0.94,filter:"blur(6px)"};
+              to = {opacity:1,x:0,y:0,scale:1,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false};
+            } else if(mode === "scale"){
+              from = {opacity:0,scale:0.9,y:10,filter:"blur(5px)"};
+              to = {opacity:1,scale:1,y:0,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false};
+            } else {
+              from = {opacity:0,y:14,scale:0.96,filter:"blur(5px)"};
+              to = {opacity:1,y:0,scale:1,filter:"blur(0px)",duration:ENTER_SEC,ease:EASE_IN,immediateRender:false};
+            }
+            tl.fromTo(fxSel, from, to, t);
+            var host = document.querySelector(fxSel);
+            if(!host) return;
+            var accent = host.querySelector(".card-accent");
+            var sheen = host.querySelector(".card-sheen");
+            var warn = host.querySelector(".warn-badge");
+            if(accent){
+              tl.fromTo(accent,{scaleY:0},{scaleY:1,duration:0.48,ease:EASE_IN,immediateRender:false}, t+0.05);
+            }
+            if(sheen){
+              tl.fromTo(sheen,{x:-420,opacity:0},{x:860,opacity:0.85,duration:0.62,ease:"power2.out",immediateRender:false}, t+0.12);
+              tl.to(sheen,{opacity:0,duration:0.28,ease:EASE_OUT}, t+0.7);
+            }
+            if(warn){
+              tl.fromTo(warn,{opacity:0,scale:0.82},{opacity:1,scale:1,duration:0.4,ease:EASE_IN,immediateRender:false}, t+0.14);
+            }
+            host.querySelectorAll(".kicker,.title,.q,.note,.chapter,.lvl,.chip").forEach(function(el){
+              if(!el.hasAttribute("data-at")) return;
+              gsap.set(el, {opacity:0});
+            });
+          }
+          function explodeCardWords(el){
+            if(el.getAttribute("data-in") !== "words") return false;
+            if(el.querySelector(".cw")) return true;
+            var raw = (el.textContent || "").trim();
+            if(!raw) return false;
+            var parts = raw.split(/\s+/).filter(Boolean);
+            if(parts.length < 2) return false;
+            el.innerHTML = parts.map(function(w){ return '<span class="cw">'+w+'</span>'; }).join(" ");
+            return true;
+          }
+          function animCardPiece(el, t, kind){
+            if(kind === "words" && explodeCardWords(el)){
+              gsap.set(el, {opacity:1});
+              var words = el.querySelectorAll(".cw");
+              words.forEach(function(w, i){
+                tl.fromTo(w,
+                  {opacity:0,y:10},
+                  {opacity:1,y:0,duration:0.28,ease:EASE_IN,immediateRender:false},
+                  t + i * 0.055);
+              });
+              return;
+            }
+            // All piece kinds → same IG-pro rise (spin/slam/back demoted)
+            tl.fromTo(el,
+              {opacity:0,y:12,scale:0.97},
+              {opacity:1,y:0,scale:1,duration:0.36,ease:EASE_IN,immediateRender:false},
+              t);
+          }
+          function countNum(el, t, end, dur, decimals){
+            var obj = {v:0};
+            tl.to(obj, {
+              v:end,
+              duration:dur,
+              ease:"power2.out",
+              onUpdate:function(){
+                if(!el) return;
+                var n = decimals ? obj.v.toFixed(decimals) : String(Math.round(obj.v));
+                el.textContent = n.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+              }
+            }, t);
+          }
+          function fitCapCutBlock(el){
+            if(!el) return;
+            var lines = Array.prototype.slice.call(el.querySelectorAll(".cap-top, .cap-bot")).filter(function(l){
+              return l && String(l.textContent || "").trim();
+            });
+            if(!lines.length) return;
+            lines.forEach(function(line){ line.style.setProperty("--lineScale", "1"); });
+            void el.offsetWidth;
+            var worst = 1;
+            lines.forEach(function(line){
+              var box = line.clientWidth || 0;
+              var need = line.scrollWidth || 0;
+              if(box > 0 && need > box){
+                worst = Math.min(worst, box / need);
+              }
+            });
+            worst = Math.max(0.5, Math.min(1, worst * 0.96));
+            lines.forEach(function(line){
+              line.style.setProperty("--lineScale", worst.toFixed(3));
+            });
+          }
+          function fitAllCaptions(){
+            document.querySelectorAll(".cap-item").forEach(fitCapCutBlock);
+          }
+          if(document.fonts && document.fonts.ready){
+            document.fonts.ready.then(fitAllCaptions).catch(fitAllCaptions);
+          } else {
+            fitAllCaptions();
+          }
+          tl.call(fitAllCaptions, null, 0);
+          document.querySelectorAll(".cap-item").forEach(function(el){
+            var s = parseFloat(el.getAttribute("data-cap-start"));
+            var e = parseFloat(el.getAttribute("data-cap-end"));
+            var accent = el.getAttribute("data-accent") || "#FACC15";
+            var words = el.querySelectorAll(".cap-w");
+            var outline = "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 3px 10px rgba(0,0,0,.55)";
+            var glow = "0 0 14px "+accent+"B3, 0 0 28px "+accent+"59, "+outline;
+            tl.call(fitCapCutBlock, [el], Math.max(0, s - 0.01));
+            // Soft enter — sadece opacity (y/x YOK: Studio sürüklemesiyle çakışmasın)
+            tl.fromTo(el,{autoAlpha:0},{autoAlpha:1,duration:0.28,ease:"power2.out",immediateRender:false}, s);
+            words.forEach(function(w, i){
+              var ws = parseFloat(w.getAttribute("data-ws"));
+              var we = parseFloat(w.getAttribute("data-we"));
+              if(!isFinite(ws)) ws = s + i * 0.14;
+              if(!isFinite(we)) we = ws + 0.28;
+              ws = Math.max(s, Math.min(e - 0.05, ws));
+              we = Math.max(ws + 0.08, Math.min(e, we));
+              var next = words[i+1];
+              var handoff = next ? parseFloat(next.getAttribute("data-ws")) : we;
+              if(!isFinite(handoff)) handoff = we;
+              handoff = Math.max(ws + 0.1, Math.min(e, handoff));
+              var hold = Math.max(0.1, Math.min(0.42, (handoff - ws) * 0.55));
+              var settleAt = Math.min(handoff - 0.02, ws + hold);
+              tl.set(w,{opacity:0.62,color:"#ffffff",scale:1,filter:"brightness(1)",textShadow:outline}, s);
+              tl.to(w,{
+                opacity:1,color:accent,filter:"brightness(1.06)",textShadow:glow,
+                duration:0.14,ease:"power2.out"
+              }, ws);
+              tl.to(w,{
+                color:"#ffffff",filter:"brightness(1)",textShadow:outline,
+                duration:0.18,ease:"power1.inOut"
+              }, settleAt);
+            });
+            tl.to(el,{autoAlpha:0,duration:0.18,ease:"power1.in"}, Math.max(s+0.4, e-0.18));
+          });
+
+
+          tl.fromTo("#broll-borsa-cam",{opacity:0,x:100,scale:1.08},{opacity:1,x:0,scale:1,duration:0.42,ease:"expo.out",immediateRender:false}, 48.0);
+          tl.to("#broll-borsa-cam",{opacity:0,x:-72,scale:1.04,duration:0.36,ease:"power2.in"}, 55.64);
+          tl.fromTo("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0},{scale:0.30,x:-350,y:-20,borderRadius:"36px",rotation:-1.0,duration:0.42,ease:"power3.inOut",immediateRender:false}, 48.0);
+          tl.to("#video-wrap",{rotation:0,duration:0.22,ease:"power1.out"}, 48.42);
+          tl.to("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,duration:0.42,ease:"power3.inOut"}, 55.58);
+
+          tl.fromTo("#broll-fed-cam",{opacity:0,x:100,scale:1.08},{opacity:1,x:0,scale:1,duration:0.42,ease:"expo.out",immediateRender:false}, 69.0);
+          tl.to("#broll-fed-cam",{opacity:0,x:-72,scale:1.04,duration:0.36,ease:"power2.in"}, 76.64);
+          tl.fromTo("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0},{scale:0.30,x:-350,y:-20,borderRadius:"36px",rotation:-1.0,duration:0.42,ease:"power3.inOut",immediateRender:false}, 69.0);
+          tl.to("#video-wrap",{rotation:0,duration:0.22,ease:"power1.out"}, 69.42);
+          tl.to("#video-wrap",{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,duration:0.42,ease:"power3.inOut"}, 76.58);
+
+          punchHold(1.12, 7.5, 1.12);
+          punchHold(41.26, 8.0, 1.14);
+          punchHold(57.7, 7.5, 1.12);
+          punchHold(114.62, 8.0, 1.14);
+
+          (function(){
+            var heroHost = document.getElementById("card-volume-host");
+            if(!heroHost) return;
+            var fx = heroHost.querySelector(".card-fx");
+            if(!fx || !fx.id) return;
+            var ht = 41.26;
+            var sel = "#"+fx.id;
+            /* Mid-card hero 3D flourish (enter still runs at card start) */
+            tl.to(sel,{rotateY:-42,rotateX:10,scale:0.94,duration:0.26,ease:"power2.in"}, ht);
+            tl.to(sel,{rotateY:0,rotateX:0,scale:1,duration:0.62,ease:"power4.out"}, ht+0.26);
+          })();
+
+
+          (function(){
+            var st = 114.62, sd = 1.4;
+            var cardId = "verdict";
+            var fx = null;
+            if(cardId){
+              var host = document.getElementById("card-"+cardId+"-host");
+              if(host) fx = host.querySelector(".card-fx");
+            }
+            if(!fx){
+              document.querySelectorAll(".card-host").forEach(function(h){
+                if(fx) return;
+                var s = parseFloat(h.getAttribute("data-start"))||0;
+                var d = parseFloat(h.getAttribute("data-duration"))||0;
+                if(st >= s && st <= s+d) fx = h.querySelector(".card-fx");
+              });
+            }
+            if(!fx || !fx.id) return;
+            var sel = "#"+fx.id;
+            var up = Math.max(0.5, sd * 0.4);
+            var down = Math.max(0.55, sd - up);
+            /* Visible "drone" on card: pull back in Z / scale, then return */
+            tl.to(sel,{scale:0.68,y:-90,rotateX:18,rotateY:-22,z:-120,duration:up,ease:"power2.inOut"}, st);
+            tl.to(sel,{scale:1,y:0,rotateX:0,rotateY:0,z:0,duration:down,ease:"power3.out"}, st+up);
+          })();
+
+          /* Motion graphics from timeline.mg */
+          (function(){
+            var el = document.getElementById("mg-flash1-flash");
+            if(!el) return;
+            tl.fromTo(el,{opacity:0},{opacity:1,duration:0.06,ease:"none",immediateRender:false}, 1.12);
+            tl.to(el,{opacity:0,duration:0.22,ease:"power2.out"}, 1.12+0.06);
+          })();
+          (function(){
+            var track = document.getElementById("mg-tick1-track");
+            if(!track) return;
+            tl.fromTo("#mg-tick1",{opacity:0,y:12},{opacity:1,y:0,duration:0.28,ease:"power2.out",immediateRender:false}, 41.5);
+            tl.fromTo(track,{x:0},{x:-540,duration:Math.max(2.5,4.0),ease:"none",immediateRender:false}, 41.5);
+            tl.to("#mg-tick1",{opacity:0,duration:0.25,ease:"power1.in"}, 41.5+4.0-0.28);
+          })();
+          (function(){
+            var host = document.getElementById("mg-sparks1-sparks");
+            if(!host) return;
+            var dots = host.querySelectorAll("i");
+            dots.forEach(function(d, i){
+              var ang = (i / Math.max(1,dots.length)) * Math.PI * 2;
+              var dist = 90 + (i % 3) * 40;
+              tl.fromTo(d,{opacity:0,x:0,y:0,scale:0.4},{opacity:1,x:Math.cos(ang)*dist,y:Math.sin(ang)*dist,scale:1,duration:0.35,ease:"power2.out",immediateRender:false}, 57.7+i*0.02);
+              tl.to(d,{opacity:0,scale:0.2,duration:0.35,ease:"power1.in"}, 57.7+0.4+i*0.02);
+            });
+          })();
+          var cardIdx = 0;
+          document.querySelectorAll(".card-host").forEach(function(host){
+            var t = parseFloat(host.getAttribute("data-start")) || 0;
+            var dur = parseFloat(host.getAttribute("data-duration")) || 4;
+            var fx = host.querySelector(".card-fx");
+            if(fx && fx.id){
+              var mode = uniqueEnter(host, cardIdx++);
+              popCard("#"+fx.id, t, mode);
+              progressCard("#"+fx.id, t, dur, mode);
+              exitCard("#"+fx.id, host, t + dur);
+            } else {
+              var ban = host.querySelector(".banner");
+              if(ban && ban.id){
+                tl.fromTo("#"+ban.id,{opacity:0,y:18,scale:0.98},{opacity:1,y:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}, t);
+              }
+            }
+          });
+          document.querySelectorAll("[data-at]").forEach(function(el){
+            if(el.classList.contains("banner")) return;
+            var t = parseFloat(el.getAttribute("data-at"));
+            var kind = el.getAttribute("data-in") || "";
+            animCardPiece(el, t, kind);
+          });
+          document.querySelectorAll("[data-out]").forEach(function(el){
+            var kind = el.getAttribute("data-out-kind") || "fade";
+            var t = parseFloat(el.getAttribute("data-out"));
+            if(kind === "scale") tl.to(el,{opacity:0,scale:0.9,duration:0.28,ease:"power2.in"}, t);
+            else tl.to(el,{opacity:0,duration:0.22,ease:"power2.in"}, t);
+          });
+          document.querySelectorAll("[data-count]").forEach(function(el){
+            var t = parseFloat(el.getAttribute("data-count-at") || "0");
+            var end = parseFloat(el.getAttribute("data-count"));
+            var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+            var dur = parseFloat(el.getAttribute("data-count-dur") || "1");
+            el.textContent = decimals ? (0).toFixed(decimals) : "0";
+            countNum(el, t, end, dur, decimals);
+            if(el.hasAttribute("data-scale-in")){
+              tl.fromTo(el,{scale:0.78},{scale:1,duration:dur,ease:"power2.out",immediateRender:false}, t);
+            }
+          });
+          document.querySelectorAll("path[data-draw]").forEach(function(path){
+            var t = parseFloat(path.getAttribute("data-draw-at") || "0");
+            var len = path.getTotalLength();
+            tl.set(path,{strokeDasharray:len,strokeDashoffset:len}, Math.max(0, t-0.15));
+            tl.to(path,{strokeDashoffset:0,duration:1.85,ease:"power2.inOut"}, t);
+          });
+          document.querySelectorAll("[data-fill]").forEach(function(el){
+            var t = parseFloat(el.getAttribute("data-fill-at") || "0");
+            var v = parseFloat(el.getAttribute("data-fill"));
+            tl.fromTo(el,{scaleX:0},{scaleX:v,duration:0.75,ease:"power3.out",immediateRender:false}, t);
+          });
+          var punches = [[1.12, 7.5], [41.26, 8.0], [57.7, 7.5], [114.62, 8.0]];
+          // Caption punch pulse kaldırıldı — fazla animasyon yok
+          window.__timelines["talking-head-recut"] = tl;
+        })();
+
+      </script>
+    </div>
+  </body>
+</html>

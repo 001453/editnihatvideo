@@ -45,7 +45,7 @@
   },
   "captionKeywords": true,
   "slots": [
-    {"type": "hook", "class": "root hook", "when": "opening questions"},
+    {"type": "hook", "class": "root hook", "when": "DISABLED — opening hook card + SFX removed (user lock)"},
     {"type": "chips", "class": "root glass chips slim", "when": "2-4 named drivers"},
     {"type": "levels", "class": "root glass levels", "when": "allocation / levels"},
     {"type": "stats", "class": "root glass stats", "when": "one or two numbers"},
@@ -59,7 +59,7 @@
     "template": "shared/instagram-follow.html",
     "brand": {
       "name": "Nihat Çetinkaya",
-      "handle": "@nihatcetinkayafinans",
+      "handle": "@cetin.finans",
       "avatar": "shared/ig_avatar.png",
       "cta": "Takip Et"
     },

@@ -399,6 +399,9 @@ class Handler(BaseHTTPRequestHandler):
                     item["text"] = (c.get("text") or f"{top} {bot}").strip()
                     item["start"] = float(c.get("start") or 0)
                     item["end"] = float(c.get("end") or 0)
+                    # tek ortak konum — satır bazlı x/y temizle
+                    for k in ("x", "y", "w", "h", "fontSize", "scale"):
+                        item.pop(k, None)
                     cleaned.append(item)
                 project["captions"] = cleaned
                 path.write_text(json.dumps(project, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -409,6 +412,52 @@ class Handler(BaseHTTPRequestHandler):
                         return self._json(500, {"error": "kaydedildi ama rebuild hata", "log": rmsg})
                     msg += " · rebuild OK — Studio Ctrl+F5"
                 return self._json(200, {"ok": True, "msg": msg, "count": len(cleaned)})
+            except Exception as e:
+                return self._json(500, {"error": str(e)})
+
+        if u.path == "/api/caption-pos":
+            vid = sanitize_id(data.get("id") or "")
+            if not vid:
+                return self._json(400, {"error": "Video ID gerekli"})
+            path = VIDEOS / vid / "project.json"
+            if not path.exists():
+                return self._json(404, {"error": "project.json yok"})
+            try:
+                project = json.loads(path.read_text(encoding="utf-8"))
+                layout = project.setdefault("layout", {})
+                cap = layout.setdefault(
+                    "caption",
+                    {"x": 40, "y": 1208, "w": 890, "h": 400, "fontSize": 58},
+                )
+                step = int(data.get("step") or 40)
+                x = int(cap.get("x") or 40)
+                y = int(cap.get("y") or 1208)
+                if data.get("x") is not None:
+                    x = int(data["x"])
+                if data.get("y") is not None:
+                    y = int(data["y"])
+                if data.get("dx") is not None:
+                    x += int(data["dx"]) * step
+                if data.get("dy") is not None:
+                    y += int(data["dy"]) * step
+                x = max(0, min(x, 1000))
+                y = max(0, min(y, 1850))
+                cap["x"], cap["y"] = x, y
+                layout["caption"] = cap
+                for c in project.get("captions") or []:
+                    if isinstance(c, dict):
+                        for k in ("x", "y", "w", "h", "scale"):
+                            c.pop(k, None)
+                path.write_text(json.dumps(project, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                msg = f"altyazi x={x} y={y}"
+                if data.get("rebuild", True):
+                    ok, rmsg = rebuild_video(vid)
+                    if not ok:
+                        return self._json(
+                            500, {"error": msg + " ama rebuild hata", "log": rmsg, "x": x, "y": y}
+                        )
+                    msg += " · rebuild OK — Ctrl+F5"
+                return self._json(200, {"ok": True, "msg": msg, "x": x, "y": y, "caption": cap})
             except Exception as e:
                 return self._json(500, {"error": str(e)})
 

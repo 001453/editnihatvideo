@@ -1,0 +1,12 @@
+{
+  "name": "0911",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.8.30 preview",
+    "check": "npx --yes hyperframes@0.8.30 check",
+    "lint": "npx --yes hyperframes@0.8.30 lint",
+    "render": "npx --yes hyperframes@0.8.30 render --quality high --fps 30",
+    "render:draft": "npx --yes hyperframes@0.8.30 render --quality draft --fps 30"
+  }
+}

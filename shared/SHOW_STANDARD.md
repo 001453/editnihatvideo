@@ -20,9 +20,12 @@ Format: **9:16 · 1080×1920 · yüz önde · üstte kart boşluğu · altyazı 
 - **Full-frame karartma yok.**
 
 ### Altyazı
-- **AI Video Studio social-hook karaoke**: Montserrat Black 900; kelimeler silik (≈%22) → konuşulunca accent (`#FACC15`/kırmızı/lime) → sonra beyaz. 4 köşe siyah outline. En fazla **2 satır**.
-- Giriş: yumuşak `rise | soft | lift` (bounce/snap yok). Karaoke: silik → accent glow → beyaz settle.
-- Punto varsayılan **~60**; uzun satırda `min(1, 20/chars)` scale. Sağda IG rail payı (~150px).
+- **Montserrat Black karaoke**: kelimeler silik → konuşulunca accent (`#FACC15`/kırmızı/lime) → sonra beyaz. 4 köşe siyah outline. En fazla **2 satır**.
+- Giriş: **sadece opacity** (y/x yok — Studio sürüklemesiyle çakışmasın).
+- **Tek ortak konum:** `project.json` → `layout.caption` `{x,y,w,h,fontSize}`. Varsayılan ~`x:40 y:1208`.
+- Konum ayarı: dashboard **`/captions?id=…`** ok tuşları (adım 40px) veya `POST /api/caption-pos` → rebuild → Studio **Ctrl+F5**.
+- Studio’da altyazı sürükleme **yasak** (kasar; seek’te kaybolur). Satır bazlı `captions[i].x/y` kullanılmaz.
+- Punto varsayılan **~58–69**; CapCut-style fit. Sağda IG rail payı.
 - Zamanlama: `project.json` `words[]` + caption `wordStart`/`wordEnd`.
 - Metin sadece editor transcript’inden.
 
@@ -40,7 +43,7 @@ Format: **9:16 · 1080×1920 · yüz önde · üstte kart boşluğu · altyazı 
 - Punch 3–5, hold 6–10s, scale 1.10–1.14, click+sub-hit.
 - B-roll **max 2×8s** — **kullanıcı ekler** (dashboard drop); agent sadece keyword + start. Whip + whoosh, PIP sol.
 - **IG Follow (KİLİT):** animated banner `shared/instagram-follow.html`
-  - Brand: Nihat Çetinkaya · `@nihatcetinkayafinans` · `shared/ig_avatar.png`
+  - Brand: Nihat Çetinkaya · `@cetin.finans` · `shared/ig_avatar.png`
   - **2 kez:** mid (~video ortası, kart boşluğunda) + end (sona yakın, kartlarla çakışmaz)
   - Süre **4.5s**, exclusive (kart/b-roll üstünde değil)
   - Motion: üstten expo slide-in → Takip Et press → Takip → slide-out

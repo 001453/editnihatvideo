@@ -157,9 +157,19 @@
         <span class="status" id="stCaps"></span>
       </section>
 
+      <section class="step" id="step3">
+        <div class="top"><span class="n">3</span><h2 class="title">Kart + b-roll paketle</h2></div>
+        <p class="hint">Bu cümleyi Cursor’a yapıştır. Agent soru sormadan paketler → <b>b-roll kutuları ondan sonra açılır</b>.</p>
+        <div class="prompt-box" id="prompt">Önce video hazır olsun (adım 1) veya listeden seç.</div>
+        <div class="actions">
+          <button class="primary" id="btnCopy">Cümleyi kopyala</button>
+          <button type="button" id="btnLoadPrompt">Prompt’u yenile</button>
+        </div>
+      </section>
+
       <section class="step" id="step3b">
-        <div class="top"><span class="n">B</span><h2 class="title">B-roll sürükle-bırak (2 video)</h2></div>
-        <p class="hint">Her b-roll <b>hep 8 saniye</b> — başlangıç cümlesine göre sen hazırlıyorsun. Kutuya 9:16 MP4 bırak (encode 8s keser). İkisi yeşil → rebuild.</p>
+        <div class="top"><span class="n">4</span><h2 class="title">B-roll sürükle-bırak (2 video)</h2></div>
+        <p class="hint">Önce adım 3 paket bitsin. Her b-roll <b>hep 8 saniye</b> — kutuya 9:16 MP4 bırak. İkisi yeşil → rebuild.</p>
         <div id="brollSlots" class="grid2" style="gap:12px;"></div>
         <div class="actions" style="margin-top:8px;">
           <button type="button" id="btnBrollRefresh">Slotları yenile</button>
@@ -170,18 +180,8 @@
         <input id="brollFile2" type="file" accept="video/*" hidden />
       </section>
 
-      <section class="step" id="step3">
-        <div class="top"><span class="n">3</span><h2 class="title">Kart + b-roll paketle</h2></div>
-        <p class="hint">Bu cümleyi Cursor’a yapıştır. Agent soru sormadan 0907 akışıyla paketler.</p>
-        <div class="prompt-box" id="prompt">Önce video hazır olsun (adım 1) veya listeden seç.</div>
-        <div class="actions">
-          <button class="primary" id="btnCopy">Cümleyi kopyala</button>
-          <button type="button" id="btnLoadPrompt">Prompt’u yenile</button>
-        </div>
-      </section>
-
       <section class="step" id="step4">
-        <div class="top"><span class="n">4</span><h2 class="title">Studio önizleme</h2></div>
+        <div class="top"><span class="n">5</span><h2 class="title">Studio önizleme</h2></div>
         <p class="hint">Açtıktan sonra mutlaka <code>Ctrl+F5</code>. Alttaki siyah şerit Studio çubuğu — videonun parçası değil.</p>
         <div class="actions">
           <button class="primary" id="btnStudio">Studio’yu aç</button>
@@ -191,7 +191,7 @@
       </section>
 
       <section class="step" id="step5">
-        <div class="top"><span class="n">5</span><h2 class="title">Render (isteğe bağlı)</h2></div>
+        <div class="top"><span class="n">6</span><h2 class="title">Render (isteğe bağlı)</h2></div>
         <p class="hint">Studio Export yerine CLI daha güvenli. Bitene kadar sayfayı yenileme (~15–20 dk high).</p>
         <div class="prompt-box" id="renderCmd">cd videos\ID
 $env:HYPERFRAMES_SKIP_SKILLS='1'
@@ -386,6 +386,12 @@ async function loadBrollSlots(){
   if (!r.ok) { box.innerHTML = `<p class="hint">${j.error||'slot yok'}</p>`; return; }
   brollCache = j.slots || [];
   box.innerHTML = '';
+  if (!brollCache.length) {
+    box.innerHTML = '<p class="hint" style="grid-column:1/-1">Henüz slot yok. <b>Önce adım 3 — Cursor ile paketle</b>. Agent ALTIN / fiyat kelimelerini yazınca 2 kutu burada açılır.</p>';
+    $('btnBrollBuild').disabled = true;
+    setStatus($('stBroll'), 'paket bekleniyor', '');
+    return;
+  }
   brollCache.forEach((s, idx) => {
     const el = document.createElement('div');
     el.className = 'drop';
