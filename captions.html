@@ -16,7 +16,6 @@
   .brand{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 8px;}
   h1{font-size:1.8rem;margin:0 0 8px;}
   .lead{color:var(--muted);margin:0 0 22px;line-height:1.45;}
-  .lead{color:var(--muted);margin:0 0 22px;line-height:1.45;}
   .pad{
     display:grid;grid-template-columns:56px 56px 56px;grid-template-rows:56px 56px 56px;
     gap:8px;width:max-content;margin:0 18px 0 0;
@@ -28,7 +27,7 @@
     padding:14px 16px;margin-bottom:18px;border:1px solid var(--line);
     border-radius:14px;background:rgba(0,0,0,.25);
   }
-  .posbox .xy{font-variant-numeric:tabular-nums;font-size:18px;min-width:160px;}
+  .posbox .xy{font-variant-numeric:tabular-nums;font-size:18px;min-width:200px;}
   .posbox input.num{width:88px;}
   .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px;}
   label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
@@ -52,7 +51,7 @@
   .idx{width:40px;color:var(--muted);font-size:12px;}
   .time{width:88px;}
   .time input{font-variant-numeric:tabular-nums;font-size:12px;padding:8px;}
-  .tone{width:120px;}
+  .tone{width:140px;}
   .preview{
     margin-top:6px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.35);
     font-family:Anton,"Arial Black",sans-serif;text-transform:uppercase;line-height:1.05;
@@ -66,20 +65,20 @@
   <div class="wrap">
     <p class="brand">Nihat pipeline</p>
     <h1>Altyazı yazım düzelt</h1>
-    <p class="lead">Tüm altyazılar <b>tek konumda</b>. Oklarla taşı → Studio’da Ctrl+F5. Yazım düzeltmesi aşağıda. Panel: <a href="/">Dashboard</a></p>
+    <p class="lead">Tüm satırlar <b>tek yerde</b>. Oklarla taşı → <b>anında kaydolur</b> (uzun bekleme yok). Yazım düzeltince aşağıdaki <b>Kaydet ve videoyu güncelle</b>. Ana panel: <a href="/">Pipeline paneli</a></p>
 
     <div class="posbox" id="posBox">
       <div class="pad" aria-label="konum">
         <button type="button" class="sp">·</button>
         <button type="button" data-dy="-1" title="Yukarı">↑</button>
         <button type="button" class="sp">·</button>
-        <button type="button" data-dx="-1" title="Sol">←</button>
+        <button type="button" data-dx="-1" title="Sola">←</button>
         <button type="button" data-dy="1" title="Aşağı">↓</button>
-        <button type="button" data-dx="1" title="Sağ">→</button>
+        <button type="button" data-dx="1" title="Sağa">→</button>
       </div>
       <div>
-        <div class="xy">X <input class="num" id="posX" type="number" step="10" /> · Y <input class="num" id="posY" type="number" step="10" /></div>
-        <div class="status" style="margin-top:6px;">Adım 40px · klavye: ok tuşları</div>
+        <div class="xy">Yatay <input class="num" id="posX" type="number" step="10" /> · Dikey <input class="num" id="posY" type="number" step="10" /></div>
+        <div class="status" style="margin-top:6px;">Her basış 40 px · klavye ok tuşları da çalışır</div>
       </div>
       <button type="button" id="posApply" class="primary">Konumu uygula</button>
       <span class="status" id="posStatus"></span>
@@ -92,9 +91,9 @@
       </div>
       <button id="loadBtn">Yükle</button>
       <button id="fixTr" type="button">Türkçe İ/ç düzelt</button>
-      <button id="saveBtn" class="primary" disabled>Kaydet + rebuild</button>
+      <button id="saveBtn" class="primary" disabled>Kaydet ve videoyu güncelle</button>
       <span class="status" id="status"></span>
-      <a href="/" style="margin-left:auto;font-size:13px;">← Dashboard</a>
+      <a href="/" style="margin-left:auto;font-size:13px;">← Pipeline paneli</a>
     </div>
 
     <div id="empty" class="lead">Video seç → Yükle.</div>
@@ -102,8 +101,8 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Baş</th>
-          <th>Bit</th>
+          <th>Başlangıç</th>
+          <th>Bitiş</th>
           <th>Üst satır</th>
           <th>Alt satır</th>
           <th>Ton</th>
@@ -116,7 +115,17 @@
 const $ = id => document.getElementById(id);
 let captions = [];
 let project = null;
-let moving = false;
+let posX = 40, posY = 1208;
+let sendTimer = null;
+let sending = false;
+let dirty = false;
+
+const TONE_LABELS = {
+  yumusak: 'Yumuşak',
+  sert: 'Sert',
+  yukselis: 'Yükseliş',
+  fixed: 'Sabit'
+};
 
 function trUpper(s){
   return String(s||'').replace(/i/g,'İ').replace(/ı/g,'I').toLocaleUpperCase('tr-TR');
@@ -124,51 +133,70 @@ function trUpper(s){
 
 function syncPosInputs(){
   const cap = (project && project.layout && project.layout.caption) || {x:40,y:1208};
-  $('posX').value = cap.x ?? 40;
-  $('posY').value = cap.y ?? 1208;
+  posX = cap.x ?? 40;
+  posY = cap.y ?? 1208;
+  $('posX').value = posX;
+  $('posY').value = posY;
 }
 
-async function moveCaption(body){
-  const id = $('vid').value;
-  if(!id || moving) return;
-  moving = true;
-  $('posStatus').textContent = 'taşınıyor…';
+function clampPos(x,y){
+  return [Math.max(0, Math.min(x, 1000)), Math.max(0, Math.min(y, 1850))];
+}
+
+// Anlık ekran güncellemesi + debounce'lu ağ isteği: her ok basışında/otomatik
+// tekrarda ayrı bir istek atmak yerine (bu donmaya ve ara adımların kaybolmasına
+// sebep oluyordu), sadece en son konumu 180ms sessizlikten sonra tek seferde gönder.
+function setPosLocal(x, y){
+  [posX, posY] = clampPos(x, y);
+  $('posX').value = posX;
+  $('posY').value = posY;
+  $('posStatus').textContent = `yatay=${posX} dikey=${posY} · bekliyor…`;
   $('posStatus').className = 'status';
+  clearTimeout(sendTimer);
+  sendTimer = setTimeout(sendPosition, 180);
+}
+
+async function sendPosition(){
+  const id = $('vid').value;
+  if(!id) return;
+  if(sending){ dirty = true; return; }
+  sending = true;
+  const x = posX, y = posY;
   try{
     const r = await fetch('/api/caption-pos', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ id, rebuild:true, step:40, ...body })
+      body: JSON.stringify({ id, x, y, rebuild:false })
     });
     const j = await r.json();
     if(!r.ok){ $('posStatus').textContent = j.error||'hata'; $('posStatus').className='status err'; return; }
     if(!project.layout) project.layout = {};
     project.layout.caption = j.caption || { ...(project.layout.caption||{}), x:j.x, y:j.y };
-    syncPosInputs();
-    $('posStatus').textContent = j.msg || (`x=${j.x} y=${j.y}`);
+    $('posStatus').textContent = `yatay=${j.x} dikey=${j.y} · kaydedildi (önizlemeyi yenile)`;
     $('posStatus').className = 'status ok';
+  } catch(e){
+    $('posStatus').textContent = 'ağ hatası — tekrar dene';
+    $('posStatus').className = 'status err';
   } finally {
-    moving = false;
+    sending = false;
+    if(dirty){ dirty = false; sendPosition(); }
   }
 }
 
 document.querySelectorAll('.pad [data-dx], .pad [data-dy]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
-    const body = {};
-    if(btn.dataset.dx!=null) body.dx = Number(btn.dataset.dx);
-    if(btn.dataset.dy!=null) body.dy = Number(btn.dataset.dy);
-    moveCaption(body);
+    const dx = btn.dataset.dx!=null ? Number(btn.dataset.dx)*40 : 0;
+    const dy = btn.dataset.dy!=null ? Number(btn.dataset.dy)*40 : 0;
+    setPosLocal(posX+dx, posY+dy);
   });
 });
-$('posApply').onclick = ()=> moveCaption({
-  x: Number($('posX').value)||0,
-  y: Number($('posY').value)||0
-});
+$('posApply').onclick = ()=> setPosLocal(Number($('posX').value)||0, Number($('posY').value)||0);
 window.addEventListener('keydown', (e)=>{
   if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
   if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && e.target.id!=='posX' && e.target.id!=='posY') return;
   e.preventDefault();
-  const map = {ArrowUp:{dy:-1},ArrowDown:{dy:1},ArrowLeft:{dx:-1},ArrowRight:{dx:1}};
-  moveCaption(map[e.key]);
+  const map = {ArrowUp:[0,-40],ArrowDown:[0,40],ArrowLeft:[-40,0],ArrowRight:[40,0]};
+  const [dx,dy] = map[e.key];
+  setPosLocal(posX+dx, posY+dy);
 });
 
 async function listVideos(){
@@ -186,6 +214,7 @@ async function listVideos(){
 }
 
 function rowHtml(c, i){
+  const tones = ['yumusak','sert','yukselis','fixed'];
   return `<tr data-i="${i}">
     <td class="idx">${i+1}</td>
     <td class="time"><input data-k="start" value="${Number(c.start).toFixed(2)}" /></td>
@@ -194,7 +223,7 @@ function rowHtml(c, i){
       <div class="preview"><div class="t"></div><div class="b"></div></div></td>
     <td><textarea data-k="bottom">${escape(c.bottom||c.text||'')}</textarea></td>
     <td class="tone"><select data-k="tone">
-      ${['yumusak','sert','yukselis','fixed'].map(t=>`<option value="${t}" ${c.tone===t?'selected':''}>${t}</option>`).join('')}
+      ${tones.map(t=>`<option value="${t}" ${c.tone===t?'selected':''}>${TONE_LABELS[t]||t}</option>`).join('')}
     </select></td>
   </tr>`;
 }
@@ -261,7 +290,7 @@ $('fixTr').onclick = () => {
 $('saveBtn').onclick = async () => {
   const id = $('vid').value;
   $('saveBtn').disabled = true;
-  $('status').textContent = 'kaydediliyor…';
+  $('status').textContent = 'kaydediliyor ve videoya işleniyor…';
   $('status').className = 'status';
   const body = {
     id,
@@ -283,7 +312,7 @@ $('saveBtn').onclick = async () => {
   const j = await r.json();
   $('saveBtn').disabled = false;
   if(!r.ok){ $('status').textContent = j.error||'hata'; $('status').className='status err'; return; }
-  $('status').textContent = j.msg || 'kaydedildi';
+  $('status').textContent = (j.msg || 'kaydedildi') + ' — önizlemeyi yenile';
   $('status').className = 'status ok';
 };
 
