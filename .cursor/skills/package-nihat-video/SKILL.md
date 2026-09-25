@@ -8,12 +8,12 @@ description: Analyze a new Nihat/Mehmet talking-head like video 0907 and package
 **Show is LOCKED** (`shared/SHOW_STANDARD.md`, `shared/show-flow.json`). This is the production flow for every new video.
 
 - Captions: Montserrat Black karaoke (dim → accent → white)
-- Cards: face-safe top band y56–280 + IG-pro motion `soft|rise|slide|scale`
+- Cards: face-safe, altyazı bandında (bkz. `shared/SHOW_STANDARD.md` — KİLİT 2026-09, eski üst bant y56–280 kullanılmıyor) + IG-pro motion `soft|rise|slide|scale`
 - IG Follow: animated mid + end (4.5s), exclusive
 - B-roll: **user drops** max 2×8s in dashboard; agent only plans keyword + start
 - Per video: new card copy, punch times, motion variety within the locked families
 
-0907 is the show bible (`videos/0907/`). Do not copy 0907 faiz/CDS copy. Do not leave empty `cards.html`.
+0907 was the original show bible but its packaged folder (`videos/0907/`) was removed (2026-09) — **`videos/0925/` is now the reference build** for current structure/positions (source files are backed up under `Claude outputs/`). Do not copy old faiz/CDS copy from any prior video. Do not leave empty `cards.html`.
 
 ## When a new video arrives
 
@@ -57,7 +57,7 @@ Pick **1–3** from `shared/PRO_CARDS.md` when the beat fits. Write `timeline.js
 | Quote / highlight line | `mk-callout-highlight` |
 | Section title | `lt-dark-card` / `lt-kicker-name` |
 
-Clone structure from `videos/0907/cards.html` for the glass majority. Change ids, copy, times. Keep `card-accent` + `card-sheen` on glass cards.
+Clone structure from `Claude outputs/0925_cards.html` (current standard: cards positioned in the caption band, not top band — see SHOW_STANDARD.md) for the glass majority. Change ids, copy, times. Keep `card-accent` + `card-sheen` on glass cards. For the 1-2 topic-specific custom/special cards, write them inline in the same `.card-host > .card > .card-fx > .root` shape (custom CSS inside — ring, bar, etc.), not as registry proCards.
 
 Time `data-start` / `data-duration` to the spoken beat. Inner `data-at` = the word time for that line.
 
@@ -66,7 +66,7 @@ Time `data-start` / `data-duration` to the spoken beat. Inner `data-at` = the wo
 Full notes: `shared/SHOW_STANDARD.md` · machine recipe: `shared/show-flow.json`.
 
 - Captions from editor; Montserrat Black social-hook outline. No full-frame video darkening.
-- Face full-bleed; cards **top band** (transparent glass, no heavy black); captions mid-lower + **keyword pop**; PIP **left**.
+- Face full-bleed; cards **altyazı bandında** (transparent glass, no heavy black — altyazı kart açıkken zaten gizli, kart o boşluğu doldurur); captions mid-lower + **keyword pop**; PIP **left**.
 - Card enter/exit: each card a **unique** mode from slam/soft/glitch/tilt/wipe/pop/rise/flip/snap/drift/zoom/fold + mid-hold progress. One hero 3D (`timeline.hero`).
 - Punch: hold + click/sub-hit; scales 1.10–1.16; not on IG window.
 - B-roll: **max 2×8s (sürekli 8 sn — kullanıcı başlangıç cümlesine göre hazırlar)**, whip + whoosh, muted, PIP left. Labs: `public/broll/LABS_PROMPTS.md`.
@@ -86,6 +86,40 @@ Full notes: `shared/SHOW_STANDARD.md` · machine recipe: `shared/show-flow.json`
 
 Agent’a: “şu mp4’ü gold slotuna bağla” demen yeterli.
 
+## B-roll üret (ZSky web — ücretsiz, elle — KİLİT 2026-09, güncellendi)
+
+ZSky'ın API/MCP erişimi ücretli Max abonelik ($99/ay) + manuel onay istiyor — **kullanılmıyor,
+iptal**. Bunun yerine ZSky'ın ücretsiz web arayüzü elle kullanılır (Labs'e alternatif, aynı
+şekilde manuel):
+
+1. Kullanıcı zsky.ai'de (giriş yapılı ücretsiz hesap) konuya uygun prompt'tan klip üretir
+   (~5sn, 9:16), indirir, agent'a verir (dosya olarak).
+2. Agent 8sn'e tamamlar (ping-pong loop — sert atlama yerine yön değiştiren yumuşak dönüş):
+   `py -3.12 scripts/prep_zsky_broll.py <zsky_ham_klip>.mp4 videos/<id>/public/broll/<ad>.mp4`
+3. `timeline.json` → `broll` start/dur/file güncelle (aynı adım 4-5, yukarıdaki gibi).
+
+## Kart görseli üret (Nano Banana MCP — ücretsiz, otomatik — KİLİT 2026-09, güncellendi)
+
+Pexels/Pixabay finans/altın temasına uygun stok bulmuyor — o yoldan vazgeçildi. Görsel üretimi
+(`mk-float-icon` `CONFIG.image` — coin/vault/goldbar/chart) artık **Nano Banana MCP**
+(`.cursor/mcp.json` → `nanobanana`, `generate_image` tool, Google AI Studio ücretsiz key,
+günde ~500 görsel) ile **otomatik** — manuel indirme yok. Nano Banana şeffaf PNG üretemiyor,
+o yüzden 2 adım:
+
+1. `generate_image` ile obje **düz yeşil (#00FF00) zemin** üzerinde üretilir (prompt'ta
+   "transparent" GEÇMEZ — checkerboard'a döner). Örnek: *"3D realistic glossy gold/amber
+   bank vault door, dramatic studio lighting, centered, floating in empty space, solid pure
+   green background (#00FF00), no text, no watermark, product render style"*.
+2. `py -3.12 scripts/prep_icon_bg.py <ham_png> shared/registry/assets/icon-<isim>.png` ile
+   yeşil zemin chroma-key'le şeffaflaştırılır.
+
+Bunlar video-özel değil, **show-locked ortak varlık** — coin/vault/goldbar/chart için birer
+kez üretilip `shared/registry/assets/icon-<isim>.png` altına kaydedilir, her videoda tekrar
+kullanılır (bkz. `shared/PRO_CARDS.md`, `CONFIG.image`). Yeni bir ikon tipi gerekmedikçe agent
+her videoda yeniden üretmez — önce `shared/registry/assets/` altında var mı diye bakar.
+
+Pictory şimdilik kullanılmıyor.
+
 ## Write + build
 
 1. `videos/<id>/cards.html`
@@ -99,3 +133,5 @@ Agent’a: “şu mp4’ü gold slotuna bağla” demen yeterli.
 Do not stack two big glass cards. Slim chips may sit on b-roll. Punches may sit on a card. IG banner is exclusive.
 
 Reference occupancy (0907, scale times to this duration): hook open → graph → b-roll → levels+punch → b-roll+chips → stats → punch → hero stats → history graph → b-roll → punch title → punch hold → scenario → IG near end → disclaimer.
+
+**Onaylı akış şablonu (0923, kullanıcı onayladı — KİLİT 2026-09):** ilk 10sn kart yok (açılış temiz) → **hero kartı** (hedef/anahtar sayı, ~12sn civarı, punch üstünde olabilir) → **3 güç/faktör kartı** (chips, kısa liste) → **b-roll #1** → **somut akış/rakam kartı** (özel tasarım — örn. para akışı, iki değerli bar) → **istatistik/oran kartı** (özel tasarım — örn. donut/ring, %'lik veri) → **IG banner (orta)** → **b-roll #2** → **rekabet/karşılaştırma kartı** (klasik glass) → **değerleme/sonuç kartı** (klasik glass) → **IG banner (son)** → **disclaimer** (video bitiminden ~3-4sn önce, video sonuna kadar). Kartlar arası boşluk ortalama 15-30sn, min 6sn; toplam 5-8 kart (disclaimer dahil); IG/b-roll pencereleri asla kart/birbiriyle çakışmaz. Yeni video paketlerken önce bu sırayı dene, transkriptin içeriğine göre kart tiplerini uyarlayarak.

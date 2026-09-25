@@ -16,3 +16,12 @@ videos/*/public/broll/*.mp4
 *.log
 .DS_Store
 Thumbs.db
+
+# KİLİT (2026-09): GitHub'a sadece PROJE (kod/şablon/kart-timeline kaynağı)
+# gitsin — üretilen video çıktısı ve gizli anahtar içeren dosyalar hariç.
+.cursor/mcp.json
+_ref_gold_tip/
+Claude outputs/
+_dash.err
+_dash.log
+videos/*/public/

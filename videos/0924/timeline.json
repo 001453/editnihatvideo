@@ -1,0 +1,61 @@
+{
+  "broll": [
+    {
+      "id": "borsa-dusus",
+      "file": "broll/borsa-dusus.mp4",
+      "start": 10.5,
+      "dur": 8.0,
+      "keyword": "BORSA EKRANI KIRMIZI DÜŞÜŞ GRAFİK",
+      "hint": "Kırmızı düşüş ekranı / borsa paneli görüntüsü — %5,54'lük sert düşüş anını destekler (~10-18s)"
+    },
+    {
+      "id": "fed-abd-veri",
+      "file": "broll/fed-abd-veri.mp4",
+      "start": 59.5,
+      "dur": 8.0,
+      "keyword": "FED MERKEZ BANKASI EKONOMİK VERİ ABD",
+      "hint": "Fed binası / ekonomik veri paneli görüntüsü — ABD veri takvimi ve Fed kararı anlatımını destekler (~59-67s)"
+    }
+  ],
+  "punches": [
+    [
+      11.3,
+      8.0,
+      1.12
+    ],
+    [
+      17.4,
+      6.0,
+      1.16
+    ],
+    [
+      48.8,
+      7.0,
+      1.12
+    ],
+    [
+      82.0,
+      8.0,
+      1.14
+    ]
+  ],
+  "hero": {
+    "id": "card-hedef",
+    "at": 19.3
+  },
+  "igBanner": [
+    {
+      "id": "mid",
+      "start": 44.0,
+      "dur": 4.5
+    },
+    {
+      "id": "end",
+      "start": 90.5,
+      "dur": 4.5
+    }
+  ],
+  "cardSfx": [],
+  "proCards": [],
+  "brollPending": false
+}

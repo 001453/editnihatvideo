@@ -120,17 +120,17 @@
     </div>
 
     <div class="guide">
-      <div class="g"><span>1</span><b>Hazırla</b>MP4 → encode + transcript</div>
-      <div class="g"><span>2</span><b>Altyazı</b>Yazım / İ-ç düzelt</div>
-      <div class="g"><span>3</span><b>Paketle</b>Cursor’a cümle yapıştır</div>
-      <div class="g"><span>4</span><b>Önizle</b>Studio + Ctrl+F5</div>
-      <div class="g"><span>5</span><b>Render</b>Draft veya high</div>
+      <div class="g"><span>1</span><b>Hazırla</b>MP4 yükle · ses yazıya çevrilir</div>
+      <div class="g"><span>2</span><b>Altyazı</b>Yazım / konum düzelt</div>
+      <div class="g"><span>3</span><b>Paketle</b>Kart + arka plan (Cursor)</div>
+      <div class="g"><span>4</span><b>Önizle</b>Süre ayarla · anında gör</div>
+      <div class="g"><span>5</span><b>Çıktı al</b>En sonda export</div>
     </div>
 
     <div class="steps">
       <section class="step" id="step1">
-        <div class="top"><span class="n">1</span><h2 class="title">Video hazırla</h2></div>
-        <p class="hint">Yeni çekim için. Sadece MP4 bırak → <b>Hazırla</b>. Uzun sürerse log’u izle; bitince adım 2’ye geç.</p>
+        <div class="top"><span class="n">1</span><h2 class="title">Yeni video hazırla</h2></div>
+        <p class="hint">Çekim MP4’ünü bırak → <b>Tam hazırla</b>. Bitince altyazı adımına geç. Log aşağıda akar.</p>
         <div class="drop" id="drop" tabindex="0">
           <strong>MP4 sürükle-bırak</strong>
           <span>veya tıkla · dosya seç</span>
@@ -138,9 +138,10 @@
         </div>
         <input id="fileInput" type="file" accept="video/mp4,video/quicktime,video/*" />
         <div class="actions">
-          <button class="primary" id="btnPrepare">Tam hazırla (encode+transcript+altyazı)</button>
-          <button type="button" id="btnTxOnly" title="Klasör zaten varsa">Sadece transcript</button>
+          <button class="primary" id="btnPrepare">Tam hazırla (sıkıştır + yazıya çevir + altyazı)</button>
+          <button type="button" id="btnTxOnly" title="Klasör zaten varsa">Sadece yazıya çevir</button>
           <button type="button" id="btnCapOnly">Sadece altyazı üret</button>
+          <button type="button" id="btnCancelPrep" title="Takılı kaldıysa">Kilidi aç</button>
         </div>
         <span class="status" id="stPrepare">bekliyor</span>
         <div class="log" id="log"></div>
@@ -148,32 +149,32 @@
 
       <section class="step" id="step2">
         <div class="top"><span class="n">2</span><h2 class="title">Altyazıya müdahale</h2></div>
-        <p class="hint">Tüm satırları tek sayfada gör, yazım düzelt. <b>İ / ç / ğ</b> için otomatik düğme var. Kaydetince rebuild olur.</p>
+        <p class="hint">Yazım düzelt, oklarla <b>konumu</b> taşı (anında kaydolur). Metin değişince <b>Kaydet ve videoyu güncelle</b>.</p>
         <div class="actions">
           <a class="btn primary" id="btnCaps" href="/captions">Altyazı sayfasını aç</a>
-          <button type="button" id="btnFixTr">Türkçe İ/ç otomatik + rebuild</button>
-          <button type="button" id="btnRebuild">Sadece rebuild</button>
+          <button type="button" id="btnFixTr">Türkçe İ/ç otomatik + güncelle</button>
+          <button type="button" id="btnRebuild">Videoyu yeniden kur</button>
         </div>
         <span class="status" id="stCaps"></span>
       </section>
 
       <section class="step" id="step3">
-        <div class="top"><span class="n">3</span><h2 class="title">Kart + b-roll paketle</h2></div>
-        <p class="hint">Bu cümleyi Cursor’a yapıştır. Agent soru sormadan paketler → <b>b-roll kutuları ondan sonra açılır</b>.</p>
+        <div class="top"><span class="n">3</span><h2 class="title">Kart + arka plan paketle</h2></div>
+        <p class="hint">Bu cümleyi Cursor sohbetine yapıştır. Agent kartları ve arka plan yerlerini kurar. Sonra aşağıdaki kutular açılır.</p>
         <div class="prompt-box" id="prompt">Önce video hazır olsun (adım 1) veya listeden seç.</div>
         <div class="actions">
           <button class="primary" id="btnCopy">Cümleyi kopyala</button>
-          <button type="button" id="btnLoadPrompt">Prompt’u yenile</button>
+          <button type="button" id="btnLoadPrompt">Cümleyi yenile</button>
         </div>
       </section>
 
       <section class="step" id="step3b">
-        <div class="top"><span class="n">4</span><h2 class="title">B-roll sürükle-bırak (2 video)</h2></div>
-        <p class="hint">Önce adım 3 paket bitsin. Her b-roll <b>hep 8 saniye</b> — kutuya 9:16 MP4 bırak. İkisi yeşil → rebuild.</p>
+        <div class="top"><span class="n">4</span><h2 class="title">Arka plan videosu (2 adet)</h2></div>
+        <p class="hint">Paket bittikten sonra. Her biri <b>8 saniye</b>, dikey 9:16 MP4. İkisi yeşil olunca güncelle.</p>
         <div id="brollSlots" class="grid2" style="gap:12px;"></div>
         <div class="actions" style="margin-top:8px;">
-          <button type="button" id="btnBrollRefresh">Slotları yenile</button>
-          <button class="primary" type="button" id="btnBrollBuild" disabled>İkisi hazır → ölçek + PIP build</button>
+          <button type="button" id="btnBrollRefresh">Kutuları yenile</button>
+          <button class="primary" type="button" id="btnBrollBuild" disabled>İkisi hazır → videoya işle</button>
         </div>
         <span class="status" id="stBroll"></span>
         <input id="brollFile1" type="file" accept="video/*" hidden />
@@ -181,30 +182,29 @@
       </section>
 
       <section class="step" id="step4">
-        <div class="top"><span class="n">5</span><h2 class="title">Studio önizleme</h2></div>
-        <p class="hint">Açtıktan sonra mutlaka <code>Ctrl+F5</code>. Alttaki siyah şerit Studio çubuğu — videonun parçası değil.</p>
+        <div class="top"><span class="n">5</span><h2 class="title">Önizleme (Studio)</h2></div>
+        <p class="hint">Aç → karta tıkla → süreyi ayarla → <b>Kaydet ve gör</b> (anında yenilenir, uzun bekleme yok). Bitince export.</p>
         <div class="actions">
-          <button class="primary" id="btnStudio">Studio’yu aç</button>
-          <button type="button" id="btnRebuild2">Rebuild + Ctrl+F5 hatırlat</button>
+          <button class="primary" id="btnStudio">Önizlemeyi aç</button>
+          <button type="button" id="btnRebuild2">Videoyu yeniden kur</button>
         </div>
         <span class="status" id="stStudio"></span>
       </section>
 
       <section class="step" id="step5">
-        <div class="top"><span class="n">6</span><h2 class="title">Render (isteğe bağlı)</h2></div>
-        <p class="hint">Studio Export yerine CLI daha güvenli. Bitene kadar sayfayı yenileme (~15–20 dk high).</p>
+        <div class="top"><span class="n">6</span><h2 class="title">Çıktı al (export)</h2></div>
+        <p class="hint">Düzen bitince. Komutu kopyala → PowerShell’de çalıştır. High ~15–20 dk sürebilir.</p>
         <div class="prompt-box" id="renderCmd">cd videos\ID
 $env:HYPERFRAMES_SKIP_SKILLS='1'
 npx --yes hyperframes@0.8.30 render --quality high --fps 30 --output renders\ID-high.mp4</div>
-        <div class="actions"><button type="button" id="btnCopyRender">Render komutunu kopyala</button></div>
+        <div class="actions"><button type="button" id="btnCopyRender">Export komutunu kopyala</button></div>
       </section>
     </div>
 
     <p class="foot">
       Başlat: <code>py -3.12 scripts\dashboard_server.py</code>
       · Panel: <code>http://127.0.0.1:8765/</code>
-      · Altyazı: <code>http://127.0.0.1:8765/captions?id=0909</code>
-      · Eski sunucu açıksa kapatıp yeniden başlat.
+      · Altyazı: <code>http://127.0.0.1:8765/captions?id=0915</code>
     </p>
   </div>
 <script>
@@ -219,19 +219,77 @@ function setStatus(el, text, cls){
 function vid(){
   return ($('vid').value || '').trim().replace(/\.mp4$/i,'').replace(/[^\w\-]+/g,'');
 }
+async function suggestNextId(){
+  try {
+    const r = await fetch('/api/videos');
+    const j = await r.json();
+    let maxN = 0;
+    (j.videos || []).forEach(v => {
+      const m = String(v.id || '').match(/^(\d{3,4})$/);
+      if (m) maxN = Math.max(maxN, parseInt(m[1], 10));
+    });
+    const n = maxN > 0 ? maxN + 1 : 915;
+    return String(n).padStart(Math.max(4, String(n).length), '0');
+  } catch (e) {
+    return suggestId('');
+  }
+}
 function suggestId(name){
   const m = String(name||'').match(/(\d{3,4})/);
   if (m) return m[1];
   const d = new Date();
   return String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
 }
-function takeFile(f){
+async function selectVideo(id, {silent} = {}){
+  if (!id) return;
+  $('vid').value = id;
+  updateCapsLink();
+  await loadPrompt(id);
+  await loadBrollSlots();
+  await refreshList();
+  if (!silent) setStatus($('stGlobal'), 'aktif video: ' + id, 'ok');
+}
+async function takeFile(f){
   if (!f) return;
   if (!/\.(mp4|mov|m4v|webm)$/i.test(f.name)) { alert('MP4 / MOV seç'); return; }
   pickedFile = f;
   $('fileLabel').textContent = f.name + ' · ' + Math.round(f.size/1024/1024) + ' MB';
-  if (!$('vid').value.trim()) $('vid').value = suggestId(f.name);
+  const cur = vid();
+  let useId = cur;
+  try {
+    const r = await fetch('/api/videos');
+    const j = await r.json();
+    const videos = j.videos || [];
+    const hit = videos.find(v => v.id === cur);
+    const fromName = suggestId(f.name);
+    const nameHit = fromName ? videos.find(v => v.id === fromName) : null;
+    // Bitmemiş taslak (video var, altyazı yok) → aynı ID'ye devam, yeni 0916/17/18 açma
+    const unfinished = videos
+      .filter(v => /^\d{3,4}$/.test(v.id) && v.has_video && !v.has_captions && !v.package_me)
+      .sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
+    const finished = (v) => v && (v.has_captions || v.package_me);
+
+    if (fromName && !finished(nameHit)) {
+      useId = fromName;
+      $('vid').value = useId;
+      setStatus($('stPrepare'), `Aynı dosya → ID ${useId} (eksik hazırlık tamamlanır)`, 'ok');
+    } else if (unfinished.length && !finished(hit)) {
+      useId = unfinished[0].id;
+      $('vid').value = useId;
+      setStatus($('stPrepare'), `Yarım kalan → ID ${useId}`, 'ok');
+    } else if (!cur || finished(hit)) {
+      useId = await suggestNextId();
+      $('vid').value = useId;
+      setStatus($('stPrepare'), `Yeni dosya → ID ${useId}` + (cur ? ` (eski ${cur} korundu)` : ''), 'ok');
+    }
+  } catch (e) {
+    if (!cur) {
+      useId = suggestId(f.name);
+      $('vid').value = useId;
+    }
+  }
   updateCapsLink();
+  await loadBrollSlots();
 }
 function updateCapsLink(){
   const id = vid() || '0909';
@@ -256,10 +314,7 @@ async function refreshList(){
       (v.caption_count ? ` · ${v.caption_count} yazı` : '') +
       (v.package_me ? ' · paket' : '');
     c.onclick = async () => {
-      $('vid').value = v.id;
-      updateCapsLink();
-      await loadPrompt(v.id);
-      refreshList();
+      await selectVideo(v.id);
     };
     box.appendChild(c);
   });
@@ -267,21 +322,15 @@ async function refreshList(){
 async function loadPrompt(id){
   id = id || vid();
   if (!id) return;
+  // Once dogru ID yaz — eski 0917 metni kalmasin
+  const fallback =
+    `videos/${id} hazır. project.json + transcript var. 0907 akışıyla paketle: kartlar, arka plan videosu, punch, IG, build. Önizlemeyi aç deyip Ctrl+F5 söyle. Kod bilmiyorum; soru sorma, doğrudan uygula.`;
+  $('prompt').textContent = fallback;
   try {
-    const r = await fetch('/api/videos');
-    const j = await r.json();
-    const hit = (j.videos||[]).find(v => v.id === id);
-    if (hit && hit.package_me) {
-      // pull status for prompt if job has it, else generic
-      const s = await fetch('/api/status/' + encodeURIComponent(id));
-      const st = await s.json();
-      if (st.prompt) { $('prompt').textContent = st.prompt; return; }
-    }
-    $('prompt').textContent =
-      `videos/${id} hazir. project.json + transcript var. 0907 akisiyla paketle: kartlar, b-roll, punch, IG, build. Ctrl+F5 soyle. Kod bilmiyorum; soru sorma, dogrudan uygula.`;
-  } catch(e) {
-    $('prompt').textContent = 'Prompt yüklenemedi.';
-  }
+    const s = await fetch('/api/status/' + encodeURIComponent(id));
+    const st = await s.json();
+    if (st.prompt) $('prompt').textContent = st.prompt;
+  } catch(e) {}
 }
 async function poll(id){
   clearInterval(pollTimer);
@@ -291,10 +340,12 @@ async function poll(id){
     if (j.log) { $('log').textContent = j.log.join('\n'); $('log').scrollTop = $('log').scrollHeight; }
     if (j.status === 'running' || j.status === 'queued') setStatus($('stPrepare'), 'çalışıyor…', 'run');
     if (j.status === 'ready') {
-      setStatus($('stPrepare'), 'hazır ✓', 'ok');
+      setStatus($('stPrepare'), 'hazır ✓ — ' + id, 'ok');
+      $('vid').value = id;
       if (j.prompt) $('prompt').textContent = j.prompt;
       clearInterval(pollTimer);
-      refreshList();
+      await selectVideo(id, {silent:true});
+      setStatus($('stPrepare'), 'hazır ✓ · sonraki adım: altyazı / paket / b-roll', 'ok');
     }
     if (j.status === 'error') {
       setStatus($('stPrepare'), 'hata', 'err');
@@ -322,7 +373,13 @@ $('fileInput').onchange = () => takeFile($('fileInput').files[0]);
 ['dragenter','dragover'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.add('over'); }));
 ['dragleave','drop'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.remove('over'); }));
 $('drop').addEventListener('drop', e => takeFile(e.dataTransfer.files && e.dataTransfer.files[0]));
-$('vid').addEventListener('input', updateCapsLink);
+$('vid').addEventListener('input', () => { updateCapsLink(); });
+$('vid').addEventListener('change', async () => {
+  updateCapsLink();
+  await loadPrompt();
+  await loadBrollSlots();
+  await refreshList();
+});
 $('btnRefresh').onclick = refreshList;
 
 $('btnPrepare').onclick = async () => {
@@ -339,7 +396,22 @@ $('btnPrepare').onclick = async () => {
   const r = await fetch('/api/upload-prepare', { method:'POST', body: fd });
   const j = await r.json();
   if (!r.ok) { setStatus($('stPrepare'), j.error || 'hata', 'err'); $('log').textContent = j.error || ''; return; }
-  poll(j.id || id);
+  const newId = j.id || id;
+  $('vid').value = newId;
+  updateCapsLink();
+  setStatus($('stPrepare'), 'hazırlanıyor: ' + newId, 'run');
+  poll(newId);
+};
+$('btnCancelPrep').onclick = async () => {
+  const id = vid();
+  if (!id) { alert('Video ID yaz'); return; }
+  const r = await fetch('/api/cancel', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ id })
+  });
+  const j = await r.json();
+  setStatus($('stPrepare'), j.msg || (r.ok ? 'kilit açıldı' : 'hata'), r.ok ? 'ok' : 'err');
+  if (j.log) $('log').textContent = (j.log || []).join?.('\n') || $('log').textContent;
 };
 
 $('btnTxOnly').onclick = () => postAction('transcribe');
@@ -352,8 +424,8 @@ $('btnFixTr').onclick = async () => {
 $('btnRebuild').onclick = $('btnRebuild2').onclick = async () => {
   const j = await postAction('rebuild');
   if (j && j.ok) {
-    setStatus($('stCaps'), j.msg + ' → Studio Ctrl+F5', 'ok');
-    setStatus($('stStudio'), 'Rebuild OK — Ctrl+F5', 'ok');
+    setStatus($('stCaps'), j.msg + ' → önizlemeyi yenile', 'ok');
+    setStatus($('stStudio'), 'Güncellendi — önizlemeyi yenile', 'ok');
   }
 };
 $('btnCopy').onclick = async () => {
@@ -373,7 +445,7 @@ $('btnStudio').onclick = async () => {
     body: JSON.stringify({id})
   });
   const j = await r.json();
-  setStatus($('stStudio'), (j.msg || '') + (j.ok ? ' · Ctrl+F5' : ''), j.ok ? 'ok' : 'err');
+  setStatus($('stStudio'), (j.msg || '') + (j.ok ? ' · açıldı' : ''), j.ok ? 'ok' : 'err');
 };
 
 let brollCache = [];
@@ -383,11 +455,11 @@ async function loadBrollSlots(){
   if (!id) { box.innerHTML = '<p class="hint">Üstten video seç (örn 0909)</p>'; return; }
   const r = await fetch('/api/broll-slots/' + encodeURIComponent(id));
   const j = await r.json();
-  if (!r.ok) { box.innerHTML = `<p class="hint">${j.error||'slot yok'}</p>`; return; }
+  if (!r.ok) { box.innerHTML = `<p class="hint">${j.error||'kutu yok'}</p>`; return; }
   brollCache = j.slots || [];
   box.innerHTML = '';
   if (!brollCache.length) {
-    box.innerHTML = '<p class="hint" style="grid-column:1/-1">Henüz slot yok. <b>Önce adım 3 — Cursor ile paketle</b>. Agent ALTIN / fiyat kelimelerini yazınca 2 kutu burada açılır.</p>';
+    box.innerHTML = '<p class="hint" style="grid-column:1/-1">Henüz kutu yok. <b>Önce adım 3 — Cursor ile paketle</b>. Agent konu kelimelerini yazınca 2 arka plan kutusu burada açılır.</p>';
     $('btnBrollBuild').disabled = true;
     setStatus($('stBroll'), 'paket bekleniyor', '');
     return;
@@ -396,8 +468,8 @@ async function loadBrollSlots(){
     const el = document.createElement('div');
     el.className = 'drop';
     el.style.minHeight = '110px';
-    el.innerHTML = `<strong>B-ROLL ${s.index} · ${s.keyword}</strong>
-      <span>başlangıç ${s.start.toFixed(1)}s · <b>8s sabit</b></span>
+    el.innerHTML = `<strong>Arka plan ${s.index} · ${s.keyword}</strong>
+      <span>başlangıç ${s.start.toFixed(1)} sn · <b>8 sn sabit</b></span>
       <div class="file-name">${s.hint || s.file}</div>
       <div class="file-name" style="color:${s.ready?'var(--ok)':'var(--gold)'}">${s.ready ? '✓ video bağlı' : '↓ buraya video bırak'}</div>`;
     const input = $(idx === 0 ? 'brollFile1' : 'brollFile2');
@@ -412,12 +484,12 @@ async function loadBrollSlots(){
     box.appendChild(el);
   });
   $('btnBrollBuild').disabled = !(j.ready);
-  setStatus($('stBroll'), j.ready ? 'iki b-roll hazır' : 'kelimeye uygun 2 video bırak', j.ready ? 'ok' : '');
+  setStatus($('stBroll'), j.ready ? 'iki arka plan hazır' : 'konuya uygun 2 video bırak', j.ready ? 'ok' : '');
 }
 async function uploadBroll(slotId, file){
   const id = vid();
   if (!id) { alert('Video ID yaz'); return; }
-  setStatus($('stBroll'), slotId + ' yükleniyor / encode…', 'run');
+  setStatus($('stBroll'), slotId + ' yükleniyor / sıkıştırılıyor…', 'run');
   const fd = new FormData();
   fd.append('id', id);
   fd.append('slot', slotId);
@@ -431,7 +503,7 @@ async function uploadBroll(slotId, file){
 $('btnBrollRefresh').onclick = loadBrollSlots;
 $('btnBrollBuild').onclick = async () => {
   const j = await postAction('rebuild');
-  if (j && j.ok) setStatus($('stBroll'), j.msg + ' → Studio Ctrl+F5', 'ok');
+  if (j && j.ok) setStatus($('stBroll'), j.msg + ' → önizlemeyi yenile', 'ok');
 };
 
 const q = new URLSearchParams(location.search).get('id');

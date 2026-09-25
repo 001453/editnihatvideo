@@ -29,6 +29,10 @@
   }
   .posbox .xy{font-variant-numeric:tabular-nums;font-size:18px;min-width:200px;}
   .posbox input.num{width:88px;}
+  .lockbox{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:650;min-width:210px;}
+  .lockbox input{width:20px;height:20px;accent-color:var(--gold);cursor:pointer;}
+  .sel{width:34px;text-align:center;}
+  .sel input{width:18px;height:18px;accent-color:var(--gold);cursor:pointer;}
   .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px;}
   label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
   select,input,textarea{
@@ -59,15 +63,61 @@
   .preview .t{color:#fff;font-size:15px;}
   .preview .b{color:#ffd84a;font-size:14px;}
   a{color:var(--gold);}
+  .videoPreview{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:18px;}
+  #videoStage{position:relative;width:300px;aspect-ratio:9/16;background:#000;border-radius:14px;
+    overflow:hidden;border:1px solid var(--line);flex:none;}
+  #videoStage video{width:100%;height:100%;object-fit:cover;display:block;}
+  #dragBox{position:absolute;border:2px solid var(--gold);background:rgba(226,184,74,.16);
+    border-radius:8px;cursor:grab;touch-action:none;}
+  #dragBox.disabled{cursor:not-allowed;opacity:.55;}
+  #dragBox.dragging{cursor:grabbing;background:rgba(226,184,74,.30);border-color:#fff;}
+  #dragBox::after{content:"ALT YAZI";position:absolute;top:4px;left:6px;font-size:10px;
+    letter-spacing:.08em;color:#1a1406;background:var(--gold);padding:2px 6px;border-radius:5px;font-weight:800;}
+  #prevVideo.zoomPreview{transform:scale(1.14);transform-origin:50% 38%;transition:transform .25s ease;}
+  #videoStage.zoomPreview::before{content:"YAKIN (yaklaşık zoom önizlemesi)";position:absolute;top:6px;right:8px;z-index:2;
+    font-size:9.5px;letter-spacing:.05em;color:#1a1406;background:var(--gold);padding:3px 7px;border-radius:6px;font-weight:800;}
+  .videoHint{flex:1;min-width:230px;color:var(--muted);font-size:12.5px;line-height:1.55;}
+  .videoHint b{color:var(--text);}
+  .punchRow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;max-width:340px;}
+  .punchChip{border:1px solid var(--line);background:#0d0f14;color:var(--gold);border-radius:999px;
+    padding:4px 10px;font-size:11px;cursor:pointer;}
+  .punchChip:hover{border-color:var(--gold);}
+  .noVideo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:var(--muted);font-size:12.5px;text-align:center;padding:20px;}
 </style>
 </head>
 <body>
   <div class="wrap">
     <p class="brand">Nihat pipeline</p>
     <h1>Altyazı yazım düzelt</h1>
-    <p class="lead">Tüm satırlar <b>tek yerde</b>. Oklarla taşı → <b>anında kaydolur</b> (uzun bekleme yok). Yazım düzeltince aşağıdaki <b>Kaydet ve videoyu güncelle</b>. Ana panel: <a href="/">Pipeline paneli</a></p>
+    <p class="lead">Tüm satırlar <b>tek yerde</b>. Oklarla taşı → <b>2 saniye bırakınca otomatik kaydolur</b> (o an doğru yer kabul edilir). Varsayılan <b>kilitli</b>: her hareket hepsini birlikte taşır. <b>Kilidi açıp</b> tablodan satır seçersen sadece o satır(lar) taşınır, geri kalanı yerinde kalır. Yazım düzeltince aşağıdaki <b>Kaydet ve videoyu güncelle</b>. Ana panel: <a href="/">Pipeline paneli</a></p>
+
+    <div class="videoPreview" id="videoBlock">
+      <div id="videoStage">
+        <video id="prevVideo" muted playsinline preload="metadata"></video>
+        <div id="dragBox"></div>
+      </div>
+      <div class="videoHint">
+        <b>Video üzerinde doğrudan sürükle.</b> Sarı kutuyu (altyazı) tut, video üzerinde istediğin yere bırak.
+        Bıraktığın yerde <b>2 saniye durursan otomatik kaydolur</b> ve kilitlenir — aşağıdaki ok tuşları/kutucuklarla birebir aynı konum sistemi (1080×1920 kanvas).
+        Tablodan bir satıra tıklayınca video o satırın başladığı ana gider — orada dur, sürükle, bırak.
+        <b>⚡ işaretli anlar</b> "punch" (yakın markaj/zoom) anlarıdır — kamera yakınlaşırken altyazı otomatik biraz yukarı kayar (çeneye binmesin diye), buraya tıklayıp o anda nasıl durduğunu kontrol edebilirsin. Bu otomatik konumu beğenmezsen yukarıdaki <b>Ekran</b> kutusundan <b>"Yakın (punch anı)"</b>'nı seç — artık ok tuşları/kutucuk sadece punch anındaki dikey konumu ayarlar, tüm punch anlarına birden uygulanır.
+        <div class="punchRow" id="punchRow"></div>
+      </div>
+    </div>
 
     <div class="posbox" id="posBox">
+      <div class="lockbox" title="Uzak = normal duruş · Yakın = kamera punch/zoom anında altyazının duracağı yer">
+        <label style="margin:0 6px 0 0;">Ekran</label>
+        <select id="posMode" style="width:160px;">
+          <option value="far">Uzak (normal)</option>
+          <option value="near">Yakın (punch anı)</option>
+        </select>
+      </div>
+      <div class="lockbox">
+        <input type="checkbox" id="lockToggle" checked />
+        <span id="lockLabel">🔒 Kilitli — hepsi birlikte</span>
+      </div>
       <div class="pad" aria-label="konum">
         <button type="button" class="sp">·</button>
         <button type="button" data-dy="-1" title="Yukarı">↑</button>
@@ -78,9 +128,11 @@
       </div>
       <div>
         <div class="xy">Yatay <input class="num" id="posX" type="number" step="10" /> · Dikey <input class="num" id="posY" type="number" step="10" /></div>
-        <div class="status" style="margin-top:6px;">Her basış 40 px · klavye ok tuşları da çalışır</div>
+        <div class="status" style="margin-top:6px;" id="posHint">Kilitli: her hareket TÜM altyazıları birlikte taşır · her basış 40 px</div>
       </div>
       <button type="button" id="posApply" class="primary">Konumu uygula</button>
+      <button type="button" id="posReset" hidden title="Seçili satırları ortak konuma döndür">Seçilenleri sıfırla</button>
+      <button type="button" id="nearReset" hidden title="Yakın (punch) konumunu otomatik hesaplamaya döndür">Yakını otomatiğe döndür</button>
       <span class="status" id="posStatus"></span>
     </div>
 
@@ -100,6 +152,7 @@
     <table id="tbl" hidden>
       <thead>
         <tr>
+          <th class="sel">Sel</th>
           <th>#</th>
           <th>Başlangıç</th>
           <th>Bitiş</th>
@@ -120,6 +173,29 @@ let sendTimer = null;
 let sending = false;
 let dirty = false;
 
+// Uzak/Yakın ekran modu: 'far' = normal (eski davranış, birebir aynı),
+// 'near' = kamera punch/zoom anındaki altyazı konumu (CAP_MANUAL_SHIFT,
+// build_engine.py) — tek ortak değer, satır seçimi/kilit bu modda geçersiz.
+let posMode = 'far';
+let yPunch = null; // null = otomatik (formülle hesaplanır)
+let yPunchSendTimer = null;
+let yPunchSending = false;
+let yPunchDirty = null;
+
+// Kilit/kilit-aç mekanizması: varsayılan kilitli — tüm hareketler ortak
+// layout.caption'ı değiştirir (eski davranış, birebir aynı). Kilit açılınca
+// tabloda seçilen satır(lar) yalnızca kendi override x/y'siyle taşınır.
+let locked = true;
+let selectedIdx = new Set();
+let itemAccDx = 0, itemAccDy = 0;
+let itemSendTimer = null;
+let itemSending = false;
+let itemDirty = false;
+
+// --- Video üzerinde sürükle-bırak konum aracı ---
+let dragging = false, dragStartPx = null, dragStartXY = null;
+let itemAbsTimer = null, pendingItemX = null, pendingItemY = null;
+
 const TONE_LABELS = {
   yumusak: 'Yumuşak',
   sert: 'Sert',
@@ -135,25 +211,33 @@ function syncPosInputs(){
   const cap = (project && project.layout && project.layout.caption) || {x:40,y:1208};
   posX = cap.x ?? 40;
   posY = cap.y ?? 1208;
+  yPunch = (cap.yPunch != null) ? Number(cap.yPunch) : null;
   $('posX').value = posX;
   $('posY').value = posY;
 }
 
 function clampPos(x,y){
-  return [Math.max(0, Math.min(x, 1000)), Math.max(0, Math.min(y, 1850))];
+  // KİLİT (2026-09, düzeltme): sabit y<=1850 sınırı kutu yüksekliğini hesaba
+  // katmıyordu — kutu 1920px'lik kanvasın altına taşıp altyazı ekran dışına
+  // kayabiliyordu. Artık kutunun tam sığacağı noktaya göre sınırlanıyor.
+  const h = Math.max((project && project.layout && project.layout.caption && project.layout.caption.h) || 400, 400);
+  return [Math.max(0, Math.min(x, 1000)), Math.max(0, Math.min(y, 1920 - h))];
 }
 
 // Anlık ekran güncellemesi + debounce'lu ağ isteği: her ok basışında/otomatik
 // tekrarda ayrı bir istek atmak yerine (bu donmaya ve ara adımların kaybolmasına
-// sebep oluyordu), sadece en son konumu 180ms sessizlikten sonra tek seferde gönder.
+// sebep oluyordu), sadece en son konumu 2000ms (2sn) sessizlikten sonra tek
+// seferde gönder — kullanıcı bıraktığı yerde 2 saniye durursa "doğru yer" kabul
+// edilir (2026-09, kullanıcı isteği: eskiden 180ms'ydi, çok erken kaydediyordu).
 function setPosLocal(x, y){
   [posX, posY] = clampPos(x, y);
   $('posX').value = posX;
   $('posY').value = posY;
-  $('posStatus').textContent = `yatay=${posX} dikey=${posY} · bekliyor…`;
+  $('posStatus').textContent = `yatay=${posX} dikey=${posY} · 2sn durursa kaydolur…`;
   $('posStatus').className = 'status';
+  paintBox();
   clearTimeout(sendTimer);
-  sendTimer = setTimeout(sendPosition, 180);
+  sendTimer = setTimeout(sendPosition, 2000);
 }
 
 async function sendPosition(){
@@ -173,6 +257,7 @@ async function sendPosition(){
     project.layout.caption = j.caption || { ...(project.layout.caption||{}), x:j.x, y:j.y };
     $('posStatus').textContent = `yatay=${j.x} dikey=${j.y} · kaydedildi (önizlemeyi yenile)`;
     $('posStatus').className = 'status ok';
+    paintBox();
   } catch(e){
     $('posStatus').textContent = 'ağ hatası — tekrar dene';
     $('posStatus').className = 'status err';
@@ -182,21 +267,402 @@ async function sendPosition(){
   }
 }
 
+// --- Yakın (punch) konumu: tek ortak dikey değer, otomatik formülün yerine geçer ---
+function setYPunchLocal(dySteps){
+  const cap = (project && project.layout && project.layout.caption) || {};
+  const h = Math.max(cap.h || 400, 400);
+  const base = (yPunch != null) ? yPunch : (cap.y ?? posY);
+  yPunch = Math.max(0, Math.min(base + dySteps*40, 1920 - h));
+  $('posY').value = yPunch;
+  $('posStatus').textContent = `yakın dikey=${yPunch} · 2sn durursa kaydolur…`;
+  $('posStatus').className = 'status';
+  clearTimeout(yPunchSendTimer);
+  yPunchSendTimer = setTimeout(()=>sendYPunch({y: yPunch}), 2000);
+}
+
+function setYPunchAbsolute(y){
+  const cap = (project && project.layout && project.layout.caption) || {};
+  const h = Math.max(cap.h || 400, 400);
+  yPunch = Math.max(0, Math.min(Math.round(y), 1920 - h));
+  $('posY').value = yPunch;
+  clearTimeout(yPunchSendTimer);
+  sendYPunch({y: yPunch});
+}
+
+async function sendYPunch(payload){
+  const id = $('vid').value;
+  if(!id) return;
+  if(yPunchSending){ yPunchDirty = payload; return; }
+  yPunchSending = true;
+  $('posStatus').textContent = 'yakın konumu kaydediliyor ve videoya işleniyor…';
+  $('posStatus').className = 'status';
+  try{
+    const r = await fetch('/api/caption-pos', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, field:'yPunch', ...payload })
+    });
+    const j = await r.json();
+    if(!r.ok){ $('posStatus').textContent = j.error||'hata'; $('posStatus').className='status err'; return; }
+    if(!project.layout) project.layout = {};
+    project.layout.caption = j.caption || project.layout.caption;
+    yPunch = (j.yPunch != null) ? j.yPunch : yPunch;
+    $('posStatus').textContent = j.msg || 'kaydedildi';
+    $('posStatus').className = 'status ok';
+  } catch(e){
+    $('posStatus').textContent = 'ağ hatası — tekrar dene';
+    $('posStatus').className = 'status err';
+  } finally {
+    yPunchSending = false;
+    if(yPunchDirty){ const p = yPunchDirty; yPunchDirty = null; sendYPunch(p); }
+  }
+}
+
+async function resetYPunch(){
+  const id = $('vid').value;
+  if(!id) return;
+  $('posStatus').textContent = 'yakın konumu otomatiğe döndürülüyor…';
+  $('posStatus').className = 'status';
+  try{
+    const r = await fetch('/api/caption-pos', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, field:'yPunch', reset:true })
+    });
+    const j = await r.json();
+    if(!r.ok){ $('posStatus').textContent = j.error||'hata'; $('posStatus').className='status err'; return; }
+    if(!project.layout) project.layout = {};
+    project.layout.caption = j.caption || project.layout.caption;
+    yPunch = null;
+    $('posY').value = (project.layout.caption.y ?? posY);
+    $('posStatus').textContent = j.msg || 'sıfırlandı';
+    $('posStatus').className = 'status ok';
+  } catch(e){
+    $('posStatus').textContent = 'ağ hatası — tekrar dene';
+    $('posStatus').className = 'status err';
+  }
+}
+
+// --- Kilit açıkken: sadece seçili satır(lar) — dx/dy step birikimli, debounce'lu ---
+function setItemPosLocal(dxSteps, dySteps){
+  if(!selectedIdx.size){
+    $('posStatus').textContent = 'önce en az bir satır seç (kilit açık)';
+    $('posStatus').className = 'status err';
+    return;
+  }
+  itemAccDx += dxSteps;
+  itemAccDy += dySteps;
+  $('posStatus').textContent = `${selectedIdx.size} satır taşınıyor… (Δx=${itemAccDx*40} Δy=${itemAccDy*40}) · 2sn durursa kaydolur…`;
+  $('posStatus').className = 'status';
+  clearTimeout(itemSendTimer);
+  itemSendTimer = setTimeout(sendItemPosition, 2000);
+}
+
+function applyItemUpdates(updated){
+  if(!updated) return;
+  Object.keys(updated).forEach(k=>{
+    const idx = Number(k);
+    if(captions[idx]){ captions[idx].x = updated[k].x; captions[idx].y = updated[k].y; }
+    refreshBadge(idx);
+  });
+  paintBox();
+}
+
+async function sendItemPosition(){
+  const id = $('vid').value;
+  const dx = itemAccDx, dy = itemAccDy;
+  itemAccDx = 0; itemAccDy = 0;
+  if(!id || !selectedIdx.size || (!dx && !dy)) return;
+  if(itemSending){ dirty = true; itemAccDx += dx; itemAccDy += dy; return; }
+  itemSending = true;
+  try{
+    const r = await fetch('/api/caption-item-pos', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, indices:[...selectedIdx], dx, dy, step:40 })
+    });
+    const j = await r.json();
+    if(!r.ok){ $('posStatus').textContent = j.error||'hata'; $('posStatus').className='status err'; return; }
+    applyItemUpdates(j.updated);
+    $('posStatus').textContent = (j.msg || 'taşındı') + ' (önizlemeyi yenile)';
+    $('posStatus').className = 'status ok';
+  } catch(e){
+    $('posStatus').textContent = 'ağ hatası — tekrar dene';
+    $('posStatus').className = 'status err';
+  } finally {
+    itemSending = false;
+    if(itemDirty){ itemDirty = false; sendItemPosition(); }
+  }
+}
+
+async function applyItemAbsolute(x, y){
+  const id = $('vid').value;
+  if(!id) return;
+  if(!selectedIdx.size){
+    $('posStatus').textContent = 'önce en az bir satır seç (kilit açık)';
+    $('posStatus').className = 'status err';
+    return;
+  }
+  [x, y] = clampPos(x, y);
+  $('posStatus').textContent = `${selectedIdx.size} satır → yatay=${x} dikey=${y} · gönderiliyor…`;
+  $('posStatus').className = 'status';
+  try{
+    const r = await fetch('/api/caption-item-pos', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, indices:[...selectedIdx], x, y })
+    });
+    const j = await r.json();
+    if(!r.ok){ $('posStatus').textContent = j.error||'hata'; $('posStatus').className='status err'; return; }
+    applyItemUpdates(j.updated);
+    $('posStatus').textContent = (j.msg || 'uygulandı') + ' (önizlemeyi yenile)';
+    $('posStatus').className = 'status ok';
+  } catch(e){
+    $('posStatus').textContent = 'ağ hatası — tekrar dene';
+    $('posStatus').className = 'status err';
+  }
+}
+
+function refreshBadge(i){
+  const tr = $('body').querySelector(`tr[data-i="${i}"]`);
+  if(!tr) return;
+  const cell = tr.querySelector('.idxnum');
+  if(!cell) return;
+  const hasOverride = captions[i] && captions[i].x!=null && captions[i].y!=null;
+  cell.innerHTML = `${i+1}${hasOverride ? ' <span title="özel konum" style="color:var(--gold)">📍</span>' : ''}`;
+}
+
+function updateLockUI(){
+  const near = posMode === 'near';
+  if(near){
+    const cap = (project && project.layout && project.layout.caption) || {};
+    $('posY').value = (yPunch != null) ? yPunch : (cap.y ?? posY);
+    $('posHint').textContent = 'Yakın (punch) konumu: kamera yakınlaşırken altyazının duracağı yer — sadece dikey (Y). Kaydedince TÜM punch anlarına birden uygulanır.';
+  } else {
+    $('posY').value = posY;
+    $('posHint').textContent = locked
+      ? 'Kilitli: her hareket TÜM altyazıları birlikte taşır · her basış 40 px'
+      : `Kilit açık: ${selectedIdx.size} satır seçili — sadece seçililer taşınır · her basış 40 px`;
+  }
+  $('posReset').hidden = near || locked;
+  $('nearReset').hidden = !near;
+  $('lockToggle').disabled = near;
+  $('posX').disabled = near;
+  document.querySelectorAll('.pad [data-dx]').forEach(b=>{ b.disabled = near; });
+  $('body').querySelectorAll('.rowSel').forEach(cb=>{
+    cb.disabled = locked || near;
+    cb.checked = selectedIdx.has(Number(cb.dataset.i));
+  });
+  paintBox();
+}
+
+// --- Video üzerinde sürükle-bırak ---
+function stageScale(){
+  const stage = $('videoStage');
+  return stage ? (stage.clientWidth / 1080) : 0.2778;
+}
+
+function currentBoxXY(){
+  if(posMode === 'near'){
+    const cap = (project && project.layout && project.layout.caption) || {};
+    const ny = (yPunch != null) ? yPunch : (cap.y ?? posY);
+    return [cap.x ?? posX, ny];
+  }
+  if(!locked && selectedIdx.size){
+    const i = [...selectedIdx][0];
+    const c = captions[i];
+    if(c && c.x != null && c.y != null) return [c.x, c.y];
+  }
+  return [posX, posY];
+}
+
+function updateZoomPreview(){
+  const near = posMode === 'near';
+  $('videoStage').classList.toggle('zoomPreview', near);
+  $('prevVideo').classList.toggle('zoomPreview', near);
+}
+
+function paintBox(){
+  const box = $('dragBox');
+  updateZoomPreview();
+  if(!box || !project) return;
+  const scale = stageScale();
+  const [x, y] = currentBoxXY();
+  const cap = (project.layout && project.layout.caption) || {w:890, h:400};
+  const w = cap.w || 890, h = cap.h || 400;
+  box.style.left = (x * scale) + 'px';
+  box.style.top = (y * scale) + 'px';
+  box.style.width = (w * scale) + 'px';
+  box.style.height = (h * scale) + 'px';
+  if(posMode === 'near'){
+    box.classList.remove('disabled');
+    box.title = 'Yakın (punch) konumu — sürükle (sadece yukarı/aşağı sayılır) · video yaklaşık zoom önizlemesi gösteriyor';
+    return;
+  }
+  const canDrag = locked || selectedIdx.size > 0;
+  box.classList.toggle('disabled', !canDrag);
+  box.title = locked
+    ? 'Ortak altyazı konumu — sürükle'
+    : (selectedIdx.size ? `${selectedIdx.size} satır seçili — sürükle` : 'Önce tablodan en az bir satır seç (kilit açık)');
+}
+
+function setupVideo(id, hasVideo, punches){
+  const v = $('prevVideo');
+  const stage = $('videoStage');
+  const oldMsg = stage.querySelector('.noVideo');
+  if(oldMsg) oldMsg.remove();
+  if(hasVideo){
+    v.style.display = '';
+    v.src = '/media/' + encodeURIComponent(id) + '?t=' + Date.now();
+    v.load();
+  } else {
+    v.style.display = 'none';
+    v.removeAttribute('src');
+    const msg = document.createElement('div');
+    msg.className = 'noVideo';
+    msg.textContent = 'Bu video için ham görüntü yok (public/input-video.mp4)';
+    stage.appendChild(msg);
+  }
+  const row = $('punchRow');
+  row.innerHTML = '';
+  (punches || []).forEach(p=>{
+    const t = Array.isArray(p) ? Number(p[0]) || 0 : Number(p.at) || 0;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'punchChip';
+    btn.textContent = '⚡ ' + t.toFixed(1) + 's';
+    btn.addEventListener('click', ()=>{
+      if(!v || !hasVideo) return;
+      v.currentTime = t;
+      v.pause();
+    });
+    row.appendChild(btn);
+  });
+}
+
+(function initDragBox(){
+  const box = $('dragBox');
+  if(!box) return;
+  box.addEventListener('pointerdown', (e)=>{
+    if(!project) return;
+    if(posMode !== 'near' && !locked && !selectedIdx.size){
+      $('posStatus').textContent = 'önce en az bir satır seç (kilit açık)';
+      $('posStatus').className = 'status err';
+      return;
+    }
+    dragging = true;
+    try{ box.setPointerCapture(e.pointerId); }catch(_){}
+    dragStartPx = {x:e.clientX, y:e.clientY};
+    dragStartXY = currentBoxXY();
+    box.classList.add('dragging');
+    e.preventDefault();
+  });
+  box.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    const scale = stageScale() || 0.2778;
+    const dxPx = e.clientX - dragStartPx.x;
+    const dyPx = e.clientY - dragStartPx.y;
+    let nx = Math.round(dragStartXY[0] + dxPx / scale);
+    let ny = Math.round(dragStartXY[1] + dyPx / scale);
+    [nx, ny] = clampPos(nx, ny);
+    if(posMode === 'near'){
+      nx = dragStartXY[0]; // yatay sabit — punch sırasında sadece dikey anlamlı
+      box.style.left = (nx * scale) + 'px';
+      box.style.top = (ny * scale) + 'px';
+      $('posY').value = ny;
+      yPunch = ny;
+      $('posStatus').textContent = `yakın dikey=${ny} · bırakınca 2sn sonra kaydolur…`;
+      $('posStatus').className = 'status';
+      clearTimeout(yPunchSendTimer);
+      yPunchSendTimer = setTimeout(()=>sendYPunch({y: yPunch}), 2000);
+      return;
+    }
+    box.style.left = (nx * scale) + 'px';
+    box.style.top = (ny * scale) + 'px';
+    $('posX').value = nx;
+    $('posY').value = ny;
+    if(locked){
+      posX = nx; posY = ny;
+      $('posStatus').textContent = `yatay=${nx} dikey=${ny} · bırakınca 2sn sonra kaydolur…`;
+      $('posStatus').className = 'status';
+      clearTimeout(sendTimer);
+      sendTimer = setTimeout(sendPosition, 2000);
+    } else {
+      pendingItemX = nx; pendingItemY = ny;
+      $('posStatus').textContent = `${selectedIdx.size} satır → yatay=${nx} dikey=${ny} · bırakınca 2sn sonra kaydolur…`;
+      $('posStatus').className = 'status';
+      clearTimeout(itemAbsTimer);
+      itemAbsTimer = setTimeout(()=>applyItemAbsolute(pendingItemX, pendingItemY), 2000);
+    }
+  });
+  function endDrag(e){
+    if(!dragging) return;
+    dragging = false;
+    box.classList.remove('dragging');
+    try{ box.releasePointerCapture(e.pointerId); }catch(_){}
+  }
+  box.addEventListener('pointerup', endDrag);
+  box.addEventListener('pointercancel', endDrag);
+})();
+
+$('lockToggle').addEventListener('change', () => {
+  locked = $('lockToggle').checked;
+  $('lockLabel').textContent = locked ? '🔒 Kilitli — hepsi birlikte' : '🔓 Kilit açık — seçili satırlar';
+  if(locked) selectedIdx.clear();
+  updateLockUI();
+});
+
+$('posMode').addEventListener('change', () => {
+  posMode = $('posMode').value;
+  updateLockUI();
+});
+
+$('nearReset').onclick = resetYPunch;
+
+$('posReset').onclick = async () => {
+  const id = $('vid').value;
+  if(!id || !selectedIdx.size){
+    $('posStatus').textContent = 'önce en az bir satır seç';
+    $('posStatus').className = 'status err';
+    return;
+  }
+  $('posStatus').textContent = 'sıfırlanıyor…';
+  $('posStatus').className = 'status';
+  try{
+    const r = await fetch('/api/caption-item-pos', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, indices:[...selectedIdx], reset:true })
+    });
+    const j = await r.json();
+    if(!r.ok){ $('posStatus').textContent = j.error||'hata'; $('posStatus').className='status err'; return; }
+    applyItemUpdates(j.updated);
+    $('posStatus').textContent = (j.msg || 'sıfırlandı') + ' (önizlemeyi yenile)';
+    $('posStatus').className = 'status ok';
+  } catch(e){
+    $('posStatus').textContent = 'ağ hatası — tekrar dene';
+    $('posStatus').className = 'status err';
+  }
+};
+
 document.querySelectorAll('.pad [data-dx], .pad [data-dy]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
-    const dx = btn.dataset.dx!=null ? Number(btn.dataset.dx)*40 : 0;
-    const dy = btn.dataset.dy!=null ? Number(btn.dataset.dy)*40 : 0;
-    setPosLocal(posX+dx, posY+dy);
+    const dxSteps = btn.dataset.dx!=null ? Number(btn.dataset.dx) : 0;
+    const dySteps = btn.dataset.dy!=null ? Number(btn.dataset.dy) : 0;
+    if(posMode === 'near'){ if(dySteps) setYPunchLocal(dySteps); return; }
+    if(locked) setPosLocal(posX+dxSteps*40, posY+dySteps*40);
+    else setItemPosLocal(dxSteps, dySteps);
   });
 });
-$('posApply').onclick = ()=> setPosLocal(Number($('posX').value)||0, Number($('posY').value)||0);
+$('posApply').onclick = ()=>{
+  if(posMode === 'near'){ setYPunchAbsolute(Number($('posY').value)||0); return; }
+  if(locked) setPosLocal(Number($('posX').value)||0, Number($('posY').value)||0);
+  else applyItemAbsolute(Number($('posX').value)||0, Number($('posY').value)||0);
+};
 window.addEventListener('keydown', (e)=>{
   if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
   if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && e.target.id!=='posX' && e.target.id!=='posY') return;
   e.preventDefault();
-  const map = {ArrowUp:[0,-40],ArrowDown:[0,40],ArrowLeft:[-40,0],ArrowRight:[40,0]};
-  const [dx,dy] = map[e.key];
-  setPosLocal(posX+dx, posY+dy);
+  const map = {ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+  const [dxSteps,dySteps] = map[e.key];
+  if(posMode === 'near'){ if(dySteps) setYPunchLocal(dySteps); return; }
+  if(locked) setPosLocal(posX+dxSteps*40, posY+dySteps*40);
+  else setItemPosLocal(dxSteps, dySteps);
 });
 
 async function listVideos(){
@@ -215,8 +681,10 @@ async function listVideos(){
 
 function rowHtml(c, i){
   const tones = ['yumusak','sert','yukselis','fixed'];
+  const hasOverride = c.x!=null && c.y!=null;
   return `<tr data-i="${i}">
-    <td class="idx">${i+1}</td>
+    <td class="sel"><input type="checkbox" class="rowSel" data-i="${i}" ${locked?'disabled':''} ${selectedIdx.has(i)?'checked':''} /></td>
+    <td class="idx idxnum">${i+1}${hasOverride ? ' <span title="özel konum" style="color:var(--gold)">📍</span>' : ''}</td>
     <td class="time"><input data-k="start" value="${Number(c.start).toFixed(2)}" /></td>
     <td class="time"><input data-k="end" value="${Number(c.end).toFixed(2)}" /></td>
     <td><textarea data-k="top">${escape(c.top||'')}</textarea>
@@ -235,16 +703,37 @@ function paint(){
   $('empty').hidden = !!captions.length;
   $('saveBtn').disabled = !captions.length;
   $('body').querySelectorAll('tr').forEach(tr => syncPreview(tr));
-  $('body').querySelectorAll('textarea,input,select').forEach(el=>{
+  $('body').querySelectorAll('textarea,input:not(.rowSel),select').forEach(el=>{
     el.addEventListener('input', () => {
       const tr = el.closest('tr');
+      if(!tr) return;
       const i = Number(tr.dataset.i);
       const k = el.dataset.k;
+      if(!k) return;
       if(k==='start'||k==='end') captions[i][k] = Number(el.value)||0;
       else captions[i][k] = el.value;
       if(k==='top'||k==='bottom') syncPreview(tr);
     });
   });
+  $('body').querySelectorAll('.rowSel').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const i = Number(cb.dataset.i);
+      if(cb.checked) selectedIdx.add(i); else selectedIdx.delete(i);
+      updateLockUI();
+    });
+  });
+  $('body').querySelectorAll('tr').forEach(tr=>{
+    tr.addEventListener('click', (e)=>{
+      if(e.target.closest('input,textarea,select')) return;
+      const i = Number(tr.dataset.i);
+      const v = $('prevVideo');
+      if(v && captions[i] && v.style.display !== 'none'){
+        v.currentTime = Number(captions[i].start) || 0;
+        v.pause();
+      }
+    });
+  });
+  updateLockUI();
 }
 
 function syncPreview(tr){
@@ -269,11 +758,16 @@ $('loadBtn').onclick = async () => {
     bottom: c.bottom||c.text||'',
     tone: c.tone||'yumusak'
   }));
+  selectedIdx.clear();
+  posMode = 'far';
+  $('posMode').value = 'far';
   history.replaceState(null,'', '?id='+id);
   $('status').textContent = captions.length + ' altyazı';
   $('status').className = 'status ok';
   syncPosInputs();
+  setupVideo(id, !!j.has_video, (j.timeline && j.timeline.punches) || []);
   paint();
+  paintBox();
 };
 
 $('fixTr').onclick = () => {

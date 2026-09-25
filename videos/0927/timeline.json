@@ -1,0 +1,61 @@
+{
+  "broll": [
+    {
+      "id": "dolar-fed",
+      "file": "broll/dolar-fed.mp4",
+      "start": 38.0,
+      "dur": 8.0,
+      "keyword": "DOLAR ENDEKSİ FED MERKEZ BANKASI",
+      "hint": "Dolar güçlenmesi / Fed binası görüntüsü — DXY 101 bandı anlatımını destekler (~38-46s)"
+    },
+    {
+      "id": "petrol-enerji",
+      "file": "broll/petrol-enerji.mp4",
+      "start": 48.5,
+      "dur": 8.0,
+      "keyword": "PETROL PLATFORMU ENERJİ",
+      "hint": "Petrol platformu / enerji görüntüsü — pahalanan petrol anlatımını destekler (~48-56s)"
+    }
+  ],
+  "punches": [
+    [
+      23.5,
+      9.0,
+      1.14
+    ],
+    [
+      64.0,
+      7.0,
+      1.12
+    ],
+    [
+      98.9,
+      8.0,
+      1.16
+    ],
+    [
+      140.2,
+      7.0,
+      1.14
+    ]
+  ],
+  "hero": {
+    "id": "card-fedgap",
+    "at": 32.4
+  },
+  "igBanner": [
+    {
+      "id": "mid",
+      "start": 78.0,
+      "dur": 4.5
+    },
+    {
+      "id": "end",
+      "start": 153.0,
+      "dur": 4.5
+    }
+  ],
+  "cardSfx": [],
+  "proCards": [],
+  "brollPending": false
+}

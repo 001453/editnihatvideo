@@ -1,0 +1,2815 @@
+{
+  "version": 1,
+  "account": "nihat",
+  "source": "D:\\nihat_pipeline\\nihat_pipeline\\_inbox\\0924__0924.mp4",
+  "duration": 99.32,
+  "cuts": [],
+  "splits": [],
+  "words": [
+    {
+      "start": 0.0,
+      "end": 0.64,
+      "text": "Borsa'da"
+    },
+    {
+      "start": 0.64,
+      "end": 1.04,
+      "text": "düşüşü"
+    },
+    {
+      "start": 1.04,
+      "end": 1.44,
+      "text": "bildik."
+    },
+    {
+      "start": 1.54,
+      "end": 2.04,
+      "text": "Bizküyüzde"
+    },
+    {
+      "start": 2.04,
+      "end": 2.24,
+      "text": "şimdi"
+    },
+    {
+      "start": 2.24,
+      "end": 2.48,
+      "text": "ne"
+    },
+    {
+      "start": 2.48,
+      "end": 2.72,
+      "text": "olacak?"
+    },
+    {
+      "start": 2.94,
+      "end": 3.18,
+      "text": "Geçen"
+    },
+    {
+      "start": 3.18,
+      "end": 3.44,
+      "text": "hafta"
+    },
+    {
+      "start": 3.44,
+      "end": 3.98,
+      "text": "bizküyüzde"
+    },
+    {
+      "start": 3.98,
+      "end": 4.22,
+      "text": "kâr"
+    },
+    {
+      "start": 4.22,
+      "end": 4.58,
+      "text": "satışı"
+    },
+    {
+      "start": 4.58,
+      "end": 4.8,
+      "text": "gelir,"
+    },
+    {
+      "start": 5.18,
+      "end": 5.4,
+      "text": "bin"
+    },
+    {
+      "start": 5.4,
+      "end": 5.76,
+      "text": "puanlık"
+    },
+    {
+      "start": 5.76,
+      "end": 5.94,
+      "text": "bir"
+    },
+    {
+      "start": 5.94,
+      "end": 6.24,
+      "text": "düşüş"
+    },
+    {
+      "start": 6.24,
+      "end": 6.72,
+      "text": "bekliyorum"
+    },
+    {
+      "start": 6.72,
+      "end": 6.86,
+      "text": "ve"
+    },
+    {
+      "start": 6.86,
+      "end": 7.22,
+      "text": "hedefim"
+    },
+    {
+      "start": 7.22,
+      "end": 7.42,
+      "text": "13"
+    },
+    {
+      "start": 7.42,
+      "end": 7.82,
+      "text": ",400"
+    },
+    {
+      "start": 7.82,
+      "end": 8.36,
+      "text": "demiştim."
+    },
+    {
+      "start": 8.56,
+      "end": 8.82,
+      "text": "Piyasa"
+    },
+    {
+      "start": 8.82,
+      "end": 9.04,
+      "text": "ise"
+    },
+    {
+      "start": 9.04,
+      "end": 9.4,
+      "text": "çok"
+    },
+    {
+      "start": 9.4,
+      "end": 9.58,
+      "text": "daha"
+    },
+    {
+      "start": 9.58,
+      "end": 9.8,
+      "text": "sert"
+    },
+    {
+      "start": 9.8,
+      "end": 10.08,
+      "text": "hareket"
+    },
+    {
+      "start": 10.08,
+      "end": 10.44,
+      "text": "etti"
+    },
+    {
+      "start": 10.44,
+      "end": 10.9,
+      "text": "ve"
+    },
+    {
+      "start": 10.9,
+      "end": 11.32,
+      "text": "Endex"
+    },
+    {
+      "start": 11.32,
+      "end": 11.72,
+      "text": "16"
+    },
+    {
+      "start": 11.72,
+      "end": 12.3,
+      "text": "öylülde"
+    },
+    {
+      "start": 12.3,
+      "end": 12.82,
+      "text": "%5"
+    },
+    {
+      "start": 12.82,
+      "end": 13.3,
+      "text": ",54"
+    },
+    {
+      "start": 13.3,
+      "end": 13.9,
+      "text": "düşüp"
+    },
+    {
+      "start": 13.9,
+      "end": 14.42,
+      "text": "13"
+    },
+    {
+      "start": 14.42,
+      "end": 14.76,
+      "text": ",100"
+    },
+    {
+      "start": 14.76,
+      "end": 15.12,
+      "text": "ürmüş"
+    },
+    {
+      "start": 15.12,
+      "end": 15.42,
+      "text": "puana"
+    },
+    {
+      "start": 15.42,
+      "end": 15.68,
+      "text": "kadar"
+    },
+    {
+      "start": 15.68,
+      "end": 16.08,
+      "text": "gerildi."
+    },
+    {
+      "start": 16.24,
+      "end": 16.88,
+      "text": "Hatta"
+    },
+    {
+      "start": 16.88,
+      "end": 17.14,
+      "text": "gün"
+    },
+    {
+      "start": 17.14,
+      "end": 17.4,
+      "text": "içinde"
+    },
+    {
+      "start": 17.4,
+      "end": 17.7,
+      "text": "12"
+    },
+    {
+      "start": 17.7,
+      "end": 18.46,
+      "text": ",814"
+    },
+    {
+      "start": 18.46,
+      "end": 18.82,
+      "text": "'ü"
+    },
+    {
+      "start": 18.82,
+      "end": 18.92,
+      "text": "bile"
+    },
+    {
+      "start": 18.92,
+      "end": 19.22,
+      "text": "gördü."
+    },
+    {
+      "start": 19.26,
+      "end": 19.48,
+      "text": "Düşüş"
+    },
+    {
+      "start": 19.48,
+      "end": 19.72,
+      "text": "benim"
+    },
+    {
+      "start": 19.72,
+      "end": 20.46,
+      "text": "tahminimden"
+    },
+    {
+      "start": 20.46,
+      "end": 21.1,
+      "text": "200"
+    },
+    {
+      "start": 21.1,
+      "end": 21.42,
+      "text": "band"
+    },
+    {
+      "start": 21.42,
+      "end": 21.58,
+      "text": "daha"
+    },
+    {
+      "start": 21.58,
+      "end": 21.84,
+      "text": "fazla"
+    },
+    {
+      "start": 21.84,
+      "end": 22.56,
+      "text": "gerçekleşti."
+    },
+    {
+      "start": 22.96,
+      "end": 23.14,
+      "text": "Benim"
+    },
+    {
+      "start": 23.14,
+      "end": 23.68,
+      "text": "beklentim"
+    },
+    {
+      "start": 23.68,
+      "end": 23.86,
+      "text": "ise"
+    },
+    {
+      "start": 23.86,
+      "end": 24.04,
+      "text": "şu"
+    },
+    {
+      "start": 24.04,
+      "end": 24.24,
+      "text": "anda"
+    },
+    {
+      "start": 24.24,
+      "end": 24.86,
+      "text": "bizküyüzün"
+    },
+    {
+      "start": 24.86,
+      "end": 25.24,
+      "text": "13"
+    },
+    {
+      "start": 25.24,
+      "end": 25.62,
+      "text": ",100"
+    },
+    {
+      "start": 25.62,
+      "end": 25.9,
+      "text": "-13"
+    },
+    {
+      "start": 25.9,
+      "end": 26.32,
+      "text": ",300"
+    },
+    {
+      "start": 26.32,
+      "end": 26.72,
+      "text": "bandı"
+    },
+    {
+      "start": 26.72,
+      "end": 27.02,
+      "text": "arasında"
+    },
+    {
+      "start": 27.02,
+      "end": 27.56,
+      "text": "bir"
+    },
+    {
+      "start": 27.56,
+      "end": 27.86,
+      "text": "süre"
+    },
+    {
+      "start": 27.86,
+      "end": 28.34,
+      "text": "dinlenmesi"
+    },
+    {
+      "start": 28.34,
+      "end": 28.76,
+      "text": "yönünde."
+    },
+    {
+      "start": 28.76,
+      "end": 29.18,
+      "text": "Çünkü"
+    },
+    {
+      "start": 29.18,
+      "end": 30.14,
+      "text": "önümüzde"
+    },
+    {
+      "start": 30.14,
+      "end": 30.54,
+      "text": "belirsiz"
+    },
+    {
+      "start": 30.54,
+      "end": 30.7,
+      "text": "bir"
+    },
+    {
+      "start": 30.7,
+      "end": 31.08,
+      "text": "süreç"
+    },
+    {
+      "start": 31.08,
+      "end": 31.26,
+      "text": "var"
+    },
+    {
+      "start": 31.26,
+      "end": 31.72,
+      "text": "ve"
+    },
+    {
+      "start": 31.72,
+      "end": 31.86,
+      "text": "bu"
+    },
+    {
+      "start": 31.86,
+      "end": 32.2,
+      "text": "durumda"
+    },
+    {
+      "start": 32.2,
+      "end": 32.76,
+      "text": "piyasaların"
+    },
+    {
+      "start": 32.76,
+      "end": 32.96,
+      "text": "biraz"
+    },
+    {
+      "start": 32.96,
+      "end": 33.4,
+      "text": "soğumaya"
+    },
+    {
+      "start": 33.4,
+      "end": 33.74,
+      "text": "birisine"
+    },
+    {
+      "start": 33.74,
+      "end": 34.28,
+      "text": "girmesi"
+    },
+    {
+      "start": 34.28,
+      "end": 34.56,
+      "text": "gerekiyor."
+    },
+    {
+      "start": 34.64,
+      "end": 35.0,
+      "text": "Yukarıda"
+    },
+    {
+      "start": 35.0,
+      "end": 35.2,
+      "text": "ise"
+    },
+    {
+      "start": 35.2,
+      "end": 35.52,
+      "text": "13"
+    },
+    {
+      "start": 35.52,
+      "end": 36.28,
+      "text": ",370"
+    },
+    {
+      "start": 36.28,
+      "end": 36.76,
+      "text": "daha"
+    },
+    {
+      "start": 36.76,
+      "end": 37.0,
+      "text": "sonra"
+    },
+    {
+      "start": 37.0,
+      "end": 37.32,
+      "text": "13"
+    },
+    {
+      "start": 37.32,
+      "end": 37.86,
+      "text": ",500"
+    },
+    {
+      "start": 37.86,
+      "end": 38.32,
+      "text": "direnç"
+    },
+    {
+      "start": 38.32,
+      "end": 38.52,
+      "text": "olarak"
+    },
+    {
+      "start": 38.52,
+      "end": 38.78,
+      "text": "bizi"
+    },
+    {
+      "start": 38.78,
+      "end": 39.16,
+      "text": "bekliyor."
+    },
+    {
+      "start": 39.3,
+      "end": 39.4,
+      "text": "Bu"
+    },
+    {
+      "start": 39.4,
+      "end": 39.9,
+      "text": "seviyeler"
+    },
+    {
+      "start": 39.9,
+      "end": 40.48,
+      "text": "kırılmadan"
+    },
+    {
+      "start": 40.48,
+      "end": 40.94,
+      "text": "kalıcı"
+    },
+    {
+      "start": 40.94,
+      "end": 41.06,
+      "text": "bir"
+    },
+    {
+      "start": 41.06,
+      "end": 41.46,
+      "text": "yükseliş"
+    },
+    {
+      "start": 41.46,
+      "end": 41.98,
+      "text": "beklemek"
+    },
+    {
+      "start": 41.98,
+      "end": 42.4,
+      "text": "şimdilik"
+    },
+    {
+      "start": 42.4,
+      "end": 42.74,
+      "text": "erken."
+    },
+    {
+      "start": 42.9,
+      "end": 43.0,
+      "text": "Peki"
+    },
+    {
+      "start": 43.0,
+      "end": 43.7,
+      "text": "önümüzdeki"
+    },
+    {
+      "start": 43.7,
+      "end": 44.14,
+      "text": "süreçte"
+    },
+    {
+      "start": 44.14,
+      "end": 44.26,
+      "text": "biz"
+    },
+    {
+      "start": 44.26,
+      "end": 44.38,
+      "text": "de"
+    },
+    {
+      "start": 44.38,
+      "end": 44.6,
+      "text": "neler"
+    },
+    {
+      "start": 44.6,
+      "end": 44.96,
+      "text": "bekliyor?"
+    },
+    {
+      "start": 45.28,
+      "end": 45.54,
+      "text": "Türkiye"
+    },
+    {
+      "start": 45.54,
+      "end": 46.08,
+      "text": "tarafında"
+    },
+    {
+      "start": 46.08,
+      "end": 46.58,
+      "text": "suzeylül"
+    },
+    {
+      "start": 46.58,
+      "end": 47.24,
+      "text": "kapanışında"
+    },
+    {
+      "start": 47.24,
+      "end": 47.94,
+      "text": "bizküyüzde"
+    },
+    {
+      "start": 47.94,
+      "end": 48.24,
+      "text": "27"
+    },
+    {
+      "start": 48.24,
+      "end": 48.8,
+      "text": "şirket"
+    },
+    {
+      "start": 48.8,
+      "end": 49.36,
+      "text": "Endex'ten"
+    },
+    {
+      "start": 49.36,
+      "end": 49.68,
+      "text": "çıkıp"
+    },
+    {
+      "start": 49.68,
+      "end": 50.0,
+      "text": "27"
+    },
+    {
+      "start": 50.0,
+      "end": 50.3,
+      "text": "yeni"
+    },
+    {
+      "start": 50.3,
+      "end": 50.68,
+      "text": "şirket"
+    },
+    {
+      "start": 50.68,
+      "end": 51.0,
+      "text": "gelecek."
+    },
+    {
+      "start": 51.64,
+      "end": 51.74,
+      "text": "Bu"
+    },
+    {
+      "start": 51.74,
+      "end": 52.08,
+      "text": "Endex"
+    },
+    {
+      "start": 52.08,
+      "end": 52.22,
+      "text": "'i"
+    },
+    {
+      "start": 52.22,
+      "end": 52.52,
+      "text": "takip"
+    },
+    {
+      "start": 52.52,
+      "end": 52.72,
+      "text": "eden"
+    },
+    {
+      "start": 52.72,
+      "end": 53.18,
+      "text": "fonların"
+    },
+    {
+      "start": 53.18,
+      "end": 53.54,
+      "text": "aynı"
+    },
+    {
+      "start": 53.54,
+      "end": 53.82,
+      "text": "anda"
+    },
+    {
+      "start": 53.82,
+      "end": 53.96,
+      "text": "hem"
+    },
+    {
+      "start": 53.96,
+      "end": 54.34,
+      "text": "satış"
+    },
+    {
+      "start": 54.34,
+      "end": 54.86,
+      "text": "hem"
+    },
+    {
+      "start": 54.86,
+      "end": 55.0,
+      "text": "de"
+    },
+    {
+      "start": 55.0,
+      "end": 55.18,
+      "text": "alış"
+    },
+    {
+      "start": 55.18,
+      "end": 55.48,
+      "text": "yapması"
+    },
+    {
+      "start": 55.48,
+      "end": 56.06,
+      "text": "gerekiyor."
+    },
+    {
+      "start": 56.06,
+      "end": 56.7,
+      "text": "Satış"
+    },
+    {
+      "start": 56.7,
+      "end": 57.14,
+      "text": "baskısı"
+    },
+    {
+      "start": 57.14,
+      "end": 57.28,
+      "text": "ve"
+    },
+    {
+      "start": 57.28,
+      "end": 57.42,
+      "text": "bu"
+    },
+    {
+      "start": 57.42,
+      "end": 57.82,
+      "text": "ekonomik"
+    },
+    {
+      "start": 57.82,
+      "end": 58.2,
+      "text": "takvim"
+    },
+    {
+      "start": 58.2,
+      "end": 58.42,
+      "text": "üst"
+    },
+    {
+      "start": 58.42,
+      "end": 58.68,
+      "text": "üste"
+    },
+    {
+      "start": 58.68,
+      "end": 59.1,
+      "text": "gelirse"
+    },
+    {
+      "start": 59.1,
+      "end": 59.46,
+      "text": "sert"
+    },
+    {
+      "start": 59.46,
+      "end": 59.96,
+      "text": "hareketler"
+    },
+    {
+      "start": 59.96,
+      "end": 60.34,
+      "text": "görebilir."
+    },
+    {
+      "start": 60.48,
+      "end": 60.88,
+      "text": "ABD"
+    },
+    {
+      "start": 60.88,
+      "end": 61.56,
+      "text": "tarafındaysa"
+    },
+    {
+      "start": 61.56,
+      "end": 62.06,
+      "text": "ardarda"
+    },
+    {
+      "start": 62.06,
+      "end": 62.34,
+      "text": "önemli"
+    },
+    {
+      "start": 62.34,
+      "end": 62.76,
+      "text": "veriler"
+    },
+    {
+      "start": 62.76,
+      "end": 62.98,
+      "text": "bizi"
+    },
+    {
+      "start": 62.98,
+      "end": 63.34,
+      "text": "bekliyor."
+    },
+    {
+      "start": 63.54,
+      "end": 63.62,
+      "text": "Bu"
+    },
+    {
+      "start": 63.62,
+      "end": 63.86,
+      "text": "hafta"
+    },
+    {
+      "start": 63.86,
+      "end": 64.24,
+      "text": "işsizlik"
+    },
+    {
+      "start": 64.24,
+      "end": 64.92,
+      "text": "başvuruları"
+    },
+    {
+      "start": 64.92,
+      "end": 65.0,
+      "text": "ve"
+    },
+    {
+      "start": 65.0,
+      "end": 65.42,
+      "text": "dayanık"
+    },
+    {
+      "start": 65.42,
+      "end": 65.62,
+      "text": "mal"
+    },
+    {
+      "start": 65.62,
+      "end": 66.2,
+      "text": "siparişleri"
+    },
+    {
+      "start": 66.2,
+      "end": 66.38,
+      "text": "var."
+    },
+    {
+      "start": 66.7,
+      "end": 66.98,
+      "text": "Gelecek"
+    },
+    {
+      "start": 66.98,
+      "end": 67.3,
+      "text": "hafta"
+    },
+    {
+      "start": 67.3,
+      "end": 67.46,
+      "text": "ise"
+    },
+    {
+      "start": 67.46,
+      "end": 67.84,
+      "text": "Fedin"
+    },
+    {
+      "start": 67.84,
+      "end": 68.22,
+      "text": "en"
+    },
+    {
+      "start": 68.22,
+      "end": 68.38,
+      "text": "çok"
+    },
+    {
+      "start": 68.38,
+      "end": 69.0,
+      "text": "önemsediği"
+    },
+    {
+      "start": 69.0,
+      "end": 69.52,
+      "text": "enflasyon"
+    },
+    {
+      "start": 69.52,
+      "end": 70.28,
+      "text": "göstergesi"
+    },
+    {
+      "start": 70.28,
+      "end": 70.68,
+      "text": "PC."
+    },
+    {
+      "start": 71.06,
+      "end": 71.48,
+      "text": "Ardandan"
+    },
+    {
+      "start": 71.48,
+      "end": 72.04,
+      "text": "Eylül"
+    },
+    {
+      "start": 72.04,
+      "end": 72.24,
+      "text": "ayı"
+    },
+    {
+      "start": 72.24,
+      "end": 72.68,
+      "text": "istihdam"
+    },
+    {
+      "start": 72.68,
+      "end": 72.94,
+      "text": "raporu"
+    },
+    {
+      "start": 72.94,
+      "end": 73.52,
+      "text": "açıklanacak."
+    },
+    {
+      "start": 73.66,
+      "end": 73.78,
+      "text": "Bu"
+    },
+    {
+      "start": 73.78,
+      "end": 74.06,
+      "text": "veriler"
+    },
+    {
+      "start": 74.06,
+      "end": 74.58,
+      "text": "Fedin"
+    },
+    {
+      "start": 74.58,
+      "end": 75.18,
+      "text": "aralıkta"
+    },
+    {
+      "start": 75.18,
+      "end": 75.66,
+      "text": "yeni"
+    },
+    {
+      "start": 75.66,
+      "end": 75.86,
+      "text": "bir"
+    },
+    {
+      "start": 75.86,
+      "end": 76.2,
+      "text": "faiz"
+    },
+    {
+      "start": 76.2,
+      "end": 76.66,
+      "text": "arttırma"
+    },
+    {
+      "start": 76.66,
+      "end": 77.44,
+      "text": "yapıp"
+    },
+    {
+      "start": 77.44,
+      "end": 78.26,
+      "text": "yapmayacağını"
+    },
+    {
+      "start": 78.26,
+      "end": 79.04,
+      "text": "şekillendirecek."
+    },
+    {
+      "start": 79.2,
+      "end": 79.3,
+      "text": "Bu"
+    },
+    {
+      "start": 79.3,
+      "end": 79.46,
+      "text": "da"
+    },
+    {
+      "start": 79.46,
+      "end": 80.12,
+      "text": "dolaylı"
+    },
+    {
+      "start": 80.12,
+      "end": 80.4,
+      "text": "olarak"
+    },
+    {
+      "start": 80.4,
+      "end": 80.7,
+      "text": "bizim"
+    },
+    {
+      "start": 80.7,
+      "end": 81.24,
+      "text": "borsamızı"
+    },
+    {
+      "start": 81.24,
+      "end": 81.7,
+      "text": "yansıyacak."
+    },
+    {
+      "start": 81.86,
+      "end": 81.98,
+      "text": "Şu"
+    },
+    {
+      "start": 81.98,
+      "end": 82.18,
+      "text": "anda"
+    },
+    {
+      "start": 82.18,
+      "end": 82.78,
+      "text": "takip"
+    },
+    {
+      "start": 82.78,
+      "end": 83.16,
+      "text": "etmemiz"
+    },
+    {
+      "start": 83.16,
+      "end": 83.5,
+      "text": "gereken"
+    },
+    {
+      "start": 83.5,
+      "end": 83.88,
+      "text": "seviye"
+    },
+    {
+      "start": 83.88,
+      "end": 84.34,
+      "text": "13"
+    },
+    {
+      "start": 84.34,
+      "end": 84.62,
+      "text": ",000"
+    },
+    {
+      "start": 84.62,
+      "end": 84.72,
+      "text": "ve"
+    },
+    {
+      "start": 84.72,
+      "end": 84.94,
+      "text": "13"
+    },
+    {
+      "start": 84.94,
+      "end": 85.14,
+      "text": ",100"
+    },
+    {
+      "start": 85.14,
+      "end": 85.62,
+      "text": "bandı."
+    },
+    {
+      "start": 85.62,
+      "end": 85.96,
+      "text": "Burada"
+    },
+    {
+      "start": 85.96,
+      "end": 86.26,
+      "text": "güç"
+    },
+    {
+      "start": 86.26,
+      "end": 86.92,
+      "text": "toplamasını"
+    },
+    {
+      "start": 86.92,
+      "end": 87.02,
+      "text": "ve"
+    },
+    {
+      "start": 87.02,
+      "end": 87.48,
+      "text": "ardından"
+    },
+    {
+      "start": 87.48,
+      "end": 87.98,
+      "text": "yukarı"
+    },
+    {
+      "start": 87.98,
+      "end": 88.18,
+      "text": "devam"
+    },
+    {
+      "start": 88.18,
+      "end": 88.68,
+      "text": "etmesini"
+    },
+    {
+      "start": 88.68,
+      "end": 89.0,
+      "text": "takip"
+    },
+    {
+      "start": 89.0,
+      "end": 89.36,
+      "text": "ederiz."
+    },
+    {
+      "start": 89.5,
+      "end": 89.72,
+      "text": "Fakat"
+    },
+    {
+      "start": 89.72,
+      "end": 90.2,
+      "text": "bu"
+    },
+    {
+      "start": 90.2,
+      "end": 90.64,
+      "text": "seviyeinin"
+    },
+    {
+      "start": 90.64,
+      "end": 91.02,
+      "text": "altına"
+    },
+    {
+      "start": 91.02,
+      "end": 91.16,
+      "text": "bir"
+    },
+    {
+      "start": 91.16,
+      "end": 91.44,
+      "text": "diniş"
+    },
+    {
+      "start": 91.44,
+      "end": 92.24,
+      "text": "olursa"
+    },
+    {
+      "start": 92.24,
+      "end": 92.48,
+      "text": "12"
+    },
+    {
+      "start": 92.48,
+      "end": 92.94,
+      "text": ",900"
+    },
+    {
+      "start": 92.94,
+      "end": 93.18,
+      "text": "'e"
+    },
+    {
+      "start": 93.18,
+      "end": 93.42,
+      "text": "kadar"
+    },
+    {
+      "start": 93.42,
+      "end": 93.8,
+      "text": "yeni"
+    },
+    {
+      "start": 93.8,
+      "end": 93.94,
+      "text": "bir"
+    },
+    {
+      "start": 93.94,
+      "end": 94.26,
+      "text": "düşüş"
+    },
+    {
+      "start": 94.26,
+      "end": 94.56,
+      "text": "kapısı"
+    },
+    {
+      "start": 94.56,
+      "end": 94.98,
+      "text": "açılır."
+    },
+    {
+      "start": 95.44,
+      "end": 96.1,
+      "text": "Anlattıklarım"
+    },
+    {
+      "start": 96.1,
+      "end": 96.28,
+      "text": "kendi"
+    },
+    {
+      "start": 96.28,
+      "end": 96.7,
+      "text": "takip"
+    },
+    {
+      "start": 96.7,
+      "end": 97.0,
+      "text": "seviye"
+    },
+    {
+      "start": 97.0,
+      "end": 97.1,
+      "text": "mi"
+    },
+    {
+      "start": 97.1,
+      "end": 97.2,
+      "text": "olun"
+    },
+    {
+      "start": 97.2,
+      "end": 97.7,
+      "text": "yatırım"
+    },
+    {
+      "start": 97.7,
+      "end": 98.14,
+      "text": "tavsiyesi"
+    },
+    {
+      "start": 98.14,
+      "end": 98.92,
+      "text": "içermemektedir."
+    }
+  ],
+  "layout": {
+    "banner": {
+      "x": 76,
+      "y": 220,
+      "w": 928,
+      "h": 120
+    },
+    "caption": {
+      "x": 50,
+      "y": 1345,
+      "w": 1000,
+      "h": 380,
+      "fontSize": 105
+    }
+  },
+  "captions": [
+    {
+      "start": 0.0,
+      "end": 1.01,
+      "text": "",
+      "top": "",
+      "bottom": "",
+      "tone": "sert",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 0,
+      "wordEnd": 1
+    },
+    {
+      "start": 1.04,
+      "end": 2.01,
+      "text": "",
+      "top": "",
+      "bottom": "",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 2,
+      "wordEnd": 3
+    },
+    {
+      "start": 2.04,
+      "end": 2.89,
+      "text": "",
+      "top": "",
+      "bottom": "",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 4,
+      "wordEnd": 6
+    },
+    {
+      "start": 2.94,
+      "end": 3.41,
+      "text": "GEÇEN HAFTA",
+      "top": "GEÇEN",
+      "bottom": "HAFTA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 7,
+      "wordEnd": 8
+    },
+    {
+      "start": 3.44,
+      "end": 3.95,
+      "text": "BİST 100",
+      "top": "",
+      "bottom": "BİST 100",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 9,
+      "wordEnd": 9
+    },
+    {
+      "start": 3.98,
+      "end": 4.55,
+      "text": "KÂR SATIŞI",
+      "top": "KÂR",
+      "bottom": "SATIŞI",
+      "tone": "yukselis",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 10,
+      "wordEnd": 11
+    },
+    {
+      "start": 4.58,
+      "end": 5.37,
+      "text": "GELİR, 1000",
+      "top": "GELİR,",
+      "bottom": "1000",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 12,
+      "wordEnd": 13
+    },
+    {
+      "start": 5.4,
+      "end": 5.91,
+      "text": "PUANLIK BİR",
+      "top": "PUANLIK",
+      "bottom": "BİR",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 14,
+      "wordEnd": 15
+    },
+    {
+      "start": 5.94,
+      "end": 6.69,
+      "text": "DÜŞÜŞ BEKLİYORUM",
+      "top": "DÜŞÜŞ",
+      "bottom": "BEKLİYORUM",
+      "tone": "sert",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 16,
+      "wordEnd": 17
+    },
+    {
+      "start": 6.72,
+      "end": 7.19,
+      "text": "VE HEDEFİM",
+      "top": "VE",
+      "bottom": "HEDEFİM",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 18,
+      "wordEnd": 19
+    },
+    {
+      "start": 7.22,
+      "end": 8.36,
+      "text": "13,400 DEMİŞTİM.",
+      "top": "",
+      "bottom": "13,400 DEMİŞTİM.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 20,
+      "wordEnd": 22
+    },
+    {
+      "start": 8.56,
+      "end": 9.01,
+      "text": "PİYASA İSE",
+      "top": "PİYASA",
+      "bottom": "İSE",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 23,
+      "wordEnd": 24
+    },
+    {
+      "start": 9.04,
+      "end": 9.77,
+      "text": "ÇOK DAHA SERT",
+      "top": "ÇOK",
+      "bottom": "DAHA SERT",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 25,
+      "wordEnd": 27
+    },
+    {
+      "start": 9.8,
+      "end": 10.41,
+      "text": "HAREKET ETTİ",
+      "top": "HAREKET",
+      "bottom": "ETTİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 28,
+      "wordEnd": 29
+    },
+    {
+      "start": 10.44,
+      "end": 11.69,
+      "text": "VE ENDEX 16",
+      "top": "VE",
+      "bottom": "ENDEX 16",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 30,
+      "wordEnd": 32
+    },
+    {
+      "start": 11.72,
+      "end": 12.79,
+      "text": "ÖYLÜLDE %5,54",
+      "top": "ÖYLÜLDE",
+      "bottom": "%5,54",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 33,
+      "wordEnd": 34
+    },
+    {
+      "start": 12.82,
+      "end": 13.87,
+      "text": "DÜŞÜP",
+      "top": "",
+      "bottom": "DÜŞÜP",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 35,
+      "wordEnd": 36
+    },
+    {
+      "start": 13.9,
+      "end": 15.09,
+      "text": "13,400",
+      "top": "",
+      "bottom": "13,400",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 37,
+      "wordEnd": 39
+    },
+    {
+      "start": 15.12,
+      "end": 15.65,
+      "text": "PUANA KADAR",
+      "top": "PUANA",
+      "bottom": "KADAR",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 40,
+      "wordEnd": 41
+    },
+    {
+      "start": 15.68,
+      "end": 16.85,
+      "text": "GERİLEDİ. HATTA",
+      "top": "GERİLEDİ.",
+      "bottom": "HATTA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 42,
+      "wordEnd": 43
+    },
+    {
+      "start": 16.88,
+      "end": 17.37,
+      "text": "GÜN İÇİNDE",
+      "top": "GÜN",
+      "bottom": "İÇİNDE",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 44,
+      "wordEnd": 45
+    },
+    {
+      "start": 17.4,
+      "end": 18.79,
+      "text": "12,814'Ü",
+      "top": "",
+      "bottom": "12,814'Ü",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 46,
+      "wordEnd": 48
+    },
+    {
+      "start": 18.82,
+      "end": 19.27,
+      "text": "BİLE GÖRDÜ.",
+      "top": "BİLE",
+      "bottom": "GÖRDÜ.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 49,
+      "wordEnd": 50
+    },
+    {
+      "start": 19.26,
+      "end": 19.71,
+      "text": "DÜŞÜŞ BENİM",
+      "top": "DÜŞÜŞ",
+      "bottom": "BENİM",
+      "tone": "sert",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 51,
+      "wordEnd": 52
+    },
+    {
+      "start": 19.72,
+      "end": 20.43,
+      "text": "TAHMİNİMDEN",
+      "top": "",
+      "bottom": "TAHMİNİMDEN",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 53,
+      "wordEnd": 53
+    },
+    {
+      "start": 20.46,
+      "end": 21.55,
+      "text": "200 PUAN DAHA",
+      "top": "200",
+      "bottom": "PUAN DAHA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 54,
+      "wordEnd": 56
+    },
+    {
+      "start": 21.58,
+      "end": 22.56,
+      "text": "FAZLA GERÇEKLEŞTİ.",
+      "top": "FAZLA",
+      "bottom": "GERÇEKLEŞTİ.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 57,
+      "wordEnd": 58
+    },
+    {
+      "start": 22.96,
+      "end": 23.65,
+      "text": "BENİM BEKLENTİM",
+      "top": "BENİM",
+      "bottom": "BEKLENTİM",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 59,
+      "wordEnd": 60
+    },
+    {
+      "start": 23.68,
+      "end": 24.21,
+      "text": "İSE ŞU ANDA",
+      "top": "İSE",
+      "bottom": "ŞU ANDA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 61,
+      "wordEnd": 63
+    },
+    {
+      "start": 24.24,
+      "end": 24.83,
+      "text": "BİST 100",
+      "top": "",
+      "bottom": "BİST 100",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 64,
+      "wordEnd": 64
+    },
+    {
+      "start": 24.86,
+      "end": 25.87,
+      "text": "13,100  13,300",
+      "top": "13,100",
+      "bottom": "13,300",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 65,
+      "wordEnd": 67
+    },
+    {
+      "start": 25.9,
+      "end": 26.69,
+      "text": "BANDI",
+      "top": "",
+      "bottom": "BANDI",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 68,
+      "wordEnd": 69
+    },
+    {
+      "start": 26.72,
+      "end": 27.53,
+      "text": "ARASINDA BİR",
+      "top": "ARASINDA",
+      "bottom": "BİR",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 70,
+      "wordEnd": 71
+    },
+    {
+      "start": 27.56,
+      "end": 28.31,
+      "text": "SÜRE DİNLENMESİ",
+      "top": "SÜRE",
+      "bottom": "DİNLENMESİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 72,
+      "wordEnd": 73
+    },
+    {
+      "start": 28.34,
+      "end": 29.15,
+      "text": "YÖNÜNDE. ÇÜNKÜ",
+      "top": "YÖNÜNDE.",
+      "bottom": "ÇÜNKÜ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 74,
+      "wordEnd": 75
+    },
+    {
+      "start": 29.18,
+      "end": 30.51,
+      "text": "ÖNÜMÜZDE BELİRSİZ",
+      "top": "ÖNÜMÜZDE",
+      "bottom": "BELİRSİZ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 76,
+      "wordEnd": 77
+    },
+    {
+      "start": 30.54,
+      "end": 31.05,
+      "text": "BİR SÜREÇ",
+      "top": "BİR",
+      "bottom": "SÜREÇ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 78,
+      "wordEnd": 79
+    },
+    {
+      "start": 31.08,
+      "end": 31.83,
+      "text": "VAR VE BU",
+      "top": "VAR",
+      "bottom": "VE BU",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 80,
+      "wordEnd": 82
+    },
+    {
+      "start": 31.86,
+      "end": 32.73,
+      "text": "DURUMDA PİYASALARIN",
+      "top": "DURUMDA",
+      "bottom": "PİYASALARIN",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 83,
+      "wordEnd": 84
+    },
+    {
+      "start": 32.76,
+      "end": 33.37,
+      "text": "BİRAZ SOĞUMA",
+      "top": "BİRAZ",
+      "bottom": "SOĞUMA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 85,
+      "wordEnd": 86
+    },
+    {
+      "start": 33.4,
+      "end": 34.25,
+      "text": "EVRESİNE GİRMESİ",
+      "top": "EVRESİNE",
+      "bottom": "GİRMESİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 87,
+      "wordEnd": 88
+    },
+    {
+      "start": 34.28,
+      "end": 34.73,
+      "text": "GEREKİYOR.",
+      "top": "",
+      "bottom": "GEREKİYOR.",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 89,
+      "wordEnd": 89
+    },
+    {
+      "start": 34.64,
+      "end": 35.17,
+      "text": "YUKARIDA İSE",
+      "top": "YUKARIDA",
+      "bottom": "İSE",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 90,
+      "wordEnd": 91
+    },
+    {
+      "start": 35.2,
+      "end": 36.73,
+      "text": "13,370 DAHA",
+      "top": "",
+      "bottom": "13,370 DAHA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 92,
+      "wordEnd": 94
+    },
+    {
+      "start": 36.76,
+      "end": 37.83,
+      "text": "SONRA 13,500",
+      "top": "SONRA",
+      "bottom": "13,500",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 95,
+      "wordEnd": 97
+    },
+    {
+      "start": 37.86,
+      "end": 38.49,
+      "text": "DİRENÇ OLARAK",
+      "top": "DİRENÇ",
+      "bottom": "OLARAK",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 98,
+      "wordEnd": 99
+    },
+    {
+      "start": 38.52,
+      "end": 39.27,
+      "text": "BİZİ BEKLİYOR.",
+      "top": "BİZİ",
+      "bottom": "BEKLİYOR.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 100,
+      "wordEnd": 101
+    },
+    {
+      "start": 39.3,
+      "end": 39.87,
+      "text": "BU SEVİYELER",
+      "top": "BU",
+      "bottom": "SEVİYELER",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 102,
+      "wordEnd": 103
+    },
+    {
+      "start": 39.9,
+      "end": 40.45,
+      "text": "KIRILMADAN",
+      "top": "",
+      "bottom": "KIRILMADAN",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 104,
+      "wordEnd": 104
+    },
+    {
+      "start": 40.48,
+      "end": 41.03,
+      "text": "KALICI BİR",
+      "top": "KALICI",
+      "bottom": "BİR",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 105,
+      "wordEnd": 106
+    },
+    {
+      "start": 41.06,
+      "end": 41.95,
+      "text": "YÜKSELİŞ BEKLEMEK",
+      "top": "YÜKSELİŞ",
+      "bottom": "BEKLEMEK",
+      "tone": "yukselis",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 107,
+      "wordEnd": 108
+    },
+    {
+      "start": 41.98,
+      "end": 42.83,
+      "text": "ŞİMDİLİK ERKEN.",
+      "top": "ŞİMDİLİK",
+      "bottom": "ERKEN.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 109,
+      "wordEnd": 110
+    },
+    {
+      "start": 42.9,
+      "end": 43.67,
+      "text": "PEKİ ÖNÜMÜZDEKİ",
+      "top": "PEKİ",
+      "bottom": "ÖNÜMÜZDEKİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 111,
+      "wordEnd": 112
+    },
+    {
+      "start": 43.7,
+      "end": 44.23,
+      "text": "SÜREÇTE BİST 100",
+      "top": "SÜREÇTE",
+      "bottom": "BİST 100",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 113,
+      "wordEnd": 114
+    },
+    {
+      "start": 44.26,
+      "end": 45.11,
+      "text": "DE NELER BEKLİYOR?",
+      "top": "DE",
+      "bottom": "NELER BEKLİYOR?",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 115,
+      "wordEnd": 117
+    },
+    {
+      "start": 45.28,
+      "end": 46.05,
+      "text": "TÜRKİYE TARAFINDA",
+      "top": "TÜRKİYE",
+      "bottom": "TARAFINDA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 118,
+      "wordEnd": 119
+    },
+    {
+      "start": 46.08,
+      "end": 47.21,
+      "text": "30 eylül KAPANIŞINDA",
+      "top": "30 EYLÜL",
+      "bottom": "KAPANIŞINDA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 120,
+      "wordEnd": 121
+    },
+    {
+      "start": 47.24,
+      "end": 47.91,
+      "text": "bist 100",
+      "top": "",
+      "bottom": "BİST 100",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 122,
+      "wordEnd": 122
+    },
+    {
+      "start": 47.94,
+      "end": 48.77,
+      "text": "27 ŞİRKET",
+      "top": "27",
+      "bottom": "ŞİRKET",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 123,
+      "wordEnd": 124
+    },
+    {
+      "start": 48.8,
+      "end": 49.33,
+      "text": "ENDEX'TEN",
+      "top": "",
+      "bottom": "ENDEX'TEN",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 125,
+      "wordEnd": 125
+    },
+    {
+      "start": 49.36,
+      "end": 50.27,
+      "text": "ÇIKIP 27 YENİ",
+      "top": "ÇIKIP",
+      "bottom": "27 YENİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 126,
+      "wordEnd": 128
+    },
+    {
+      "start": 50.3,
+      "end": 51.15,
+      "text": "ŞİRKET GELECEK.",
+      "top": "ŞİRKET",
+      "bottom": "GELECEK.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 129,
+      "wordEnd": 130
+    },
+    {
+      "start": 51.64,
+      "end": 52.19,
+      "text": "BU ENDEX'İ",
+      "top": "BU",
+      "bottom": "ENDEX'İ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 131,
+      "wordEnd": 133
+    },
+    {
+      "start": 52.22,
+      "end": 52.69,
+      "text": "TAKİP EDEN",
+      "top": "TAKİP",
+      "bottom": "EDEN",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 134,
+      "wordEnd": 135
+    },
+    {
+      "start": 52.72,
+      "end": 53.51,
+      "text": "FONLARIN AYNI",
+      "top": "FONLARIN",
+      "bottom": "AYNI",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 136,
+      "wordEnd": 137
+    },
+    {
+      "start": 53.54,
+      "end": 54.31,
+      "text": "ANDA HEM SATIŞ",
+      "top": "ANDA",
+      "bottom": "HEM SATIŞ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 138,
+      "wordEnd": 140
+    },
+    {
+      "start": 54.34,
+      "end": 55.15,
+      "text": "HEM DE ALIŞ",
+      "top": "HEM",
+      "bottom": "DE ALIŞ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 141,
+      "wordEnd": 143
+    },
+    {
+      "start": 55.18,
+      "end": 56.03,
+      "text": "YAPMASI GEREKİYOR.",
+      "top": "YAPMASI",
+      "bottom": "GEREKİYOR.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 144,
+      "wordEnd": 145
+    },
+    {
+      "start": 56.06,
+      "end": 57.11,
+      "text": "SATIŞ BASKISI",
+      "top": "SATIŞ",
+      "bottom": "BASKISI",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 146,
+      "wordEnd": 147
+    },
+    {
+      "start": 57.14,
+      "end": 57.79,
+      "text": "VE BU EKONOMİK",
+      "top": "VE",
+      "bottom": "BU EKONOMİK",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 148,
+      "wordEnd": 150
+    },
+    {
+      "start": 57.82,
+      "end": 58.39,
+      "text": "TAKVİM ÜST",
+      "top": "TAKVİM",
+      "bottom": "ÜST",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 151,
+      "wordEnd": 152
+    },
+    {
+      "start": 58.42,
+      "end": 59.07,
+      "text": "ÜSTE GELİRSE",
+      "top": "ÜSTE",
+      "bottom": "GELİRSE",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 153,
+      "wordEnd": 154
+    },
+    {
+      "start": 59.1,
+      "end": 59.93,
+      "text": "SERT HAREKETLER",
+      "top": "SERT",
+      "bottom": "HAREKETLER",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 155,
+      "wordEnd": 156
+    },
+    {
+      "start": 59.96,
+      "end": 60.45,
+      "text": "GÖREBİLİR.",
+      "top": "",
+      "bottom": "GÖREBİLİR.",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 157,
+      "wordEnd": 157
+    },
+    {
+      "start": 60.48,
+      "end": 61.53,
+      "text": "ABD TARAFINDAYSA",
+      "top": "ABD",
+      "bottom": "TARAFINDAYSA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 158,
+      "wordEnd": 159
+    },
+    {
+      "start": 61.56,
+      "end": 62.31,
+      "text": "ARD ARDA ÖNEMLİ",
+      "top": "ARD ARDA",
+      "bottom": "ÖNEMLİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 160,
+      "wordEnd": 161
+    },
+    {
+      "start": 62.34,
+      "end": 62.95,
+      "text": "VERİLER BİZİ",
+      "top": "VERİLER",
+      "bottom": "BİZİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 162,
+      "wordEnd": 163
+    },
+    {
+      "start": 62.98,
+      "end": 63.51,
+      "text": "BEKLİYOR.",
+      "top": "",
+      "bottom": "BEKLİYOR.",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 164,
+      "wordEnd": 164
+    },
+    {
+      "start": 63.54,
+      "end": 64.21,
+      "text": "BU HAFTA İŞSİZLİK",
+      "top": "BU",
+      "bottom": "HAFTA İŞSİZLİK",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 165,
+      "wordEnd": 167
+    },
+    {
+      "start": 64.24,
+      "end": 64.89,
+      "text": "BAŞVURULARI",
+      "top": "",
+      "bottom": "BAŞVURULARI",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 168,
+      "wordEnd": 168
+    },
+    {
+      "start": 64.92,
+      "end": 65.39,
+      "text": "VE DAYANIKlı",
+      "top": "VE",
+      "bottom": "DAYANIKLI",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 169,
+      "wordEnd": 170
+    },
+    {
+      "start": 65.42,
+      "end": 66.17,
+      "text": "MAL SİPARİŞLERİ",
+      "top": "MAL",
+      "bottom": "SİPARİŞLERİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 171,
+      "wordEnd": 172
+    },
+    {
+      "start": 66.2,
+      "end": 66.95,
+      "text": "VAR. GELECEK",
+      "top": "VAR.",
+      "bottom": "GELECEK",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 173,
+      "wordEnd": 174
+    },
+    {
+      "start": 66.98,
+      "end": 67.43,
+      "text": "HAFTA İSE",
+      "top": "HAFTA",
+      "bottom": "İSE",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 175,
+      "wordEnd": 176
+    },
+    {
+      "start": 67.46,
+      "end": 68.35,
+      "text": "FEd İN EN ÇOK",
+      "top": "FED İN",
+      "bottom": "EN ÇOK",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 177,
+      "wordEnd": 179
+    },
+    {
+      "start": 68.38,
+      "end": 68.97,
+      "text": "ÖNEMSEDİĞİ",
+      "top": "",
+      "bottom": "ÖNEMSEDİĞİ",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 180,
+      "wordEnd": 180
+    },
+    {
+      "start": 69.0,
+      "end": 69.49,
+      "text": "ENFLASYON",
+      "top": "",
+      "bottom": "ENFLASYON",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 181,
+      "wordEnd": 181
+    },
+    {
+      "start": 69.52,
+      "end": 70.25,
+      "text": "GÖSTERGESİ",
+      "top": "",
+      "bottom": "GÖSTERGESİ",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 182,
+      "wordEnd": 182
+    },
+    {
+      "start": 70.28,
+      "end": 71.45,
+      "text": "PCe ARDıNDAN",
+      "top": "PCE",
+      "bottom": "ARDINDAN",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 183,
+      "wordEnd": 184
+    },
+    {
+      "start": 71.48,
+      "end": 72.21,
+      "text": "EYLÜL AYI",
+      "top": "EYLÜL",
+      "bottom": "AYI",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 185,
+      "wordEnd": 186
+    },
+    {
+      "start": 72.24,
+      "end": 72.91,
+      "text": "İSTİHDAM RAPORU",
+      "top": "İSTİHDAM",
+      "bottom": "RAPORU",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 187,
+      "wordEnd": 188
+    },
+    {
+      "start": 72.94,
+      "end": 73.63,
+      "text": "AÇIKLANACAK.",
+      "top": "",
+      "bottom": "AÇIKLANACAK.",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 189,
+      "wordEnd": 189
+    },
+    {
+      "start": 73.66,
+      "end": 74.11,
+      "text": "BU VERİLER",
+      "top": "BU",
+      "bottom": "VERİLER",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 190,
+      "wordEnd": 191
+    },
+    {
+      "start": 74.06,
+      "end": 75.15,
+      "text": "FED İN ARALIKTA",
+      "top": "FED İN",
+      "bottom": "ARALIKTA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 192,
+      "wordEnd": 193
+    },
+    {
+      "start": 75.18,
+      "end": 76.17,
+      "text": "YENİ BİR FAİZ",
+      "top": "YENİ",
+      "bottom": "BİR FAİZ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 194,
+      "wordEnd": 196
+    },
+    {
+      "start": 76.2,
+      "end": 77.41,
+      "text": "ARTTIRMA YAPIP",
+      "top": "ARTTIRMA",
+      "bottom": "YAPIP",
+      "tone": "yukselis",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 197,
+      "wordEnd": 198
+    },
+    {
+      "start": 77.44,
+      "end": 78.23,
+      "text": "YAPMAYACAĞINI",
+      "top": "",
+      "bottom": "YAPMAYACAĞINI",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 199,
+      "wordEnd": 199
+    },
+    {
+      "start": 78.26,
+      "end": 79.11,
+      "text": "ŞEKİLLENDİRECEK.",
+      "top": "",
+      "bottom": "ŞEKİLLENDİRECEK.",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 200,
+      "wordEnd": 200
+    },
+    {
+      "start": 79.2,
+      "end": 80.09,
+      "text": "BU DA DOLAYLI",
+      "top": "BU",
+      "bottom": "DA DOLAYLI",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 201,
+      "wordEnd": 203
+    },
+    {
+      "start": 80.12,
+      "end": 80.67,
+      "text": "OLARAK BİZİM",
+      "top": "OLARAK",
+      "bottom": "BİZİM",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 204,
+      "wordEnd": 205
+    },
+    {
+      "start": 80.7,
+      "end": 81.21,
+      "text": "BORSAMIZ",
+      "top": "",
+      "bottom": "BORSAMIZ",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 206,
+      "wordEnd": 206
+    },
+    {
+      "start": 81.24,
+      "end": 81.83,
+      "text": "YANSIYACAK.",
+      "top": "",
+      "bottom": "YANSIYACAK.",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 207,
+      "wordEnd": 207
+    },
+    {
+      "start": 81.86,
+      "end": 82.75,
+      "text": "ŞU ANDA TAKİP",
+      "top": "ŞU",
+      "bottom": "ANDA TAKİP",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 208,
+      "wordEnd": 210
+    },
+    {
+      "start": 82.78,
+      "end": 83.47,
+      "text": "ETMEMİZ GEREKEN",
+      "top": "ETMEMİZ",
+      "bottom": "GEREKEN",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 211,
+      "wordEnd": 212
+    },
+    {
+      "start": 83.5,
+      "end": 84.31,
+      "text": "SEVİYE 13,000",
+      "top": "SEVİYE",
+      "bottom": "13,000",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 213,
+      "wordEnd": 214
+    },
+    {
+      "start": 84.34,
+      "end": 84.91,
+      "text": "VE 13,100",
+      "top": "",
+      "bottom": "VE 13,100",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 215,
+      "wordEnd": 217
+    },
+    {
+      "start": 84.94,
+      "end": 85.59,
+      "text": "BANDI.",
+      "top": "",
+      "bottom": "BANDI.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 218,
+      "wordEnd": 219
+    },
+    {
+      "start": 85.62,
+      "end": 86.23,
+      "text": "BURADA GÜÇ",
+      "top": "BURADA",
+      "bottom": "GÜÇ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 220,
+      "wordEnd": 221
+    },
+    {
+      "start": 86.26,
+      "end": 86.89,
+      "text": "TOPLAMASINI",
+      "top": "",
+      "bottom": "TOPLAMASINI",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 222,
+      "wordEnd": 222
+    },
+    {
+      "start": 86.92,
+      "end": 87.45,
+      "text": "VE ARDINDAN",
+      "top": "VE",
+      "bottom": "ARDINDAN",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 223,
+      "wordEnd": 224
+    },
+    {
+      "start": 87.48,
+      "end": 88.15,
+      "text": "YUKARI DEVAM",
+      "top": "YUKARI",
+      "bottom": "DEVAM",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 225,
+      "wordEnd": 226
+    },
+    {
+      "start": 88.18,
+      "end": 88.97,
+      "text": "ETMESİNİ TAKİP",
+      "top": "ETMESİNİ",
+      "bottom": "TAKİP",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 227,
+      "wordEnd": 228
+    },
+    {
+      "start": 89.0,
+      "end": 89.69,
+      "text": "EDEceğiz FAKAT",
+      "top": "EDECEĞİZ",
+      "bottom": "FAKAT",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 229,
+      "wordEnd": 230
+    },
+    {
+      "start": 89.72,
+      "end": 90.61,
+      "text": "BU SEVİYEİNİN",
+      "top": "BU",
+      "bottom": "SEVİYEİNİN",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 231,
+      "wordEnd": 232
+    },
+    {
+      "start": 90.64,
+      "end": 91.13,
+      "text": "ALTINA BİR",
+      "top": "ALTINA",
+      "bottom": "BİR",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 233,
+      "wordEnd": 234
+    },
+    {
+      "start": 91.16,
+      "end": 92.21,
+      "text": "İNİŞ OLURSA",
+      "top": "İNİŞ",
+      "bottom": "OLURSA",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 235,
+      "wordEnd": 236
+    },
+    {
+      "start": 92.24,
+      "end": 93.15,
+      "text": "12,900'E",
+      "top": "",
+      "bottom": "12,900'E",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 237,
+      "wordEnd": 239
+    },
+    {
+      "start": 93.18,
+      "end": 93.77,
+      "text": "KADAR YENİ",
+      "top": "KADAR",
+      "bottom": "YENİ",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 240,
+      "wordEnd": 241
+    },
+    {
+      "start": 93.8,
+      "end": 94.25,
+      "text": "BİR DÜŞÜŞ",
+      "top": "BİR",
+      "bottom": "DÜŞÜŞ",
+      "tone": "sert",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 242,
+      "wordEnd": 243
+    },
+    {
+      "start": 94.26,
+      "end": 95.11,
+      "text": "KAPISI AÇILIR.",
+      "top": "KAPISI",
+      "bottom": "AÇILIR.",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 244,
+      "wordEnd": 245
+    },
+    {
+      "start": 95.44,
+      "end": 96.07,
+      "text": "ANLATTIKLARIM",
+      "top": "",
+      "bottom": "ANLATTIKLARIM",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 246,
+      "wordEnd": 246
+    },
+    {
+      "start": 96.1,
+      "end": 96.67,
+      "text": "KENDİ TAKİP",
+      "top": "KENDİ",
+      "bottom": "TAKİP",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 247,
+      "wordEnd": 248
+    },
+    {
+      "start": 96.7,
+      "end": 97.15,
+      "text": "SEVİYEm",
+      "top": "SEVİYEM",
+      "bottom": "SEVİYEM",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 249,
+      "wordEnd": 250
+    },
+    {
+      "start": 97.1,
+      "end": 97.67,
+      "text": "OLUp YATIRIM",
+      "top": "OLUP",
+      "bottom": "YATIRIM",
+      "tone": "yumusak",
+      "format": "A",
+      "account": "nihat",
+      "wordStart": 251,
+      "wordEnd": 252
+    },
+    {
+      "start": 97.7,
+      "end": 98.15,
+      "text": "TAVSİYESİ",
+      "top": "",
+      "bottom": "TAVSİYESİ",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 253,
+      "wordEnd": 253
+    },
+    {
+      "start": 98.14,
+      "end": 98.99,
+      "text": "İÇERMEMEKTEDİR.",
+      "top": "",
+      "bottom": "İÇERMEMEKTEDİR.",
+      "tone": "yumusak",
+      "format": "B",
+      "account": "nihat",
+      "wordStart": 254,
+      "wordEnd": 254
+    }
+  ],
+  "events": []
+}

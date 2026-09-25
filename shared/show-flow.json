@@ -15,15 +15,21 @@
     "cards": "transparent glass, never opaque black plates"
   },
   "density": {
-    "cards": "6-10 on ~2min",
+    "cards": "5-8 on ~2min — fewer, punchier cards, not a constant stream",
     "broll": "max 2 clips × 8s (Labs)",
     "punches": "3-5, hold 6-10s",
     "hero3d": "exactly 1 per video",
     "specialMoment": "at most 1 per video (drone|crash|mockup|split|scrub|stamp)"
   },
+  "cardPacing": {
+    "maxCardDurationSec": 3.0,
+    "openNoCardSec": 10.0,
+    "note": "User lock (2026-09): every card-host max 3.0s on screen (compress kicker/title/note to fit — punchier copy, not full transcript sentences). No card at all in the first 10s of the video (talking head plays clean, no hero exception). After that, cards land at spaced, roughly-even intervals tied to real transcript numbers — never back-to-back, never a wall of cards. Fewer total cards (see density.cards) beats more cards.",
+    "minGapBetweenCardsSec": 6.0
+  },
   "cardEnter": ["soft", "rise", "slide", "scale"],
   "cardExit": ["fade", "scale", "slide"],
-  "cardRule": "IG Reels motion: unique soft|rise|slide|scale; enter 0.42s expo.out + blur land; exit 0.38s; breathe only — no bounce/glitch",
+  "cardRule": "IG Reels motion: unique soft|rise|slide|scale; enter 0.42s expo.out; exit 0.38s; no CSS filter blur / no hold breathe (edit-safe scrub)",
   "proCards": {
     "enabled": true,
     "doc": "shared/PRO_CARDS.md",
@@ -38,10 +44,21 @@
       "number-wheel",
       "mk-callout-highlight",
       "lt-dark-card",
-      "lt-kicker-name"
+      "lt-kicker-name",
+      "mk-badge-stat",
+      "mk-widget-glow",
+      "mk-float-icon",
+      "mk-app-mockup",
+      "mk-mini-disclaimer"
     ],
     "forbid": ["liquid-glass-*", "caption-*", "full-screen VFX that covers face"],
-    "note": "Variety layer on top of locked glass kit — captions stay Montserrat social-hook"
+    "note": "Variety layer on top of locked glass kit — captions stay Montserrat social-hook",
+    "imageGen": {
+      "tool": "nanobanana MCP (.cursor/mcp.json → nanobanana, generate_image, free Google AI Studio key)",
+      "bgRemoveScript": "scripts/prep_icon_bg.py",
+      "assetsDir": "shared/registry/assets/",
+      "note": "2026-09: pexels/pixabay stock dropped (no finance/gold-themed footage). Nano Banana can't output native alpha — generate on solid green (#00FF00) bg, then prep_icon_bg.py chroma-keys it transparent. Used for mk-float-icon CONFIG.image only (show-locked shared assets, generated once per icon type)."
+    }
   },
   "captionKeywords": true,
   "slots": [
@@ -77,7 +94,9 @@
     "maxClips": 2,
     "dur": 8,
     "durLocked": true,
-    "prep": "User prepares exactly 8s clips from the spoken start sentence; agent only gives keyword + start time",
+    "prep": "Two paths (2026-09, updated: ZSky API/MCP needs paid Max plan, user declined — cancelled): (1) user drops 8s 9:16 clips in dashboard slots — Labs, manual; (2) user (or agent, if given the file) generates a free clip manually on the ZSky web app (zsky.ai, logged-in free tier, no API/MCP/subscription needed), downloads it, hands it to agent, agent extends 5s->8s with scripts/prep_zsky_broll.py (ping-pong loop). No automated agentFetch — this is a manual download step, same shape as Labs.",
+    "agentFetch": false,
+    "agentFetchPrepScript": "scripts/prep_zsky_broll.py",
     "pip": true,
     "pipSide": "left",
     "pipX": -350,
@@ -118,13 +137,17 @@
   "safeZone": {"left": 40, "right": 150, "top": 56, "cardBandBottom": 280, "faceTop": 300, "faceBottom": 1100, "bottom": 280, "cardMaxW": 880, "cardMaxH": 230},
   "videoGrade": {"legibilityOverlay": false},
   "researchBacklog": [
-    "special.drone pull-back once per video",
-    "special.crash zoom on warn word",
     "phone mockup frame component",
-    "split-tilt A vs B compare card",
     "chart scrub on one hero number",
-    "0.5s open hook slam",
-    "optional ducked bed A/B"
+    "optional ducked bed A/B",
+    "Lottie coin settle on hero only"
   ],
+  "tipExplainer": {
+    "enabled": true,
+    "timelineKey": "tipScenes",
+    "kinds": ["verdict", "stat", "branches", "nodes", "social"],
+    "circlePip": "clip-path circle on #video-wrap during scene",
+    "note": "Max 2. Prefer verdict|stat over fake @social cards. social only with @cetin.finans"
+  },
   "copyRule": "Only numbers and claims present in this video's transcript. Never reuse 0907 CDS/faiz text. Animation/look locked; copy is per-topic."
 }

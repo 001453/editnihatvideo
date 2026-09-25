@@ -21,26 +21,29 @@ def classify_tone(text):
     return "yumusak"
 
 
-def chunk_words(words, max_words=6, min_words=3):
-    """Bigger chunks → longer on-screen holds (speech-synced, not flashy)."""
-    chunks, cur = [], []
+def chunk_words(words, min_chars=10, max_words=5):
+    """KİLİT (2026-09, '10 harf' kuralı): blok KELİME sayısına göre değil KARAKTER
+    sayısına göre kapanır — en az MIN_CHARS harf birikince (cümle sonu beklemeden)
+    blok kapanır, MAX_WORDS'e ulaşınca da (harf yetmese bile) kapanır. Önceki
+    'min_words=10,max_words=16' sürümü cümle tamamlanana kadar bekliyordu — bu da
+    16 kelimeye varan dev altyazı blokları üretip caption kutusuna sığdırmak için
+    otomatik küçültmeyi (cap_line_scale + fitCapCutBlock) tetikliyor, altyazı
+    minicik/sıkışık görünüyordu (0923'te gözlemlendi). Bu sürüm 0922'nin doğru
+    davranışını (ort. ~2 kelime/blok, max 5) yeniden üretir — kısa, büyük, okunaklı
+    altyazı patlamaları."""
+    chunks, cur, cur_chars = [], [], 0
     for w in words:
         cur.append(w)
-        ends = bool(re.search(r"[.!?]$", w["text"]))
-        dur = float(cur[-1]["end"]) - float(cur[0]["start"])
-        if ends and len(cur) >= min_words:
+        cur_chars += len(w["text"]) + 1
+        if len(cur) >= max_words:
             chunks.append(cur)
-            cur = []
-        elif len(cur) >= max_words:
+            cur, cur_chars = [], 0
+        elif cur_chars >= min_chars:
             chunks.append(cur)
-            cur = []
-        elif ends and len(cur) < min_words:
-            continue
-        elif dur >= 2.4 and len(cur) >= min_words:
-            chunks.append(cur)
-            cur = []
+            cur, cur_chars = [], 0
     if cur:
-        if chunks and len(cur) < min_words:
+        # Kalan kuyruk tek kelimelik gibi çok kısaysa bir önceki gruba ekle
+        if chunks and len(cur) < 2:
             chunks[-1].extend(cur)
         else:
             chunks.append(cur)
@@ -48,7 +51,9 @@ def chunk_words(words, max_words=6, min_words=3):
 
 
 def split_top_bottom(ch):
-    """Always 2 lines — minimize longest line so punto stays near standard."""
+    """Kelimeleri iki satıra dengeli böl (üst + alt). build_engine.py zaten
+    balance_caption_lines() ile en iyi bölme noktasını yeniden hesaplıyor —
+    burada sadece makul bir başlangıç noktası veriyoruz."""
     n = len(ch)
     if n == 1:
         return "", caption_display(ch[0]["text"])
@@ -57,15 +62,9 @@ def split_top_bottom(ch):
             caption_display(ch[0]["text"]),
             caption_display(ch[1]["text"]),
         )
-    best_i, best_score = 1, None
-    for i in range(1, n):
-        a = " ".join(w["text"] for w in ch[:i])
-        b = " ".join(w["text"] for w in ch[i:])
-        score = max(len(a), len(b)) * 10 + abs(len(a) - len(b))
-        if best_score is None or score < best_score:
-            best_score, best_i = score, i
-    top = caption_display(" ".join(w["text"] for w in ch[:best_i]))
-    bottom = caption_display(" ".join(w["text"] for w in ch[best_i:]))
+    mid = max(1, n // 2)
+    top = caption_display(" ".join(w["text"] for w in ch[:mid]))
+    bottom = caption_display(" ".join(w["text"] for w in ch[mid:]))
     return top, bottom
 
 
@@ -99,13 +98,14 @@ def main():
             "wordStart": ch[0]["idx"],
             "wordEnd": ch[-1]["idx"],
         })
-    # Min hold ~2s so captions don't flash; stay speech-synced without overlap
-    MIN_HOLD, GAP = 2.05, 0.04
+    # Kısa kuyruk kartı için minimum tutuş; konuşma süresine bağlı kal
+    MIN_HOLD, GAP = 0.85, 0.03
     for i, c in enumerate(captions):
         target = c["start"] + MIN_HOLD
-        limit = (captions[i + 1]["start"] - GAP) if i + 1 < len(captions) else (float(words[-1]["end"]) + 0.4)
-        c["end"] = round(min(max(c["end"], target), max(c["start"] + 0.6, limit)), 3)
+        limit = (captions[i + 1]["start"] - GAP) if i + 1 < len(captions) else (float(words[-1]["end"]) + 0.35)
+        c["end"] = round(min(max(c["end"], target), max(c["start"] + 0.45, limit)), 3)
     duration = round(float(words[-1]["end"]) + 0.4, 3) if words else 0
+    # Punto büyütüldü (75 -> 90); uzun satırlar Studio'daki oto-sığdırma ile taşmadan küçülür
     project = {
         "version": 1,
         "account": args.account,
@@ -116,7 +116,7 @@ def main():
         "words": [{"start": w["start"], "end": w["end"], "text": w["text"]} for w in words],
         "layout": {
             "banner": {"x": 76, "y": 220, "w": 928, "h": 120},
-            "caption": {"x": 40, "y": 1208, "w": 1000, "h": 340, "fontSize": 58},
+            "caption": {"x": 40, "y": 1180, "w": 1000, "h": 380, "fontSize": 105},
         },
         "captions": captions,
         "events": [],

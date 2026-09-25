@@ -1,0 +1,193 @@
+<!-- hyperframes-registry-item: mk-badge-stat -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: transparent;
+        overflow: hidden;
+      }
+      #mk-bs-root {
+        --mk-bs-ink: #ffffff;
+        --mk-bs-ink-dim: #b9c0cc;
+        --mk-bs-bronze-1: #7a4a1f;
+        --mk-bs-bronze-2: #d99a4e;
+        --mk-bs-bronze-3: #fbe3ad;
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: transparent;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+      }
+      #mk-bs-group {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 26px;
+      }
+      #mk-bs-badge {
+        position: relative;
+        width: 128px;
+        height: 128px;
+        border-radius: 50%;
+        flex: none;
+        background: radial-gradient(
+          circle at 34% 28%,
+          var(--mk-bs-bronze-3) 0%,
+          var(--mk-bs-bronze-2) 42%,
+          var(--mk-bs-bronze-1) 100%
+        );
+        box-shadow:
+          0 14px 30px rgba(0, 0, 0, 0.45),
+          inset 0 3px 6px rgba(255, 255, 255, 0.55),
+          inset 0 -10px 18px rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #mk-bs-badge::after {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+      }
+      #mk-bs-num {
+        font-weight: 800;
+        font-size: 56px;
+        letter-spacing: -0.02em;
+        color: #3a2308;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+      }
+      #mk-bs-text {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      #mk-bs-label {
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: 0.02em;
+        color: var(--mk-bs-ink-dim);
+        text-transform: uppercase;
+      }
+      #mk-bs-value {
+        font-weight: 800;
+        font-size: 50px;
+        letter-spacing: -0.02em;
+        color: var(--mk-bs-ink);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      #mk-bs-caption {
+        font-weight: 500;
+        font-size: 26px;
+        color: var(--mk-bs-ink-dim);
+      }
+      #mk-bs-root.mk-bs-light #mk-bs-label,
+      #mk-bs-root.mk-bs-light #mk-bs-caption {
+        color: #6e6e73;
+      }
+      #mk-bs-root.mk-bs-light #mk-bs-value {
+        color: #1d1d1f;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="mk-bs-root"
+      data-composition-id="mk-badge-stat"
+      data-start="0"
+      data-duration="6"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div id="mk-bs-group">
+        <div id="mk-bs-badge"><span id="mk-bs-num">01</span></div>
+        <div id="mk-bs-text">
+          <div id="mk-bs-label"></div>
+          <div id="mk-bs-value">0</div>
+          <div id="mk-bs-caption"></div>
+        </div>
+      </div>
+      <div
+        id="mk-bs-drv"
+        class="clip"
+        data-start="0"
+        data-duration="6"
+        data-track-index="0"
+        style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+      ></div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+
+        /* ---- published parameters (inspector-style CONFIG) ----
+           A bronze/gold 3D numbered badge next to a stat — for a
+           "beat N" style callout (e.g. "02 · 130 TON merkez bankasi
+           alimi"). Inspired by numbered highlight cards. */
+        var CONFIG = {
+          scheme: "dark", // "light" | "dark"
+          number: "01",
+          label: "BAŞLIK",
+          value: "0", // free text (e.g. a year, a range, a short stat)
+          caption: "",
+          x: 1300, // group left edge; null = centered
+          y: 250, // group top edge; null = centered
+          animationIn: true,
+          animationOut: true,
+        };
+
+        var DUR = 6;
+        var root = document.getElementById("mk-bs-root");
+        var group = document.getElementById("mk-bs-group");
+        var badge = document.getElementById("mk-bs-badge");
+        var num = document.getElementById("mk-bs-num");
+        var valueEl = document.getElementById("mk-bs-value");
+
+        if (CONFIG.scheme === "light") root.classList.add("mk-bs-light");
+        num.textContent = CONFIG.number;
+        document.getElementById("mk-bs-label").textContent = CONFIG.label;
+        document.getElementById("mk-bs-caption").textContent = CONFIG.caption;
+        valueEl.textContent = CONFIG.value;
+
+        var rect = group.getBoundingClientRect();
+        group.style.left =
+          (CONFIG.x === null ? Math.round((1920 - rect.width) / 2) : CONFIG.x) + "px";
+        group.style.top =
+          (CONFIG.y === null ? Math.round((1080 - rect.height) / 2) : CONFIG.y) + "px";
+
+        var tl = gsap.timeline({ paused: true });
+
+        if (CONFIG.animationIn) {
+          gsap.set(group, { opacity: 0, x: -24 });
+          gsap.set(badge, { scale: 0.4, rotate: -18 });
+          tl.to(group, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 0.2);
+          tl.to(
+            badge,
+            { scale: 1, rotate: 0, duration: 0.6, ease: "back.out(2.2)" },
+            0.2,
+          );
+        }
+
+        if (CONFIG.animationOut) {
+          tl.to(group, { opacity: 0, x: 18, duration: 0.35, ease: "power2.in" }, DUR - 0.5);
+        }
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+
+        window.__timelines["mk-badge-stat"] = tl;
+      })();
+    </script>
+  </body>
+</html>

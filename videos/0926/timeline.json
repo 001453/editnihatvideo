@@ -1,0 +1,50 @@
+{
+  "broll": [
+    {
+      "id": "kurumsal-yatirimci",
+      "file": "broll/kurumsal-yatirimci.mp4",
+      "start": 24.0,
+      "dur": 8.0,
+      "keyword": "KURUMSAL YATIRIMCI GÜMÜŞ",
+      "hint": "Trading/yatırım ofisi görüntüsü — 1400+ kurum pozisyon teması (~24-32s)"
+    },
+    {
+      "id": "maden-uretim",
+      "file": "broll/maden-uretim.mp4",
+      "start": 51.0,
+      "dur": 8.0,
+      "keyword": "MADEN OCAK GÜMÜŞ ÜRETİM",
+      "hint": "Sanayi/maden üretim görüntüsü — bakır/çinko yan ürünü teması (~51-59s)"
+    }
+  ],
+  "punches": [
+    [4.0, 7.0, 1.12],
+    [34.5, 7.0, 1.14],
+    [61.0, 6.5, 1.16],
+    [69.0, 6.0, 1.12]
+  ],
+  "hero": {
+    "id": "card-hedef150",
+    "at": 10.3
+  },
+  "special": {
+    "type": "drone",
+    "at": 10.3,
+    "dur": 1.4
+  },
+  "igBanner": [
+    {
+      "id": "mid",
+      "start": 41.0,
+      "dur": 4.5
+    },
+    {
+      "id": "end",
+      "start": 74.56,
+      "dur": 4.5
+    }
+  ],
+  "cardSfx": [],
+  "proCards": [],
+  "brollPending": true
+}

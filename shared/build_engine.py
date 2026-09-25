@@ -43,7 +43,12 @@ cap["fontSize"] = int(cap.get("fontSize") if cap.get("fontSize") is not None els
 cap["h"] = max(int(cap["h"]), 400)
 # serbest konum — tek layout.caption (ok tuşları); Studio tek tek sürükleme yok
 cap["x"] = max(0, min(int(cap["x"]), 1000))
-cap["y"] = max(0, min(int(cap["y"]), 1850))
+# KİLİT (2026-09, düzeltme): eski sabit "y<=1850" sınırı kutu YÜKSEKLİĞİNİ
+# (min 400px) hesaba katmıyordu — y=1628+h=400=2028, 1920px'lik kanvasın
+# 108px altına taşıyor, altyazı ekranın dışına/oynatıcı kontrollerinin
+# altına kayıyordu ("sonraki videoda da böyle olmuş" — 0923'te gözlemlendi).
+# Şimdi üst sınır kutunun kanvas içinde tam sığacağı noktaya göre hesaplanıyor.
+cap["y"] = max(0, min(int(cap["y"]), 1920 - cap["h"]))
 cap["w"] = max(480, min(int(cap["w"]), 1080 - cap["x"] - 40))
 
 BROLL = list(timeline.get("broll") or [])
@@ -417,26 +422,49 @@ def fit_caption_line(text, soft_max=22):
 
 
 def caption_layout_for(c):
-    """Tek ortak kutu — layout.caption. Per-caption Studio sürükleme yok (kasmasın)."""
-    cx = int(cap["x"])
-    cy = int(cap["y"])
-    cw = int(cap["w"])
-    ch = int(cap["h"])
-    fs = int(cap["fontSize"])
-    sc = float(cap.get("scale") or 1)
+    """Varsayılan: tek ortak kutu — layout.caption (Studio sürükleme yok, kasmasın).
+    KİLİT (2026-09, kilit/kilit-aç): kullanıcı /captions sayfasında kilidi açıp bir
+    satırı tek tek taşırsa, o satırın project.json'daki captions[i].x/y alanı set
+    edilir — burada o override varsa ortak kutu yerine ONU kullanırız. Override
+    yoksa (varsayılan/kilitli durum) davranış eskisiyle birebir aynı."""
+    has_override = isinstance(c, dict) and c.get("x") is not None and c.get("y") is not None
+    cx = int(c["x"]) if has_override else int(cap["x"])
+    cy = int(c["y"]) if has_override else int(cap["y"])
+    cw = int(c["w"]) if (has_override and c.get("w") is not None) else int(cap["w"])
+    ch = int(c["h"]) if (has_override and c.get("h") is not None) else int(cap["h"])
+    fs = int(c["fontSize"]) if (has_override and c.get("fontSize") is not None) else int(cap["fontSize"])
+    sc = float(c["scale"]) if (has_override and c.get("scale") is not None) else float(cap.get("scale") or 1)
     cw = max(480, min(int(cw), 1000))
     cx = max(0, min(int(cx), 1080 - cw - 40))
-    cy = max(0, min(int(cy), 1850))
     ch = max(ch, 400)
+    # KİLİT (2026-09, düzeltme): eski sabit "cy<=1850" sınırı kutu yüksekliğini
+    # hesaba katmıyordu — kutu kanvasın (1920px) altından taşabiliyordu. Artık
+    # kutunun tam kanvas içinde sığacağı noktaya göre sınırlanıyor.
+    # KİLİT (2026-09, elle taşıma): metin kutunun İÇİNDE ortalanıyor (justify-
+    # content:center) — kutunun tam boyu kadar pay bırakmak gereksiz, metnin
+    # kendisi kutunun ortasında, alt/üstte boşluk var. Kullanıcı /captions veya
+    # Stüdyoda ELLE bir satırı taşıyıp bıraktıysa (override var) "bıraktığın yerde
+    # kalsın" ilkesiyle daha fazla alan tanınır; ortak/varsayılan konum için eski
+    # sıkı sınır aynen korunur (dokunulmamış yüzlerce satırı riske atmasın).
+    cy_max = (min(1920 - ch + 140, 1920 - 40)) if has_override else (1920 - ch)
+    cy = max(0, min(int(cy), cy_max))
     return cx, cy, cw, ch, fs, sc
 
 
 def caption_items():
     parts = []
+    _card_wins = card_windows()
     for i, c in enumerate(captions):
         start = float(c["start"])
         end = min(float(c["end"]), DUR)
         dur = max(0.2, end - start)
+        # KİLİT (2026-09, düzeltme): kart ekrandayken (kendi konusunu zaten
+        # anlatıyorken) aynı süreye denk gelen altyazıyı tekrar basma — kart o
+        # süreyi "yutmuş" sayılır. SIFIR çakışma garantisi: ortanca nokta değil,
+        # herhangi bir kesişim varsa (kısmi bile olsa) altyazı tamamen atlanır —
+        # kart açıkken altyazı asla yarım/kısmi görünmesin.
+        if any(start < ce and end > cs for cs, ce in _card_wins):
+            continue
         tone = "fixed" if ACCOUNT == "mehmet" else (c.get("tone") or "yumusak")
         accent = TONE_ACCENT.get(tone, "#FACC15")
         anim = CAP_ANIMS[i % len(CAP_ANIMS)]
@@ -459,7 +487,13 @@ def caption_items():
         line_scale = cap_line_scale(len(longest), len(longest.split()) if longest else 1)
         cid = f"cap-{i:03d}"
         cx, cy, cw, ch, fs, sc = caption_layout_for(c)
-        top_style = f' style="--lineScale:{line_scale:.2f}"' if top_html else ""
+        # KİLİT (2026-09, Ş düzeltmesi): Anton fontunun Ş/ş glifi normalden çok
+        # uzun bir kuyruk (cedilla) ile çiziliyor — üst satırda Ş/ş geçiyorsa bu
+        # kuyruk alt satırla çakışabiliyor (görsel bindirme). Üst satırda Ş/ş
+        # varsa ekstra alt boşluk bırakılır; başka hiçbir satırı etkilemez.
+        top_needs_gap = top_html and ("Ş" in top or "ş" in top)
+        top_extra = ";margin-bottom:50px" if top_needs_gap else ""
+        top_style = f' style="--lineScale:{line_scale:.2f}{top_extra}"' if top_html else ""
         bot_style = f' style="--lineScale:{line_scale:.2f}"'
         # Her altyazı ayrı clip — host'ta transform YOK (Studio left/top anlık)
         parts.append(
@@ -704,9 +738,18 @@ def sync_cards_from_index():
             left = left + props["x"]
         if top is not None and "y" in props:
             top = top + props["y"]
-            # face-safe band for upper cards (disclaimer bottom OK)
-            if top < 1400:
-                top = max(40, min(320, top))
+            # KİLİT (2026-09): "face-safe band" oto-sıkıştırması kaldırıldı. Eskiden
+            # disclaimer dışındaki her kart top<1400 ise zorla 40-320px bandına
+            # geri çekiliyordu ("yüzü kapatmasın" varsayımıyla) — ama bu sabit bant
+            # bazı videolarda tam sunucunun kafasının olduğu yerdi, yani kullanıcı
+            # kartı Studio'da elle gövdeye (aşağı) çekse bile rebuild'de sessizce
+            # kafaya geri itiliyordu. Artık kullanıcının Studio'da bıraktığı konum
+            # (gsap x/y dahil) nihai kabul edilir — captions.html'deki "elle
+            # ayarla, bırak, o konum doğru kabul edilsin" ilkesiyle aynı. Sadece
+            # kartın kanvas dışına (üstten/alttan) taşmasını önlüyoruz.
+            CANVAS_H = 1920.0
+            max_top = CANVAS_H - (h if h is not None else 0.0)
+            top = max(0.0, min(top, max_top))
         style_vals = {}
         if left is not None and left != _style_px(c_style, "left"):
             style_vals["left"] = left
@@ -783,8 +826,13 @@ def sync_caption_layout_from_index():
         # gsap y negatif = yukarı — layout.caption top'a ekle
         new_y = base_y + dy
 
-    new_x = int(round(max(0, min(200, new_x))))
-    new_y = int(round(max(980, min(1550, new_y))))
+    # KİLİT (2026-09, düzeltme): eski sabit sınırlar (x<=200, y 980-1550) hem
+    # dar hem kutu yüksekliğini hesaba katmıyordu. Artık x/y kanvasa (1080x1920)
+    # göre, kutunun gerçek yüksekliğiyle (min 400px) sığacağı şekilde sınırlanıyor
+    # — /captions sayfası ve build_engine.py'nin geri kalanıyla aynı kural.
+    cap_h = max(int(cap.get("h") or 400), 400)
+    new_x = int(round(max(0, min(1000, new_x))))
+    new_y = int(round(max(0, min(1920 - cap_h, new_y))))
     old = (int(cap.get("x", 0)), int(cap.get("y", 0)))
     if old == (new_x, new_y) and not xs and not ys:
         return 0
@@ -799,16 +847,18 @@ def sync_caption_layout_from_index():
     return 1
 
 
-# KİLİT (2026-09): otomatik çalıştırma kapatıldı. SHOW_STANDARD.md "Studio'da altyazı
-# sürükleme yasak" der; ama bu fonksiyon her build'de index.html'deki (Studio'nun kendi
-# runtime'ının bıraktığı) eski gsap/host stilini "kullanıcı Studio'da taşıdı" sanıp
-# project.json -> layout.caption'ı sessizce eziyordu — /captions sayfasından yapılan
-# ayarın rebuild sonrası kaybolmasının asıl sebebi buydu. Tek doğru kaynak artık
-# project.json -> layout.caption (dashboard /captions + /api/caption-pos).
-# sync_caption_layout_from_index()
+# KİLİT (2026-09, düzeltme): eskiden HER build'de (normal rebuild dahil)
+# otomatik çalışıyordu — bu da index.html'deki (Studio'nun eski/kalıntı
+# oturumundan kalma) bayat gsap/host stilini "kullanıcı az önce taşıdı" sanıp
+# project.json -> layout.caption'ı sessizce eziyordu (dashboard /captions'tan
+# yapılan ayar rebuild sonrası kayboluyordu). O yüzden tamamen kapatılmıştı.
+# Artık SADECE kullanıcı Stüdyo'da bir altyazı kutusuna tıklayıp açık açık
+# "Şeritten/konumu al" dediğinde (NIHAT_SYNC_ONLY hızlı-yol) çalışıyor — normal
+# rebuild'lerde asla tetiklenmiyor, eski riskin kaynağı ortadan kalktı.
 
 # Hizli edit: sadece Studio → cards/layout sync, full HTML rewrite yok
 if os.environ.get("NIHAT_SYNC_ONLY") == "1":
+    sync_caption_layout_from_index()
     print("sync-only OK", flush=True)
     raise SystemExit(0)
 
@@ -948,6 +998,29 @@ def card_blocks():
         re.S,
     ):
         out.append((m.group(1), float(m.group(2)), m.group(3)[:1200]))
+    return out
+
+
+CARD_MAX_DUR = 5.0  # KİLİT (2026-09): kart ekranda en fazla 5sn kalsın
+
+
+def card_windows():
+    """Her kart-host için (start, end) aralığı — süre CARD_MAX_DUR ile sınırlı.
+    Altyazıların kartla çakışmaması (aynı anda ikisi de aynı şeyi anlatmasın)
+    için caption_items() burayı kullanır."""
+    out = []
+    for m in re.finditer(
+        r'<div[^>]*class="card-host[^"]*"[^>]*id="(card-[^"]+-host)"[^>]*>',
+        cards_html,
+    ):
+        tag = m.group(0)
+        sm = re.search(r'data-start="([0-9.]+)"', tag)
+        dm = re.search(r'data-duration="([0-9.]+)"', tag)
+        if not sm:
+            continue
+        start = float(sm.group(1))
+        dur = min(float(dm.group(1)) if dm else 4.0, CARD_MAX_DUR)
+        out.append((start, start + dur))
     return out
 
 
@@ -1093,15 +1166,40 @@ for b in BROLL:
     s = b["start"]
     e = b["start"] + b["dur"]
     cam = f"#broll-{b['id']}-cam"
-    # Whip in/out: lateral blur-ish motion + PIP settle left
+    # Whip in/out: lateral blur-ish motion + PIP settle top-left, framed
+    # (KİLİT 2026-09, kullanıcı geri bildirimi #1: eski sol-orta offset x:-350,y:-20
+    # çerçevesiz olduğu için broll'un arkasında "kayboluyor" gibi duruyordu.
+    # KİLİT 2026-09, kullanıcı geri bildirimi #2: sağ tarafta platformun (IG/TikTok)
+    # beğeni/yorum/paylaş ikon şeridi olduğu için PIP sağda OLAMAZ — sol tarafta
+    # kalmalı (show standardındaki "PIP sol" kuralına geri dönüldü), sadece altyazı
+    # bandının üstüne, üst-sol köşeye çekildi. PIP artık üst-sol köşede, beyaz
+    # kenarlık + gölgeyle net bir "kart" olarak ayrışıyor. Ölçek (0.30) DEĞİŞMEDİ —
+    # broll'un görünür alanı küçülmüyor, sadece yüz kutusu farklı/daha net bir yere
+    # taşınıyor.)
     broll_js.append(f'''
           tl.fromTo("{cam}",{{opacity:0,x:100,scale:1.08}},{{opacity:1,x:0,scale:1,duration:0.42,ease:"expo.out",immediateRender:false}}, {s});
           tl.to("{cam}",{{opacity:0,x:-72,scale:1.04,duration:0.36,ease:"power2.in"}}, {e - 0.36:.2f});
-          tl.fromTo("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0}},{{scale:0.30,x:-350,y:-20,borderRadius:"36px",rotation:-1.0,duration:0.42,ease:"power3.inOut",immediateRender:false}}, {s});
+          tl.fromTo("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,boxShadow:"0 0 0 0 rgba(255,255,255,0)"}},{{scale:0.30,x:-338,y:-632,borderRadius:"36px",rotation:-1.0,boxShadow:"0 0 0 4px rgba(255,255,255,.85), 0 18px 40px rgba(0,0,0,.45)",duration:0.42,ease:"power3.inOut",immediateRender:false}}, {s});
           tl.to("#video-wrap",{{rotation:0,duration:0.22,ease:"power1.out"}}, {s + 0.42:.2f});
-          tl.to("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,duration:0.42,ease:"power3.inOut"}}, {e - 0.42:.2f});
+          tl.to("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,boxShadow:"0 0 0 0 rgba(255,255,255,0)",duration:0.42,ease:"power3.inOut"}}, {e - 0.42:.2f});
 ''')
 broll_js_txt = "".join(broll_js)
+
+# KİLİT (2026-09): #video-cam punch (kamera yakınlaştırma) sırasında transform-origin
+# (50% 38%) altında kalan her nokta (çene/yaka dahil) aşağı doğru İTİLİYOR — sabit
+# pozisyondaki altyazı kutusu bu sırada çeneye/yakaya çok yaklaşıyor/biniyor
+# ("kamera zoom out olunca altyazı üstte kalıyor" — aslında punch/zoom-in anında
+# altyazı çeneye biniyor). Punch süresince altyazı katmanını aynı miktarda YUKARI
+# kaydırarak (video-cam'in ittiği kadar) telafi ediyoruz — böylece boşluk sabit kalır.
+CAP_ORIGIN_Y = 0.38 * 1920.0  # #video-cam transform-origin: 50% 38%
+CAP_DEPTH = float(cap["y"]) - CAP_ORIGIN_Y  # altyazı kutusu bu orijinin ne kadar aşağısında
+
+# KİLİT (2026-09, manuel yakın/punch konumu): kullanıcı /captions panelinden
+# punch anındaki ("yakın") altyazı konumunu elle ayarlayabilir. cap["yPunch"]
+# doluysa yukarıdaki otomatik ölçek-bağımlı telafi formülü yerine SABİT bir
+# shift kullanılır (yPunch - normal y farkı); boşsa eskisi gibi otomatik çalışır.
+_y_punch = cap.get("yPunch")
+CAP_MANUAL_SHIFT = (float(_y_punch) - float(cap["y"])) if _y_punch is not None else None
 
 punch_js_lines = []
 for punch in PUNCHES:
@@ -1109,6 +1207,7 @@ for punch in PUNCHES:
     hold = float(punch[1]) if len(punch) > 1 else 7.0
     scale = float(punch[2]) if len(punch) > 2 else 1.12
     punch_js_lines.append(f"          punchHold({t}, {hold}, {scale});")
+    punch_js_lines.append(f"          punchCaptionCompensate({t}, {hold}, {scale});")
 punch_js = "\n".join(punch_js_lines)
 
 hero_id = (HERO.get("id") or "").strip()
@@ -1183,6 +1282,18 @@ js = f'''
             tl.to(cam, {{scale:sc, duration:0.34, ease:"power3.out", immediateRender:false}}, t);
             tl.to(cam, {{scale:1, duration:0.55, ease:"power2.inOut"}}, t+hold);
           }}
+          var CAP_DEPTH = {CAP_DEPTH:.2f};
+          var CAP_MANUAL_SHIFT = {('null' if CAP_MANUAL_SHIFT is None else f'{CAP_MANUAL_SHIFT:.2f}')};
+          function punchCaptionCompensate(t, hold, scale){{
+            // KİLİT (2026-09): punch sırasında #video-cam'in ittiği çene/yaka kadar
+            // altyazı katmanını yukarı kaydır — böylece altyazı çeneye binmesin.
+            // CAP_MANUAL_SHIFT set edilmişse (kullanıcı /captions panelinden yakın
+            // konumu elle ayarladıysa) otomatik formül yerine o sabit değer kullanılır.
+            var sc = Math.min(scale || 1.12, 1.14);
+            var shift = (CAP_MANUAL_SHIFT != null) ? CAP_MANUAL_SHIFT : -(CAP_DEPTH * (sc - 1));
+            tl.to("#caption-layer", {{y:shift, duration:0.34, ease:"power3.out", immediateRender:false}}, t);
+            tl.to("#caption-layer", {{y:0, duration:0.55, ease:"power2.inOut"}}, t+hold);
+          }}
           /* Instagram Reels motion lock (AI Video Studio tokens):
              enter ~0.42s expo.out, exit ~0.38s, soft land — no bounce/glitch. */
           var EASE_IN = "expo.out";
@@ -1204,7 +1315,7 @@ js = f'''
             if(mode === "glitch" || mode === "slam" || mode === "snap" || mode === "zoom") return "rise";
             if(mode === "tilt" || mode === "flip" || mode === "fold" || mode === "drift") return "slide";
             if(mode === "wipe" || mode === "pop" || mode === "zoom") return "scale";
-            if(mode === "soft" || mode === "rise" || mode === "slide" || mode === "scale") return mode;
+            if(mode === "soft" || mode === "rise" || mode === "slide" || mode === "scale" || mode === "punch" || mode === "drop" || mode === "flip3d") return mode;
             return "soft";
           }}
           var ENTER_POOL = ["soft","rise","slide","scale"];
@@ -1267,6 +1378,25 @@ js = f'''
             }} else if(mode === "scale"){{
               from = {{opacity:0,scale:0.92,y:8}};
               to = {{opacity:1,scale:1,y:0,duration:ENTER_SEC,ease:EASE_IN,immediateRender:false}};
+            }} else if(mode === "punch"){{
+              /* motion-graphics "scale_punch": enerjik, hafif zıplayan giriş —
+                 vurgulamak istediğin önemli bir kart için (ör. büyük rakam). */
+              from = {{opacity:0,scale:0.55,y:6}};
+              to = {{opacity:1,scale:1,y:0,duration:ENTER_SEC+0.08,ease:"back.out(2.2)",immediateRender:false}};
+            }} else if(mode === "drop"){{
+              /* motion-graphics "slam" (hafifletilmiş): yukarıdan net bir
+                 iniş — kısa, kararlı bir duyuru hissi. Blur filtre YOK
+                 (exitCard'daki nottaki gibi Stüdyo'da scrub kasmasına yol
+                 açabiliyor), sadece transform — düzenleme akışını bozmaz. */
+              from = {{opacity:0,y:-46,scale:1.02}};
+              to = {{opacity:1,y:0,scale:1,duration:ENTER_SEC+0.06,ease:"power4.out",immediateRender:false}};
+            }} else if(mode === "flip3d"){{
+              /* motion-graphics "3D kart çevirme": kartın kendi ekseninde hızlı
+                 bir çeyrek dönüşle sahneye girmesi — punch/drop'tan farklı,
+                 daha "profesyonel" motion-graphics hissi veren yeni bir giriş
+                 seçeneği (opt-in, sadece data-enter="flip3d" ile). */
+              from = {{opacity:0,rotateY:-78,scale:0.94}};
+              to = {{opacity:1,rotateY:0,scale:1,duration:ENTER_SEC+0.10,ease:"power3.out",immediateRender:false}};
             }} else {{
               from = {{opacity:0,y:12,scale:0.98}};
               to = {{opacity:1,y:0,scale:1,duration:ENTER_SEC,ease:EASE_IN,immediateRender:false}};
@@ -1286,6 +1416,12 @@ js = f'''
             }}
             if(warn){{
               tl.fromTo(warn,{{opacity:0,scale:0.9}},{{opacity:1,scale:1,duration:0.32,ease:EASE_IN,immediateRender:false}}, t+0.14);
+            }}
+            var numBadge = host.querySelector(".num-badge");
+            if(numBadge){{
+              /* KİLİT (2026-09): sayı rozeti — warn-badge ile aynı ritimde,
+                 hafif geç ve küçük bir "pop" ile beliriyor. */
+              tl.fromTo(numBadge,{{opacity:0,scale:0.7,rotate:-12}},{{opacity:1,scale:1,rotate:0,duration:0.36,ease:"back.out(2.0)",immediateRender:false}}, t+0.16);
             }}
             host.querySelectorAll(".kicker,.title,.q,.note,.chapter,.lvl,.chip").forEach(function(el){{
               if(!el.hasAttribute("data-at")) return;
@@ -1343,7 +1479,7 @@ js = f'''
           var cardIdx = 0;
           document.querySelectorAll(".card-host").forEach(function(host){{
             var t = parseFloat(host.getAttribute("data-start")) || 0;
-            var dur = parseFloat(host.getAttribute("data-duration")) || 4;
+            var dur = Math.min(parseFloat(host.getAttribute("data-duration")) || 4, 5);
             var fx = host.querySelector(".card-fx");
             if(fx && fx.id){{
               var mode = uniqueEnter(host, cardIdx++);
@@ -1353,6 +1489,7 @@ js = f'''
             }} else {{
               var ban = host.querySelector(".banner");
               if(ban && ban.id){{
+                tl.set("#"+ban.id,{{opacity:0,y:18,scale:0.98}}, 0);
                 tl.fromTo("#"+ban.id,{{opacity:0,y:18,scale:0.98}},{{opacity:1,y:0,scale:1,duration:0.36,ease:"power3.out",immediateRender:false}}, t);
               }}
             }}
@@ -1378,6 +1515,13 @@ js = f'''
             countNum(el, t, end, dur, decimals);
             if(el.hasAttribute("data-scale-in")){{
               tl.fromTo(el,{{scale:0.78}},{{scale:1,duration:dur,ease:"power2.out",immediateRender:false}}, t);
+              /* İniş parlaması (motion-graphics "glow" primitivi): sayı yerine
+                 oturduğu anda kısa bir ışıma — "değer -> anlam" beatini
+                 görsel olarak imzalar, abartıya kaçmadan (~0.2sn, bir kez). */
+              tl.to(el,{{
+                textShadow:"0 0 42px rgba(90,176,255,.85), 0 8px 24px rgba(90,176,255,.35)",
+                duration:0.22, ease:"sine.out", yoyo:true, repeat:1, immediateRender:false
+              }}, t + dur);
             }}
           }});
           document.querySelectorAll("path[data-draw]").forEach(function(path){{
@@ -1402,20 +1546,21 @@ js = f'''
             if (new URLSearchParams(location.search).get("edit") === "0") return;
           }} catch (e) {{}}
           var VID = {json.dumps(ROOT.name)};
+          var dockMode = "card";
           var dock = document.createElement("div");
           dock.id = "card-timing-dock";
           dock.innerHTML = ''
             + '<div class="ctd-row">'
             + '<b id="ctd-name">kart</b>'
-            + '<label>Başlangıç (sn) <input id="ctd-start" type="number" step="0.05" min="0"></label>'
-            + '<label>Süre (sn) <input id="ctd-dur" type="number" step="0.05" min="0.2"></label>'
-            + '<button type="button" id="ctd-m05" title="Yarım saniye kısalt">−0.5 sn</button>'
-            + '<button type="button" id="ctd-p05" title="Yarım saniye uzat">+0.5 sn</button>'
-            + '<button type="button" id="ctd-save">Kaydet ve gör</button>'
-            + '<button type="button" id="ctd-sync" title="Alttaki şeritte değiştirdiğin süreleri yaz">Şeritten al</button>'
-            + '<button type="button" id="ctd-del">Kartı sil</button>'
+            + '<button type="button" id="ctd-sync" title="Sürükleyip bıraktığın yeri kalıcı kaydeder">📍 Konumu Kaydet</button>'
+            + '<label class="ctd-cardonly">Başlangıç (sn) <input id="ctd-start" type="number" step="0.05" min="0"></label>'
+            + '<label class="ctd-cardonly">Süre (sn) <input id="ctd-dur" type="number" step="0.05" min="0.2"></label>'
+            + '<button type="button" id="ctd-m05" class="ctd-cardonly" title="Yarım saniye kısalt">−0.5 sn</button>'
+            + '<button type="button" id="ctd-p05" class="ctd-cardonly" title="Yarım saniye uzat">+0.5 sn</button>'
+            + '<button type="button" id="ctd-save" class="ctd-cardonly">Kaydet ve gör</button>'
+            + '<button type="button" id="ctd-del" class="ctd-cardonly">Kartı sil</button>'
             + '<button type="button" id="ctd-x">Kapat</button>'
-            + '</div><div class="ctd-msg" id="ctd-msg">Karta tıkla → süreyi ayarla → Kaydet ve gör. Uzun bekleme yok.</div>';
+            + '</div><div class="ctd-msg" id="ctd-msg">Kartı sürükle → bıraktığında yeşil "📍 Konumu Kaydet" butonuna bas.</div>';
           var st = document.createElement("style");
           st.textContent = "#card-timing-dock{{position:fixed;left:0;right:0;bottom:0;z-index:99999;display:none;padding:14px 16px 18px;background:rgba(10,12,16,.94);border-top:1px solid rgba(226,184,74,.45);font-family:Segoe UI,system-ui,sans-serif;color:#f2f0ea}}" +
             "#card-timing-dock .ctd-row{{display:flex;flex-wrap:wrap;gap:10px;align-items:center}}" +
@@ -1424,8 +1569,11 @@ js = f'''
             "#card-timing-dock button{{padding:10px 12px;border-radius:10px;border:1px solid #2a2f3a;background:#1a1e28;color:#fff;cursor:pointer;font-weight:650}}" +
             "#card-timing-dock #ctd-save{{background:linear-gradient(180deg,#f0d06a,#c99620);color:#1a1406;border-color:#e2b84a}}" +
             "#card-timing-dock #ctd-del{{background:#3a1515;border-color:#ff5c5c;color:#ffb4b4}}" +
+            "#card-timing-dock #ctd-sync{{background:linear-gradient(180deg,#5fe08a,#1f9e52);color:#04220f;border-color:#3fce74;" +
+              "font-size:15px;padding:12px 18px;box-shadow:0 0 0 rgba(63,206,116,.55);animation:ctdSyncPulse 1.8s ease-in-out infinite}}" +
+            "@keyframes ctdSyncPulse{{0%,100%{{box-shadow:0 0 0 rgba(63,206,116,.55)}}50%{{box-shadow:0 0 14px 4px rgba(63,206,116,.55)}}}}" +
             "#card-timing-dock .ctd-msg{{margin-top:8px;font-size:12px;color:#9a9aaa}}" +
-            ".card-host.ctd-on{{outline:2px solid #e2b84a;outline-offset:2px}}";
+            ".card-host.ctd-on, .cap-host.ctd-on{{outline:2px solid #e2b84a;outline-offset:2px}}";
           document.head.appendChild(st);
           document.body.appendChild(dock);
           var cur = null;
@@ -1444,27 +1592,35 @@ js = f'''
           }}
           function show(host){{
             cur = host;
-            document.querySelectorAll(".card-host.ctd-on").forEach(function(h){{ h.classList.remove("ctd-on"); }});
+            document.querySelectorAll(".ctd-on").forEach(function(h){{ h.classList.remove("ctd-on"); }});
             host.classList.add("ctd-on");
-            document.getElementById("ctd-name").textContent = host.getAttribute("data-card-id") || host.id;
-            readIntoInputs(host);
-            watch(host);
-            document.getElementById("ctd-msg").textContent = "±0.5 sn veya kutuya yaz → Kaydet ve gör. Şerit kenarı = süre, ortası = başlangıç.";
+            var isCap = host.classList.contains("cap-host");
+            dockMode = isCap ? "cap" : "card";
+            dock.querySelectorAll(".ctd-cardonly").forEach(function(el){{ el.style.display = isCap ? "none" : ""; }});
+            if(isCap){{
+              document.getElementById("ctd-name").textContent = "Altyazı";
+              document.getElementById("ctd-msg").textContent = "Altyazıda sürüklediğin yer birkaç saniyede kendiliğinden kaydediliyor (sol altta 'kaydedildi' görürsün). Hemen kesinleştirmek istersen yeşil 📍 Konumu Kaydet butonuna bas.";
+            }} else {{
+              document.getElementById("ctd-name").textContent = host.getAttribute("data-card-id") || host.id;
+              readIntoInputs(host);
+              watch(host);
+              document.getElementById("ctd-msg").textContent = "Kartı sürükleyip bıraktıktan sonra yeşil 📍 Konumu Kaydet butonuna bas — otomatik kaydetmiyor. Süre için: ±0.5 sn veya kutuya yaz → Kaydet ve gör.";
+            }}
             dock.style.display = "block";
           }}
           function hide(){{
             dock.style.display = "none";
-            document.querySelectorAll(".card-host.ctd-on").forEach(function(h){{ h.classList.remove("ctd-on"); }});
+            document.querySelectorAll(".ctd-on").forEach(function(h){{ h.classList.remove("ctd-on"); }});
             if(obs){{ try{{ obs.disconnect(); }}catch(e){{}} obs = null; }}
             cur = null;
           }}
           document.addEventListener("click", function(ev){{
-            var host = ev.target && ev.target.closest && ev.target.closest(".card-host");
+            var host = ev.target && ev.target.closest && ev.target.closest(".card-host, .cap-host");
             if(host){{ show(host); return; }}
             if(dock.style.display === "block" && !dock.contains(ev.target)) hide();
           }}, true);
           document.addEventListener("keydown", function(ev){{
-            if(!cur) return;
+            if(!cur || cur.classList.contains("cap-host")) return;
             var t = ev.target;
             if(t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
             if(ev.key === "Delete" || ev.key === "Backspace"){{
@@ -1533,15 +1689,30 @@ js = f'''
           document.getElementById("ctd-save").onclick = function(){{ saveNow(true); }};
           document.getElementById("ctd-sync").onclick = async function(){{
             var msg = document.getElementById("ctd-msg");
+            if(dockMode === "cap"){{
+              msg.textContent = "Stüdyodan alınıyor…";
+              try{{
+                var r = await fetch("http://127.0.0.1:8765/api/sync-studio-caption-items", {{
+                  method:"POST", headers:{{"Content-Type":"application/json"}},
+                  body: JSON.stringify({{id: VID, full: true}})
+                }});
+                var j = await r.json();
+                msg.textContent = r.ok ? (j.msg || "alındı") + " — yenileniyor…" : (j.error || "hata");
+                if(r.ok) setTimeout(function(){{ location.reload(); }}, 280);
+              }}catch(e){{
+                msg.textContent = "Panel kapalı. Komut: py -3.12 scripts/dashboard_server.py";
+              }}
+              return;
+            }}
             msg.textContent = "şeritten alınıyor…";
             try{{
-              var r = await fetch("http://127.0.0.1:8765/api/sync-studio-cards", {{
+              var r2 = await fetch("http://127.0.0.1:8765/api/sync-studio-cards", {{
                 method:"POST", headers:{{"Content-Type":"application/json"}},
                 body: JSON.stringify({{id: VID, rebuild:false}})
               }});
-              var j = await r.json();
-              msg.textContent = r.ok ? "şeritten alındı — yenileniyor…" : (j.error || "hata");
-              if(r.ok) setTimeout(function(){{ location.reload(); }}, 280);
+              var j2 = await r2.json();
+              msg.textContent = r2.ok ? "şeritten alındı — yenileniyor…" : (j2.error || "hata");
+              if(r2.ok) setTimeout(function(){{ location.reload(); }}, 280);
             }}catch(e){{
               msg.textContent = "Panel kapalı.";
             }}
@@ -1551,6 +1722,47 @@ js = f'''
             if(!confirm("Bu kart silinsin mi?")) return;
             post({{ cardId: cur.getAttribute("data-card-id") || cur.id, delete:true }}, true);
           }};
+
+          /* Otomatik altyazı senkronu: Stüdyoda sürükleyip bıraktığın altyazı
+             kutuları birkaç saniyede bir kendiliğinden project.json + export'un
+             okuduğu public/index.html'e yazılır — hiçbir tıklama gerekmez.
+             Stüdyo'nun kendi (kök) index.html'ine dokunmuyor, sayfa hiç
+             yenilenmiyor — düzenleme akışın kesilmez. */
+          var badge = document.createElement("div");
+          badge.id = "autosync-badge";
+          badge.textContent = "";
+          document.body.appendChild(badge);
+          var badgeStyle = document.createElement("style");
+          badgeStyle.textContent = "#autosync-badge{{position:fixed;left:14px;bottom:14px;z-index:99998;" +
+            "padding:6px 12px;border-radius:8px;background:rgba(20,120,60,.92);color:#eafff0;" +
+            "font-family:Segoe UI,system-ui,sans-serif;font-size:12px;font-weight:650;" +
+            "opacity:0;transition:opacity .25s;pointer-events:none}}" +
+            "#autosync-badge.on{{opacity:1}}";
+          document.head.appendChild(badgeStyle);
+          var badgeTimer = null;
+          function flashBadge(text){{
+            badge.textContent = text;
+            badge.classList.add("on");
+            if(badgeTimer) clearTimeout(badgeTimer);
+            badgeTimer = setTimeout(function(){{ badge.classList.remove("on"); }}, 2200);
+          }}
+          setInterval(async function(){{
+            try{{
+              var ra = await fetch("http://127.0.0.1:8765/api/sync-studio-caption-items", {{
+                method:"POST", headers:{{"Content-Type":"application/json"}},
+                body: JSON.stringify({{id: VID}})
+              }});
+              var ja = await ra.json();
+              if(ra.ok && ja.count > 0){{
+                flashBadge(ja.count + " altyazı kaydedildi ✓");
+              }}
+            }}catch(e){{ /* panel kapalıysa sessizce dene, sonraki turda tekrar dener */ }}
+          }}, 3500);
+          /* NOT: Kartlar için otomatik arka-plan senkronu (6sn'de bir) buradan
+             kasıtlı olarak kaldırıldı — Stüdyo'da canlı sürüklerken diskteki
+             dosyayı arkadan değiştirip Stüdyo'nun kendi (henüz kaydedilmemiş)
+             sürükleme durumunu ezme ihtimali vardı. Kart konumu artık SADECE
+             aşağıdaki "Konumu Kaydet" butonuna basınca senkronize edilir. */
         }})();
 '''
 
@@ -1590,7 +1802,9 @@ html_doc = f'''<!doctype html>
 {ig_html}
 {mg_html_bits()}
 {tip_html}
+      <div id="caption-layer" style="position:absolute;inset:0;pointer-events:none;">
 {caption_items()}
+      </div>
       </div>
 {sfx_html}
       <script src="vendor/gsap.min.js"></script>
