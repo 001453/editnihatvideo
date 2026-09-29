@@ -1,0 +1,53 @@
+{
+  "broll": [
+    {
+      "id": "dolar-fed",
+      "file": "broll/dolar-fed.mp4",
+      "start": 24.5,
+      "dur": 8.0,
+      "keyword": "DOLAR FED MERKEZ BANKASI FAİZ",
+      "hint": "Dolar / Fed binası görüntüsü — altın hedefi öncesi makro girişi destekler (~24-32s)"
+    },
+    {
+      "id": "gumus-arz",
+      "file": "broll/gumus-arz.mp4",
+      "start": 46.8,
+      "dur": 8.0,
+      "keyword": "GÜMÜŞ KÜLÇE MADEN ARZ",
+      "hint": "Gümüş külçe / maden görüntüsü — arz açığı ve 150 TL hedefi anlatımını destekler (~46-54s)"
+    },
+    {
+      "id": "bitcoin-dusus",
+      "file": "broll/bitcoin-dusus.mp4",
+      "start": 58.5,
+      "dur": 8.0,
+      "keyword": "BITCOIN KRIPTO DÜŞÜŞ GRAFİK KIRMIZI",
+      "hint": "Kripto borsası ekranı / kırmızı grafik — 85K desteğinin kırılması anlatımını destekler (~58-66s)"
+    },
+    {
+      "id": "bist-endeks",
+      "file": "broll/bist-endeks.mp4",
+      "start": 84.5,
+      "dur": 8.0,
+      "keyword": "BORSA İSTANBUL ENDEKS EKRAN",
+      "hint": "BIST endeks ekranı / borsa salonu görüntüsü — 13.000 altında satış baskısı anlatımını destekler (~84-92s)"
+    }
+  ],
+  "punches": [],
+  "hero": {
+    "id": "card-altin",
+    "at": 14.40
+  },
+  "igBanner": [],
+  "cardSfx": [],
+  "proCards": [
+    {
+      "id": "altin-progress",
+      "block": "mk-progress-stat",
+      "start": 33.0,
+      "dur": 6.0,
+      "copy": {"scheme": "dark", "value": 6730, "suffix": " TL", "label": "GRAM ALTIN", "caption": "Hedef 7.500 · Kasım", "max": 7500, "trackWidth": 520, "x": 220, "y": 160}
+    }
+  ],
+  "brollPending": false
+}

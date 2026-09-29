@@ -1,0 +1,2214 @@
+{
+  "words": [
+    {
+      "type": "word",
+      "text": "Alt\u0131nda",
+      "start": 0.0,
+      "end": 0.52,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "hedefim",
+      "start": 0.52,
+      "end": 1.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "7",
+      "start": 1.02,
+      "end": 1.44,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": ".500",
+      "start": 1.44,
+      "end": 1.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "lira,",
+      "start": 1.96,
+      "end": 2.22,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 2.22,
+      "end": 2.6
+    },
+    {
+      "type": "word",
+      "text": "gram",
+      "start": 2.6,
+      "end": 2.88,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 2.88,
+      "end": 3.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "6",
+      "start": 3.3,
+      "end": 3.62,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": ".500",
+      "start": 3.62,
+      "end": 4.04,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "lira",
+      "start": 4.04,
+      "end": 4.54,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131na",
+      "start": 4.54,
+      "end": 5.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "d\u00fc\u015fmedi\u011fi",
+      "start": 5.02,
+      "end": 5.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "s\u00fcrece",
+      "start": 5.64,
+      "end": 5.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kas\u0131m",
+      "start": 5.94,
+      "end": 6.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ortas\u0131na",
+      "start": 6.42,
+      "end": 6.78,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kadar",
+      "start": 6.78,
+      "end": 7.1,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "hedefim",
+      "start": 7.1,
+      "end": 7.6,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "7",
+      "start": 7.6,
+      "end": 7.82,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": ".500",
+      "start": 7.82,
+      "end": 8.26,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "lira.",
+      "start": 8.26,
+      "end": 8.58,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 8.58,
+      "end": 8.96
+    },
+    {
+      "type": "word",
+      "text": "\u015eu",
+      "start": 8.96,
+      "end": 9.1,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "an",
+      "start": 9.1,
+      "end": 9.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "16",
+      "start": 9.3,
+      "end": 9.82,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": ".355",
+      "start": 9.82,
+      "end": 10.98,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "dolar",
+      "start": 10.98,
+      "end": 11.38,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "civar\u0131nda",
+      "start": 11.38,
+      "end": 11.92,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "gram",
+      "start": 11.92,
+      "end": 12.48,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 12.48,
+      "end": 12.92,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ise",
+      "start": 12.92,
+      "end": 13.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "6",
+      "start": 13.12,
+      "end": 13.5,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": ".800",
+      "start": 13.5,
+      "end": 13.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "lira",
+      "start": 13.96,
+      "end": 14.38,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "s\u0131n\u0131r\u0131na",
+      "start": 14.38,
+      "end": 14.82,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yana\u015ft\u0131.",
+      "start": 14.82,
+      "end": 15.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 15.28,
+      "end": 15.36
+    },
+    {
+      "type": "word",
+      "text": "Daha",
+      "start": 15.36,
+      "end": 15.48,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ge\u00e7en",
+      "start": 15.48,
+      "end": 15.86,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "hafta",
+      "start": 15.86,
+      "end": 16.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "FETFYZ",
+      "start": 16.12,
+      "end": 16.66,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "haberi",
+      "start": 16.66,
+      "end": 16.98,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u00f6ncesi",
+      "start": 16.98,
+      "end": 17.46,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 17.46,
+      "end": 18.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "6",
+      "start": 18.28,
+      "end": 18.5,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": ".500",
+      "start": 18.5,
+      "end": 18.82,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "liraya",
+      "start": 18.82,
+      "end": 19.22,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kadar",
+      "start": 19.22,
+      "end": 19.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "gerilmi\u015fti.",
+      "start": 19.42,
+      "end": 19.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 19.96,
+      "end": 20.02
+    },
+    {
+      "type": "word",
+      "text": "Bizi",
+      "start": 20.02,
+      "end": 20.16,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "takip",
+      "start": 20.16,
+      "end": 20.52,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "edenler",
+      "start": 20.52,
+      "end": 20.86,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "hat\u0131rlar,",
+      "start": 20.86,
+      "end": 21.24,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 21.24,
+      "end": 21.44
+    },
+    {
+      "type": "word",
+      "text": "ge\u00e7en",
+      "start": 21.44,
+      "end": 21.66,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "hafta",
+      "start": 21.66,
+      "end": 21.9,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 21.9,
+      "end": 22.26,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bitcoin",
+      "start": 22.26,
+      "end": 22.6,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ve",
+      "start": 22.6,
+      "end": 22.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "g\u00fcm\u00fc\u015f",
+      "start": 22.96,
+      "end": 23.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "analizlerimiz",
+      "start": 23.36,
+      "end": 24.08,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ise",
+      "start": 24.08,
+      "end": 24.4,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "nokta",
+      "start": 24.4,
+      "end": 24.88,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "at\u0131\u015f\u0131",
+      "start": 24.88,
+      "end": 25.2,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "geldi.",
+      "start": 25.2,
+      "end": 25.38,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 25.38,
+      "end": 25.46
+    },
+    {
+      "type": "word",
+      "text": "\u015eimdi",
+      "start": 25.46,
+      "end": 25.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "as\u0131l",
+      "start": 25.64,
+      "end": 26.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "konuya",
+      "start": 26.14,
+      "end": 26.44,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "gelecek",
+      "start": 26.44,
+      "end": 26.78,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olursak",
+      "start": 26.78,
+      "end": 27.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "neden",
+      "start": 27.3,
+      "end": 27.5,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kas\u0131m",
+      "start": 27.5,
+      "end": 27.9,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ortas\u0131na",
+      "start": 27.9,
+      "end": 28.22,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kadar",
+      "start": 28.22,
+      "end": 28.5,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "7",
+      "start": 28.5,
+      "end": 28.76,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": ".500",
+      "start": 28.76,
+      "end": 29.08,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "lira",
+      "start": 29.08,
+      "end": 29.34,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "dedi\u011fimi?",
+      "start": 29.34,
+      "end": 29.72,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Birincisi",
+      "start": 29.72,
+      "end": 30.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "merkez",
+      "start": 30.14,
+      "end": 30.58,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bankalar\u0131",
+      "start": 30.58,
+      "end": 31.0,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131nlar\u0131n\u0131",
+      "start": 31.0,
+      "end": 31.62,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "fiziksel",
+      "start": 31.62,
+      "end": 32.06,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olarak",
+      "start": 32.06,
+      "end": 32.32,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ta\u015f\u0131maya",
+      "start": 32.32,
+      "end": 32.78,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ba\u015flad\u0131",
+      "start": 32.78,
+      "end": 33.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bile.",
+      "start": 33.12,
+      "end": 33.34,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 33.34,
+      "end": 33.48
+    },
+    {
+      "type": "word",
+      "text": "Mesela",
+      "start": 33.48,
+      "end": 33.8,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Hollanda",
+      "start": 33.8,
+      "end": 34.16,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Merkez",
+      "start": 34.16,
+      "end": 34.6,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Bankas\u0131,",
+      "start": 34.6,
+      "end": 34.98,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 34.98,
+      "end": 35.1
+    },
+    {
+      "type": "word",
+      "text": "New",
+      "start": 35.1,
+      "end": 35.2,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "York'ta",
+      "start": 35.2,
+      "end": 35.54,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ve",
+      "start": 35.54,
+      "end": 35.66,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Ottawa'da",
+      "start": 35.66,
+      "end": 36.32,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "duran",
+      "start": 36.32,
+      "end": 36.58,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "86",
+      "start": 36.58,
+      "end": 36.92,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ton",
+      "start": 36.92,
+      "end": 37.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n\u0131",
+      "start": 37.36,
+      "end": 37.72,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kalk\u0131p",
+      "start": 37.72,
+      "end": 38.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Londra",
+      "start": 38.12,
+      "end": 38.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "'ya",
+      "start": 38.42,
+      "end": 38.52,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ta\u015f\u0131d\u0131.",
+      "start": 38.52,
+      "end": 38.9,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 38.9,
+      "end": 39.0
+    },
+    {
+      "type": "word",
+      "text": "Bunun",
+      "start": 39.0,
+      "end": 39.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "anlam\u0131",
+      "start": 39.14,
+      "end": 39.56,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u015fu,",
+      "start": 39.56,
+      "end": 39.76,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 39.76,
+      "end": 39.94
+    },
+    {
+      "type": "word",
+      "text": "herkes",
+      "start": 39.94,
+      "end": 40.18,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "rezervini",
+      "start": 40.18,
+      "end": 40.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "g\u00fcvenli",
+      "start": 40.94,
+      "end": 41.48,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ve",
+      "start": 41.48,
+      "end": 41.62,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "elinin",
+      "start": 41.62,
+      "end": 41.88,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131nda",
+      "start": 41.88,
+      "end": 42.32,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olacak",
+      "start": 42.32,
+      "end": 42.56,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bir",
+      "start": 42.56,
+      "end": 42.78,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yerde",
+      "start": 42.78,
+      "end": 42.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tutmak",
+      "start": 42.96,
+      "end": 43.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "istiyor.",
+      "start": 43.3,
+      "end": 43.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 43.64,
+      "end": 43.74
+    },
+    {
+      "type": "word",
+      "text": "\u00dcstelik",
+      "start": 43.74,
+      "end": 44.24,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "d\u00fcnya",
+      "start": 44.24,
+      "end": 44.62,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 44.62,
+      "end": 44.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "konseyi",
+      "start": 44.96,
+      "end": 45.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "nanketine",
+      "start": 45.36,
+      "end": 45.84,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "g\u00f6re",
+      "start": 45.84,
+      "end": 46.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "merkez",
+      "start": 46.02,
+      "end": 46.46,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bankalar\u0131ndan",
+      "start": 46.46,
+      "end": 47.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "%89",
+      "start": 47.02,
+      "end": 47.84,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "'u",
+      "start": 47.84,
+      "end": 48.18,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u00f6n\u00fcm\u00fczdeki",
+      "start": 48.18,
+      "end": 48.74,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "12",
+      "start": 48.74,
+      "end": 49.1,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ayda",
+      "start": 49.1,
+      "end": 49.66,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 49.66,
+      "end": 50.18,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "rezervlerini",
+      "start": 50.18,
+      "end": 50.66,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "artt\u0131rmay\u0131",
+      "start": 50.66,
+      "end": 51.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "planl\u0131yorlar.",
+      "start": 51.12,
+      "end": 51.62,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 51.62,
+      "end": 51.82
+    },
+    {
+      "type": "word",
+      "text": "Yani",
+      "start": 51.82,
+      "end": 52.04,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bu",
+      "start": 52.04,
+      "end": 52.32,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "anl\u0131k",
+      "start": 52.32,
+      "end": 52.9,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bir",
+      "start": 52.9,
+      "end": 53.06,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "talep",
+      "start": 53.06,
+      "end": 53.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olmay\u0131p",
+      "start": 53.36,
+      "end": 53.78,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "planl\u0131",
+      "start": 53.78,
+      "end": 54.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bir",
+      "start": 54.14,
+      "end": 54.26,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yat\u0131r\u0131m\u0131n",
+      "start": 54.26,
+      "end": 54.68,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "haber\u00e7isi",
+      "start": 54.68,
+      "end": 55.08,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "oldu\u011funu",
+      "start": 55.08,
+      "end": 55.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "g\u00f6steriyor.",
+      "start": 55.28,
+      "end": 55.86,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Ayn\u0131",
+      "start": 55.86,
+      "end": 56.18,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "zamanda",
+      "start": 56.18,
+      "end": 56.54,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "d\u00fcnya",
+      "start": 56.54,
+      "end": 56.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "genelinde",
+      "start": 56.94,
+      "end": 57.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 57.42,
+      "end": 58.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "art\u0131k",
+      "start": 58.02,
+      "end": 58.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "rezervlerde",
+      "start": 58.28,
+      "end": 59.06,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ve",
+      "start": 59.06,
+      "end": 59.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ABD",
+      "start": 59.28,
+      "end": 59.84,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tahvillerini",
+      "start": 59.84,
+      "end": 60.48,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bile",
+      "start": 60.48,
+      "end": 60.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "geride",
+      "start": 60.64,
+      "end": 61.06,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "b\u0131rak\u0131p",
+      "start": 61.06,
+      "end": 61.5,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "en",
+      "start": 61.5,
+      "end": 61.72,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "b\u00fcy\u00fck",
+      "start": 61.72,
+      "end": 61.92,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "varl\u0131k",
+      "start": 61.92,
+      "end": 62.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "s\u0131n\u0131f",
+      "start": 62.28,
+      "end": 62.52,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "haline",
+      "start": 62.52,
+      "end": 62.8,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "geldi.",
+      "start": 62.8,
+      "end": 63.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 63.02,
+      "end": 63.24
+    },
+    {
+      "type": "word",
+      "text": "Bu",
+      "start": 63.24,
+      "end": 63.32,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "sessiz",
+      "start": 63.32,
+      "end": 63.72,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ama",
+      "start": 63.72,
+      "end": 63.92,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kal\u0131c\u0131",
+      "start": 63.92,
+      "end": 64.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bir",
+      "start": 64.42,
+      "end": 64.56,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "de\u011fi\u015fin.",
+      "start": 64.56,
+      "end": 64.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 64.96,
+      "end": 65.1
+    },
+    {
+      "type": "word",
+      "text": "Ve",
+      "start": 65.1,
+      "end": 65.1,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bu",
+      "start": 65.1,
+      "end": 65.26,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tablo",
+      "start": 65.26,
+      "end": 65.56,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u00f6zel",
+      "start": 65.56,
+      "end": 65.86,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yat\u0131r\u0131mc\u0131lar\u0131n",
+      "start": 65.86,
+      "end": 66.56,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "da",
+      "start": 66.56,
+      "end": 66.76,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Portfoy",
+      "start": 66.76,
+      "end": 67.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "'un",
+      "start": 67.14,
+      "end": 67.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131na",
+      "start": 67.3,
+      "end": 67.84,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "daha",
+      "start": 67.84,
+      "end": 68.06,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "fazla",
+      "start": 68.06,
+      "end": 68.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yer",
+      "start": 68.28,
+      "end": 68.44,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "vermesine",
+      "start": 68.44,
+      "end": 69.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "zemin",
+      "start": 69.02,
+      "end": 69.34,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "haz\u0131rl\u0131yor.",
+      "start": 69.34,
+      "end": 69.8,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 69.8,
+      "end": 69.9
+    },
+    {
+      "type": "word",
+      "text": "Bu",
+      "start": 69.9,
+      "end": 69.98,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u00f6zel",
+      "start": 69.98,
+      "end": 70.22,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yat\u0131r\u0131mc\u0131",
+      "start": 70.22,
+      "end": 70.74,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "dedi\u011fimiz",
+      "start": 70.74,
+      "end": 71.08,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "k\u0131sm\u0131",
+      "start": 71.08,
+      "end": 71.4,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "a\u00e7acak",
+      "start": 71.4,
+      "end": 71.68,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olursak",
+      "start": 71.68,
+      "end": 72.16,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "onlar,",
+      "start": 72.16,
+      "end": 72.46,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 72.46,
+      "end": 72.84
+    },
+    {
+      "type": "word",
+      "text": "emeklilik",
+      "start": 72.84,
+      "end": 73.16,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u015firketleri,",
+      "start": 73.16,
+      "end": 73.8,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 73.8,
+      "end": 73.94
+    },
+    {
+      "type": "word",
+      "text": "sigorta",
+      "start": 73.94,
+      "end": 74.16,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u015firketleri,",
+      "start": 74.16,
+      "end": 74.86,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 74.86,
+      "end": 75.04
+    },
+    {
+      "type": "word",
+      "text": "aile",
+      "start": 75.04,
+      "end": 75.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ofisleri",
+      "start": 75.3,
+      "end": 75.82,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ve",
+      "start": 75.82,
+      "end": 75.98,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "he\u00e7fonlar.",
+      "start": 75.98,
+      "end": 76.58,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 76.58,
+      "end": 76.66
+    },
+    {
+      "type": "word",
+      "text": "Bunlar",
+      "start": 76.66,
+      "end": 76.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "b\u00fcy\u00fck",
+      "start": 76.94,
+      "end": 77.16,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "abilerimiz.",
+      "start": 77.16,
+      "end": 77.72,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 77.72,
+      "end": 77.9
+    },
+    {
+      "type": "word",
+      "text": "\u015eimdiye",
+      "start": 77.9,
+      "end": 78.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kadar",
+      "start": 78.42,
+      "end": 78.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "paran\u0131n",
+      "start": 78.64,
+      "end": 79.1,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u00e7o\u011funu",
+      "start": 79.1,
+      "end": 79.66,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "hisse",
+      "start": 79.66,
+      "end": 80.1,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ve",
+      "start": 80.1,
+      "end": 80.22,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "devlet",
+      "start": 80.22,
+      "end": 80.58,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tahvilli",
+      "start": 80.58,
+      "end": 80.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olarak",
+      "start": 80.96,
+      "end": 81.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "de\u011ferlendirdiler.",
+      "start": 81.3,
+      "end": 82.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 82.14,
+      "end": 82.32
+    },
+    {
+      "type": "word",
+      "text": "Bunun",
+      "start": 82.32,
+      "end": 82.52,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "klasik",
+      "start": 82.52,
+      "end": 83.08,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bir",
+      "start": 83.08,
+      "end": 83.2,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ad\u0131",
+      "start": 83.2,
+      "end": 83.38,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "da",
+      "start": 83.38,
+      "end": 83.5,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "var,",
+      "start": 83.5,
+      "end": 83.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 83.64,
+      "end": 83.84
+    },
+    {
+      "type": "word",
+      "text": "60",
+      "start": 83.84,
+      "end": 83.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "-40",
+      "start": 83.96,
+      "end": 84.32,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "oran\u0131.",
+      "start": 84.32,
+      "end": 84.62,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Alt\u0131n",
+      "start": 84.62,
+      "end": 85.02,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u00e7o\u011fu",
+      "start": 85.02,
+      "end": 85.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Portfoy",
+      "start": 85.36,
+      "end": 85.68,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "'ya",
+      "start": 85.68,
+      "end": 85.82,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yoktu",
+      "start": 85.82,
+      "end": 86.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ya",
+      "start": 86.3,
+      "end": 86.54,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "da",
+      "start": 86.54,
+      "end": 86.66,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "%1",
+      "start": 86.66,
+      "end": 87.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "-2",
+      "start": 87.12,
+      "end": 87.76,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "s\u00fcs",
+      "start": 87.76,
+      "end": 88.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "gibi",
+      "start": 88.12,
+      "end": 88.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "duruyordu.",
+      "start": 88.3,
+      "end": 88.78,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 88.78,
+      "end": 88.86
+    },
+    {
+      "type": "word",
+      "text": "\u00c7\u00fcnk\u00fc",
+      "start": 88.86,
+      "end": 89.12,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "onlarca",
+      "start": 89.12,
+      "end": 89.86,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "y\u0131l",
+      "start": 89.86,
+      "end": 90.04,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "hisse",
+      "start": 90.04,
+      "end": 90.52,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "d\u00fc\u015f\u00fcnce",
+      "start": 90.52,
+      "end": 90.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tahvil",
+      "start": 90.94,
+      "end": 91.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "y\u00fckseldi,",
+      "start": 91.3,
+      "end": 91.82,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 91.82,
+      "end": 92.0
+    },
+    {
+      "type": "word",
+      "text": "koruma",
+      "start": 92.0,
+      "end": 92.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tahvilden",
+      "start": 92.14,
+      "end": 92.7,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "geldi.",
+      "start": 92.7,
+      "end": 92.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 92.94,
+      "end": 93.22
+    },
+    {
+      "type": "word",
+      "text": "Alt\u0131n",
+      "start": 93.22,
+      "end": 93.52,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "getirivermeyen",
+      "start": 93.52,
+      "end": 94.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "meter",
+      "start": 94.3,
+      "end": 94.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olarak",
+      "start": 94.64,
+      "end": 94.92,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "genelde",
+      "start": 94.92,
+      "end": 95.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bekletildi.",
+      "start": 95.36,
+      "end": 95.88,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 95.88,
+      "end": 96.28
+    },
+    {
+      "type": "word",
+      "text": "2022'deyse",
+      "start": 96.28,
+      "end": 97.0,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bu",
+      "start": 97.0,
+      "end": 97.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "durum",
+      "start": 97.14,
+      "end": 97.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "de\u011fi\u015fti.",
+      "start": 97.3,
+      "end": 97.72,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 97.72,
+      "end": 97.82
+    },
+    {
+      "type": "word",
+      "text": "S\u00fcs",
+      "start": 97.82,
+      "end": 97.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olarak",
+      "start": 97.96,
+      "end": 98.26,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "bak\u0131lan",
+      "start": 98.26,
+      "end": 98.72,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131n",
+      "start": 98.72,
+      "end": 99.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "koruma",
+      "start": 99.28,
+      "end": 99.6,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "de\u011feri",
+      "start": 99.6,
+      "end": 99.88,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olarak",
+      "start": 99.88,
+      "end": 100.14,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Portfoy'da",
+      "start": 100.14,
+      "end": 100.74,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "\u00e7e\u015fit",
+      "start": 100.74,
+      "end": 101.04,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "a\u011f\u0131rl\u0131l\u0131\u011f\u0131",
+      "start": 101.04,
+      "end": 101.64,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kullan\u0131l\u0131p",
+      "start": 101.64,
+      "end": 102.2,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "g\u00fcven",
+      "start": 102.2,
+      "end": 102.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "sa\u011flamaya",
+      "start": 102.42,
+      "end": 102.84,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ba\u015flad\u0131.",
+      "start": 102.84,
+      "end": 103.16,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 103.16,
+      "end": 103.34
+    },
+    {
+      "type": "word",
+      "text": "Toparlayacak",
+      "start": 103.34,
+      "end": 103.9,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olursak",
+      "start": 103.9,
+      "end": 104.28,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "arkada\u015flar,",
+      "start": 104.28,
+      "end": 104.74,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 104.74,
+      "end": 105.06
+    },
+    {
+      "type": "word",
+      "text": "6500",
+      "start": 105.06,
+      "end": 105.54,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "alt\u0131na",
+      "start": 105.54,
+      "end": 106.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "inmedi\u011fimiz",
+      "start": 106.36,
+      "end": 106.98,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "s\u00fcrece",
+      "start": 106.98,
+      "end": 107.36,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "g\u00f6r\u00fc\u015f\u00fcm",
+      "start": 107.36,
+      "end": 108.1,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "de\u011fi\u015fmeyecek.",
+      "start": 108.1,
+      "end": 108.8,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "spacing",
+      "text": " ",
+      "start": 108.8,
+      "end": 108.88
+    },
+    {
+      "type": "word",
+      "text": "Takibimize",
+      "start": 108.88,
+      "end": 109.44,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kas\u0131m",
+      "start": 109.44,
+      "end": 109.96,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ortas\u0131na",
+      "start": 109.96,
+      "end": 110.34,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kadar",
+      "start": 110.34,
+      "end": 110.6,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "7500",
+      "start": 110.6,
+      "end": 111.3,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "lira.",
+      "start": 111.3,
+      "end": 111.62,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "Anlatt\u0131klar\u0131m",
+      "start": 111.62,
+      "end": 112.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "ise",
+      "start": 112.42,
+      "end": 112.56,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tamamen",
+      "start": 112.56,
+      "end": 113.04,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "kendi",
+      "start": 113.04,
+      "end": 113.24,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "stratejim",
+      "start": 113.24,
+      "end": 113.94,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "olup",
+      "start": 113.94,
+      "end": 114.4,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "yatar\u0131m",
+      "start": 114.4,
+      "end": 114.78,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "tavsiyesi",
+      "start": 114.78,
+      "end": 115.42,
+      "speaker_id": "speaker_0"
+    },
+    {
+      "type": "word",
+      "text": "i\u00e7ermemektedir.",
+      "start": 115.42,
+      "end": 116.28,
+      "speaker_id": "speaker_0"
+    }
+  ]
+}

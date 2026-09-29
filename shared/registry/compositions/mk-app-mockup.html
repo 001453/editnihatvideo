@@ -1,0 +1,236 @@
+<!-- hyperframes-registry-item: mk-app-mockup -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: transparent;
+        overflow: hidden;
+      }
+      #mk-am-root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: transparent;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+      }
+      /* ---- bank-card variant ---- */
+      #mk-am-card {
+        position: absolute;
+        width: 560px;
+        height: 340px;
+        border-radius: 30px;
+        padding: 34px 38px;
+        background: linear-gradient(145deg, #232733 0%, #14161c 70%);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        box-shadow: 0 24px 54px rgba(0, 0, 0, 0.5);
+        display: none;
+      }
+      #mk-am-card.mk-am-show {
+        display: block;
+      }
+      #mk-am-chip {
+        width: 58px;
+        height: 44px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f5d98a, #c9922f);
+        margin-bottom: 30px;
+      }
+      #mk-am-cardnum {
+        font-weight: 600;
+        font-size: 34px;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.55);
+        margin-bottom: 26px;
+      }
+      #mk-am-cardrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      #mk-am-cardname {
+        font-weight: 700;
+        font-size: 26px;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+      }
+      #mk-am-mark {
+        display: flex;
+      }
+      #mk-am-mark span {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      #mk-am-mark span:first-child {
+        background: #f5b942;
+        opacity: 0.9;
+      }
+      #mk-am-mark span:last-child {
+        background: #e8e8ea;
+        opacity: 0.85;
+        margin-left: -14px;
+      }
+      /* ---- app widget variant ---- */
+      #mk-am-app {
+        position: absolute;
+        width: 480px;
+        padding: 32px 36px;
+        border-radius: 28px;
+        background: linear-gradient(160deg, rgba(24, 27, 34, 0.94), rgba(13, 14, 18, 0.94));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+        display: none;
+      }
+      #mk-am-app.mk-am-show {
+        display: block;
+      }
+      #mk-am-apphead {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      #mk-am-appdot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #f5b942;
+      }
+      #mk-am-appname {
+        font-weight: 700;
+        font-size: 24px;
+        letter-spacing: 0.03em;
+        color: #aeb6c2;
+        text-transform: uppercase;
+      }
+      #mk-am-appvalue {
+        font-weight: 800;
+        font-size: 62px;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+        margin-bottom: 10px;
+      }
+      #mk-am-appsub {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 24px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(90, 214, 137, 0.16);
+        color: #5ad689;
+      }
+      #mk-am-appsub.mk-am-down {
+        background: rgba(232, 92, 92, 0.16);
+        color: #e85c5c;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="mk-am-root"
+      data-composition-id="mk-app-mockup"
+      data-start="0"
+      data-duration="6"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div id="mk-am-card">
+        <div id="mk-am-chip"></div>
+        <div id="mk-am-cardnum">•••• •••• •••• ••••</div>
+        <div id="mk-am-cardrow">
+          <div id="mk-am-cardname">ALTIN HESABI</div>
+          <div id="mk-am-mark"><span></span><span></span></div>
+        </div>
+      </div>
+      <div id="mk-am-app">
+        <div id="mk-am-apphead"><span id="mk-am-appdot"></span><span id="mk-am-appname"></span></div>
+        <div id="mk-am-appvalue">0</div>
+        <div id="mk-am-appsub"></div>
+      </div>
+      <div
+        id="mk-am-drv"
+        class="clip"
+        data-start="0"
+        data-duration="6"
+        data-track-index="0"
+        style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+      ></div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+
+        /* ---- published parameters (inspector-style CONFIG) ----
+           A generic fake finance UI mockup card — no real bank/brand
+           marks. "card" = bank/asset-account card mockup (chip, masked
+           number, account label). "app" = app-widget mockup (icon
+           row, big value, up/down chip). Keep the label/value tied to
+           this video's own numbers, never demo text. */
+        var CONFIG = {
+          variant: "app", // "card" | "app"
+          cardName: "ALTIN HESABI",
+          appName: "PİYASA",
+          value: "0",
+          trend: "up", // "up" | "down"
+          sub: "",
+          x: 1300, // left edge; null = centered
+          y: 220, // top edge; null = centered
+          animationIn: true,
+          animationOut: true,
+        };
+
+        var DUR = 6;
+        var root = document.getElementById("mk-am-root");
+        var card = document.getElementById("mk-am-card");
+        var app = document.getElementById("mk-am-app");
+        var el = CONFIG.variant === "card" ? card : app;
+
+        if (CONFIG.variant === "card") {
+          card.classList.add("mk-am-show");
+          document.getElementById("mk-am-cardname").textContent = CONFIG.cardName;
+        } else {
+          app.classList.add("mk-am-show");
+          document.getElementById("mk-am-appname").textContent = CONFIG.appName;
+          document.getElementById("mk-am-appvalue").textContent = CONFIG.value;
+          var subEl = document.getElementById("mk-am-appsub");
+          subEl.textContent = CONFIG.sub;
+          if (CONFIG.trend === "down") subEl.classList.add("mk-am-down");
+          if (!CONFIG.sub) subEl.style.display = "none";
+        }
+
+        var rect = el.getBoundingClientRect();
+        el.style.left = (CONFIG.x === null ? Math.round((1920 - rect.width) / 2) : CONFIG.x) + "px";
+        el.style.top = (CONFIG.y === null ? Math.round((1080 - rect.height) / 2) : CONFIG.y) + "px";
+
+        var tl = gsap.timeline({ paused: true });
+
+        if (CONFIG.animationIn) {
+          gsap.set(el, { opacity: 0, y: 26, scale: 0.96 });
+          tl.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 0.2);
+        }
+
+        if (CONFIG.animationOut) {
+          tl.to(el, { opacity: 0, y: -16, duration: 0.35, ease: "power2.in" }, DUR - 0.5);
+        }
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+
+        window.__timelines["mk-app-mockup"] = tl;
+      })();
+    </script>
+  </body>
+</html>

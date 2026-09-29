@@ -1,0 +1,246 @@
+<!-- hyperframes-registry-item: mk-btc-pulse -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: transparent;
+        overflow: hidden;
+      }
+      #mk-bp-root {
+        --mk-bp-ink: #ffffff;
+        --mk-bp-ink-dim: #c7cdd6;
+        --mk-bp-amber-1: #7a3f06;
+        --mk-bp-amber-2: #f7931a;
+        --mk-bp-amber-3: #ffd48a;
+        --mk-bp-accum-1: #3a1d5c;
+        --mk-bp-accum-2: #a259ff;
+        --mk-bp-accum-3: #e6c9ff;
+        --mk-bp-accent: var(--mk-bp-amber-2);
+        --mk-bp-accent-dim: var(--mk-bp-amber-1);
+        --mk-bp-accent-light: var(--mk-bp-amber-3);
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: transparent;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+      }
+      #mk-bp-root.mk-bp-accum {
+        --mk-bp-accent: var(--mk-bp-accum-2);
+        --mk-bp-accent-dim: var(--mk-bp-accum-1);
+        --mk-bp-accent-light: var(--mk-bp-accum-3);
+      }
+      #mk-bp-group {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 620px;
+      }
+      #mk-bp-row {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+      #mk-bp-coin {
+        position: relative;
+        width: 118px;
+        height: 118px;
+        border-radius: 50%;
+        flex: none;
+        background: radial-gradient(
+          circle at 34% 28%,
+          var(--mk-bp-accent-light) 0%,
+          var(--mk-bp-accent) 46%,
+          var(--mk-bp-accent-dim) 100%
+        );
+        box-shadow:
+          0 14px 32px rgba(0, 0, 0, 0.5),
+          inset 0 3px 6px rgba(255, 255, 255, 0.5),
+          inset 0 -10px 18px rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #mk-bp-coin::after {
+        content: "";
+        position: absolute;
+        inset: 7px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+      }
+      #mk-bp-ring {
+        position: absolute;
+        inset: -14px;
+        border-radius: 50%;
+        border: 2px solid var(--mk-bp-accent);
+        opacity: 0;
+      }
+      #mk-bp-sym {
+        font-weight: 800;
+        font-size: 56px;
+        color: #241205;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+      }
+      #mk-bp-text {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      #mk-bp-label {
+        font-weight: 700;
+        font-size: 28px;
+        letter-spacing: 0.02em;
+        color: var(--mk-bp-ink-dim);
+        text-transform: uppercase;
+      }
+      #mk-bp-value {
+        font-weight: 800;
+        font-size: 58px;
+        letter-spacing: -0.02em;
+        color: var(--mk-bp-ink);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        text-shadow: 0 0 26px color-mix(in srgb, var(--mk-bp-accent) 55%, transparent);
+      }
+      #mk-bp-caption {
+        font-weight: 500;
+        font-size: 25px;
+        color: var(--mk-bp-ink-dim);
+      }
+      #mk-bp-bar-track {
+        position: relative;
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        overflow: hidden;
+      }
+      #mk-bp-bar-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--mk-bp-accent-dim), var(--mk-bp-accent), var(--mk-bp-accent-light));
+      }
+      #mk-bp-root.mk-bp-light #mk-bp-label,
+      #mk-bp-root.mk-bp-light #mk-bp-caption {
+        color: #6e6e73;
+      }
+      #mk-bp-root.mk-bp-light #mk-bp-value {
+        color: #1d1d1f;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="mk-bp-root"
+      data-composition-id="mk-btc-pulse"
+      data-start="0"
+      data-duration="7"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div id="mk-bp-group">
+        <div id="mk-bp-row">
+          <div id="mk-bp-coin">
+            <span id="mk-bp-ring"></span>
+            <span id="mk-bp-sym">₿</span>
+          </div>
+          <div id="mk-bp-text">
+            <div id="mk-bp-label"></div>
+            <div id="mk-bp-value">0</div>
+          </div>
+        </div>
+        <div id="mk-bp-caption"></div>
+        <div id="mk-bp-bar-track"><div id="mk-bp-bar-fill"></div></div>
+      </div>
+      <div
+        id="mk-bp-drv"
+        class="clip"
+        data-start="0"
+        data-duration="7"
+        data-track-index="0"
+        style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+      ></div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+
+        /* ---- published parameters (inspector-style CONFIG) ----
+           0921 (Bitcoin analiz) videosuna özel yeni bir proCard —
+           mevcut registry'deki mk-badge-stat / mk-progress-stat'tan
+           farklı: amber/mor "kripto sinyal" paleti, nabız halkalı
+           BTC madeni parası + alt dolum çubuğu (fill). "tone" ile
+           iki ruh hali: "in" (fon girişi, amber) / "accum" (toplama, mor). */
+        var CONFIG = {
+          scheme: "dark",
+          tone: "in", // "in" | "accum"
+          value: "0",
+          label: "BAŞLIK",
+          caption: "",
+          fill: 60, // 0-100, alt çubuk doluluk
+          x: 1300,
+          y: 250,
+          animationIn: true,
+          animationOut: true,
+        };
+
+        var DUR = 7;
+        var root = document.getElementById("mk-bp-root");
+        var group = document.getElementById("mk-bp-group");
+        var coin = document.getElementById("mk-bp-coin");
+        var ring = document.getElementById("mk-bp-ring");
+        var barFill = document.getElementById("mk-bp-bar-fill");
+
+        if (CONFIG.scheme === "light") root.classList.add("mk-bp-light");
+        if (CONFIG.tone === "accum") root.classList.add("mk-bp-accum");
+        document.getElementById("mk-bp-label").textContent = CONFIG.label;
+        document.getElementById("mk-bp-value").textContent = CONFIG.value;
+        document.getElementById("mk-bp-caption").textContent = CONFIG.caption;
+
+        var rect = group.getBoundingClientRect();
+        group.style.left =
+          (CONFIG.x === null ? Math.round((1920 - rect.width) / 2) : CONFIG.x) + "px";
+        group.style.top =
+          (CONFIG.y === null ? Math.round((1080 - rect.height) / 2) : CONFIG.y) + "px";
+
+        var fillPct = Math.max(0, Math.min(100, Number(CONFIG.fill) || 0));
+
+        var tl = gsap.timeline({ paused: true });
+
+        if (CONFIG.animationIn) {
+          gsap.set(group, { opacity: 0, x: -24 });
+          gsap.set(coin, { scale: 0.4, rotate: -22 });
+          gsap.set(ring, { scale: 0.7, opacity: 0 });
+          gsap.set(barFill, { width: "0%" });
+          tl.to(group, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 0.15);
+          tl.to(coin, { scale: 1, rotate: 0, duration: 0.6, ease: "back.out(2.2)" }, 0.15);
+          tl.to(ring, { scale: 1.35, opacity: 0.55, duration: 0.7, ease: "power2.out" }, 0.25);
+          tl.to(ring, { scale: 1.6, opacity: 0, duration: 0.9, ease: "power1.out" }, 0.85);
+          tl.to(barFill, { width: fillPct + "%", duration: 0.9, ease: "power2.out" }, 0.55);
+        }
+
+        if (CONFIG.animationOut) {
+          tl.to(group, { opacity: 0, x: 18, duration: 0.35, ease: "power2.in" }, DUR - 0.5);
+        }
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+
+        window.__timelines["mk-btc-pulse"] = tl;
+      })();
+    </script>
+  </body>
+</html>

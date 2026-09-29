@@ -1,0 +1,47 @@
+{
+  "broll": [
+    {
+      "id": "piyasa-fiyatlama",
+      "file": "broll/piyasa-fiyatlama.mp4",
+      "start": 46.0,
+      "dur": 8.0,
+      "keyword": "PİYASA EKRANI FİYATLAMA GRAFİK",
+      "hint": "Piyasa ekranı / fiyatlama grafiği — marketin hafta içi riski fiyatlamaya başlaması anlatımını destekler (~46-54s)"
+    },
+    {
+      "id": "tahvil-getiri",
+      "file": "broll/tahvil-getiri.mp4",
+      "start": 101.0,
+      "dur": 8.0,
+      "keyword": "TAHVİL GETİRİ EKRAN GRAFİK YÜKSELİŞ",
+      "hint": "Tahvil getiri ekranı / yükselen grafik — %5.1 seviyesine çıkan tahvil faizi anlatımını destekler (~101-109s)"
+    }
+  ],
+  "punches": [],
+  "hero": {
+    "id": "card-altin",
+    "at": 22.2
+  },
+  "igBanner": [],
+  "cardSfx": [],
+  "proCards": [
+    {
+      "id": "altin-progress",
+      "block": "mk-progress-stat",
+      "start": 38.0,
+      "dur": 6.0,
+      "copy": {
+        "scheme": "dark",
+        "value": 6600,
+        "suffix": " TL",
+        "label": "GRAM ALTIN",
+        "caption": "Hedef 7.500 · Kasım ortası",
+        "max": 7500,
+        "trackWidth": 520,
+        "x": 220,
+        "y": 160
+      }
+    }
+  ],
+  "brollPending": false
+}

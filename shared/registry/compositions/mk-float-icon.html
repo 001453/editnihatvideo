@@ -1,0 +1,248 @@
+<!-- hyperframes-registry-item: mk-float-icon -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: transparent;
+        overflow: hidden;
+      }
+      #mk-fi-root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: transparent;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+        perspective: 1400px;
+      }
+      #mk-fi-group {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      #mk-fi-obj {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        transform-style: preserve-3d;
+        background: radial-gradient(circle at 32% 26%, #fff2cf 0%, #f5b942 38%, #b9791f 78%, #7a4a1f 100%);
+        box-shadow:
+          0 28px 60px rgba(0, 0, 0, 0.5),
+          inset 0 6px 14px rgba(255, 255, 255, 0.55),
+          inset 0 -16px 30px rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #mk-fi-obj::after {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.4);
+      }
+      #mk-fi-obj.mk-fi-bar {
+        border-radius: 22px;
+        width: 260px;
+        height: 168px;
+        background: linear-gradient(135deg, #fff2cf 0%, #f5c96a 30%, #c9922f 65%, #8a5a1e 100%);
+      }
+      #mk-fi-obj.mk-fi-bar::after {
+        border-radius: 14px;
+        inset: 10px;
+      }
+      #mk-fi-icon {
+        width: 108px;
+        height: 108px;
+      }
+      #mk-fi-icon svg {
+        width: 100%;
+        height: 100%;
+        display: none;
+      }
+      #mk-fi-icon svg.mk-fi-show {
+        display: block;
+      }
+      /* Generated-image mode (ZSky) — replaces the CSS sphere/bar with a real
+         rendered PNG when CONFIG.image is set. Kept as its own element so the
+         CSS fallback path (no image configured) is untouched. */
+      #mk-fi-img {
+        display: none;
+        width: 260px;
+        height: 260px;
+        object-fit: contain;
+        transform-style: preserve-3d;
+        filter: drop-shadow(0 26px 40px rgba(0, 0, 0, 0.55));
+      }
+      #mk-fi-img.mk-fi-show {
+        display: block;
+      }
+      #mk-fi-label {
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: #f0d9a6;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="mk-fi-root"
+      data-composition-id="mk-float-icon"
+      data-start="0"
+      data-duration="6"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div id="mk-fi-group">
+        <div id="mk-fi-obj">
+          <div id="mk-fi-icon">
+            <!-- coin: currency mark -->
+            <svg id="mk-fi-icon-coin" class="mk-fi-show" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 3v18M8 7.5c0-1.4 1.6-2.5 4-2.5s4 1.1 4 2.4c0 3-8 1.6-8 4.6 0 1.3 1.6 2.4 4 2.4s4-1.1 4-2.5"
+                stroke="#3a2308"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <!-- chart: uptrend -->
+            <svg id="mk-fi-icon-chart" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M3 17L9 11L13 15L21 6"
+                stroke="#3a2308"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path d="M15 6H21V12" stroke="#3a2308" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <!-- vault: shield -->
+            <svg id="mk-fi-icon-vault" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 3L20 6.5V11C20 16 16.6 19.9 12 21C7.4 19.9 4 16 4 11V6.5L12 3Z"
+                stroke="#3a2308"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+              <path d="M9 12L11 14L15.5 9" stroke="#3a2308" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <!-- goldbar: stacked bars -->
+            <svg id="mk-fi-icon-goldbar" viewBox="0 0 24 24" fill="none">
+              <path d="M4 17L6 14H18L20 17H4Z" stroke="#3a2308" stroke-width="1.6" stroke-linejoin="round" />
+              <path d="M6 14L7.4 12H16.6L18 14" stroke="#3a2308" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+        <img id="mk-fi-img" alt="" crossorigin="anonymous" />
+        <div id="mk-fi-label"></div>
+      </div>
+      <div
+        id="mk-fi-drv"
+        class="clip"
+        data-start="0"
+        data-duration="6"
+        data-track-index="0"
+        style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+      ></div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+
+        /* ---- published parameters (inspector-style CONFIG) ----
+           A floating gold/amber 3D-styled icon object (coin, uptrend
+           chart, vault/security, gold bar) — a topic-relevant stand-in
+           when no real b-roll footage exists for a beat. Keep it
+           topic-matched to the transcript (e.g. "coin" for a price
+           beat, "vault" for a safe-haven beat), never generic.
+
+           image: optional. Path (relative to this file, e.g.
+           "assets/icon-goldbar.png") to a generated PNG (ZSky) that
+           replaces the plain CSS sphere/bar with a real rendered
+           object. Leave "" to keep the CSS fallback (icon field
+           still used in that case). Generate once per icon type and
+           reuse across videos — these are show-locked assets, not
+           per-video content. */
+        var CONFIG = {
+          icon: "coin", // "coin" | "chart" | "vault" | "goldbar"
+          image: "", // e.g. "assets/icon-goldbar.png" — overrides CSS look when set
+          label: "",
+          x: 1300, // group left edge; null = centered
+          y: 220, // group top edge; null = centered
+          animationIn: true,
+          animationOut: true,
+        };
+
+        var DUR = 6;
+        var root = document.getElementById("mk-fi-root");
+        var group = document.getElementById("mk-fi-group");
+        var obj = document.getElementById("mk-fi-obj");
+        var imgEl = document.getElementById("mk-fi-img");
+
+        var useImage = !!CONFIG.image;
+        var flourish = obj; // element the sway/in/out animation targets
+
+        if (useImage) {
+          obj.style.display = "none";
+          imgEl.src = CONFIG.image;
+          imgEl.classList.add("mk-fi-show");
+          flourish = imgEl;
+        } else {
+          var icons = root.querySelectorAll("#mk-fi-icon svg");
+          for (var i = 0; i < icons.length; i++) icons[i].classList.remove("mk-fi-show");
+          var chosen = document.getElementById("mk-fi-icon-" + CONFIG.icon) || document.getElementById("mk-fi-icon-coin");
+          chosen.classList.add("mk-fi-show");
+          if (CONFIG.icon === "goldbar") obj.classList.add("mk-fi-bar");
+        }
+
+        document.getElementById("mk-fi-label").textContent = CONFIG.label;
+        if (!CONFIG.label) document.getElementById("mk-fi-label").style.display = "none";
+
+        var rect = group.getBoundingClientRect();
+        group.style.left =
+          (CONFIG.x === null ? Math.round((1920 - rect.width) / 2) : CONFIG.x) + "px";
+        group.style.top =
+          (CONFIG.y === null ? Math.round((1080 - rect.height) / 2) : CONFIG.y) + "px";
+
+        var tl = gsap.timeline({ paused: true });
+
+        if (CONFIG.animationIn) {
+          gsap.set(group, { opacity: 0, scale: 0.7 });
+          tl.to(group, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.8)" }, 0.15);
+        }
+
+        /* idle sway — subtle continuous 3D rotation, not a full spin.
+           Narrower amplitude in image mode: a real rendered object reads
+           wrong past a small angle, unlike the CSS gradient sphere. */
+        var swayDeg = useImage ? 8 : 16;
+        gsap.set(flourish, { rotateY: -swayDeg, rotateX: useImage ? 2 : 4 });
+        tl.to(flourish, { rotateY: swayDeg, duration: 1.8, ease: "sine.inOut", yoyo: true, repeat: 2 }, 0.4);
+
+        if (CONFIG.animationOut) {
+          tl.to(group, { opacity: 0, scale: 0.85, duration: 0.35, ease: "power2.in" }, DUR - 0.5);
+        }
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+
+        window.__timelines["mk-float-icon"] = tl;
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+{
+  "broll": [
+    {
+      "id": "dolar-fed",
+      "file": "broll/dolar-fed.mp4",
+      "start": 38.0,
+      "dur": 8.0,
+      "keyword": "DOLAR ENDEKSİ FED MERKEZ BANKASI",
+      "hint": "Dolar güçlenmesi / Fed binası görüntüsü — DXY 101 bandı anlatımını destekler (~38-46s)"
+    },
+    {
+      "id": "petrol-enerji",
+      "file": "broll/petrol-enerji.mp4",
+      "start": 48.5,
+      "dur": 8.0,
+      "keyword": "PETROL PLATFORMU ENERJİ",
+      "hint": "Petrol platformu / enerji görüntüsü — pahalanan petrol anlatımını destekler (~48-56s)"
+    }
+  ],
+  "punches": [
+    [
+      23.5,
+      9.0,
+      1.14
+    ],
+    [
+      64.0,
+      7.0,
+      1.12
+    ],
+    [
+      98.9,
+      8.0,
+      1.16
+    ],
+    [
+      140.2,
+      7.0,
+      1.14
+    ]
+  ],
+  "hero": {
+    "id": "card-fedgap",
+    "at": 32.4
+  },
+  "igBanner": [
+    {
+      "id": "mid",
+      "start": 78.0,
+      "dur": 4.5
+    },
+    {
+      "id": "end",
+      "start": 153.0,
+      "dur": 4.5
+    }
+  ],
+  "cardSfx": [],
+  "proCards": [
+    {
+      "id": "fedgap-widget",
+      "block": "mk-widget-glow",
+      "start": 71.7,
+      "dur": 6.0,
+      "copy": {"value": 100, "suffix": " BP", "label": "FED FAİZ FARKI", "max": 150, "x": 310, "y": 200}
+    },
+    {
+      "id": "float-chart",
+      "block": "mk-float-icon",
+      "start": 84.0,
+      "dur": 8.0,
+      "copy": {"icon": "chart", "label": "", "x": 430, "y": 60}
+    }
+  ],
+  "brollPending": false
+}
