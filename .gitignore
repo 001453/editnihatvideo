@@ -6,22 +6,18 @@ __pycache__/
 .transcode-cache/
 node_modules/
 _inbox/
-videos/*/renders/
-videos/*/snapshots/
-videos/*/public/broll/_raw_*
-videos/*/public/input-video.mp4
-videos/*/public/broll/*.mp4
 *.mp4
 !shared/**/*.mp4
 *.log
 .DS_Store
 Thumbs.db
 
-# KİLİT (2026-09): GitHub'a sadece PROJE (kod/şablon/kart-timeline kaynağı)
-# gitsin — üretilen video çıktısı ve gizli anahtar içeren dosyalar hariç.
+# KİLİT (2026-09, kullanıcı direktifi): GitHub'a artık SADECE ORTAK PIPELINE gider
+# (shared/, template/, scripts/, kok config). videos/ klasorunun tamami haric —
+# her kullanicinin kendi videolari kendine ozel/gizli kalsin, GitHub'a gitmesin.
 .cursor/mcp.json
 _ref_gold_tip/
 Claude outputs/
 _dash.err
 _dash.log
-videos/*/public/
+videos/
