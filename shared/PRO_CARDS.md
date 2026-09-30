@@ -29,6 +29,7 @@ Altyazı motoru **kilitli** (Montserrat Black social-hook, 2 satır). Kartlarda 
 | `mk-float-icon` | Yüzen altın/amber 3D obje (coin/chart/vault/goldbar) | gerçek broll yoksa, konuya uyan an (fiyat→coin, güvenli liman→vault, külçe→goldbar, trend→chart) |
 | `mk-app-mockup` | Sahte hesap kartı / app widget (`variant:"card"` veya `"app"`) | “hesabım”, bakiye, %değişim anlatılan an |
 | `mk-mini-disclaimer` | Küçük italik not, kart bandının dışında sürekli durabilir | simülasyon/veri sahnesinde ek uyarı (bitiş bannerinin yerine değil, ek) |
+| `mk-scene-break` | **Tam ekran (1080×1920) sahne kesme** — konuşan kişi tamamen kaybolur, adım-adım tablo (başlık kartı + rozet + noktalı bağlantı çizgisi + 2 veri satırı + dipnot) | Videonun en güçlü/karşılaştırmalı istatistik anı — **her videoda ZORUNLU en az 1 tane** (bkz. aşağıdaki Kural) |
 
 ### Bu 5'i nereden geldi
 
@@ -38,7 +39,8 @@ kartı ve veri sahnelerinde duran küçük italik not. Onun kırmızı-parlama b
 vignette/blur stili **alınmadı** — kilitli `videoGrade.legibilityOverlay:false` / no-blur
 kuralıyla çakışıyor, ayrı onay gerekir. Bunların hepsi sadece kart gövdesi/rozet/ikon dili;
 yüzü örtmüyor, glow tamamen kart içinde (küçük bir çizgi/obje üstünde), sayfa geneli
-karartma yok.
+karartma yok. `mk-scene-break` istisna: o bilinçli olarak TAM SAHNE — konuyu tablo halinde
+adım adım anlatan aynı hesaptaki "sert kesim" grafiği örnek alındı.
 
 `mk-float-icon`: broll YERİNE değil, broll YOKSA kullan — ikon konuya uygun olmalı (`coin`
 fiyat anı, `goldbar` fiziksel külçe anı, `vault` güvenli-liman/risk anı, `chart` trend anı).
@@ -57,6 +59,31 @@ bandına binmez). Bitiş bannerinin (`YATIRIM TAVSİYESİ DEĞİL`) yerine geçm
 5. IG / b-roll exclusive pencerelerine koyma.
 6. Liquid Glass / iOS Home / full-screen VFX **yasak** (yüz + Anton bozulur).
 
+## Kural — her videoda `mk-scene-break` (ZORUNLU, KİLİT — 2026-09)
+
+Rakip hesaptaki (@eemrebayirrr) "konuşmacı kaybolup tam ekran adım-adım tablo" sahnesi
+kanıtlanmış işleyen mekanizmayla eklendi: **her videoda konuya özel içerikle en az 1 tane**,
+videonun en güçlü karşılaştırma/istatistik anına yerleştirilir (ör. "zirveden kayıp",
+"950 milyar dolarlık yeni pazar", "1.400+ kurum girdi"). `timeline.json` → `proCards[]`
+içine `"block":"mk-scene-break"` girdisi olarak eklenir (aşağıdaki JSON örneğine bak).
+Her video için `heading` / `headingValue` / `badge` / `rows[]` / `footnote` o videonun
+KENDİ konusuna göre yeniden yazılır — asla önceki videodan kopya bırakılmaz.
+
+**Mekanizma (KANITLANMIŞ, 2026-09 — ekranda doğrulandı):**
+- Registry dosyası (`shared/registry/compositions/mk-scene-break.html`) kendi kök
+  elemanında `data-width="1080" data-height="1920"` bildiriyor (gerçek dikey video
+  kanvasıyla birebir — eski 1920×1080 "iç sahne" yaklaşımı Stüdyo'da sadece sol-üst
+  1080×1080 karesini gösteriyordu, tam ekran olmuyordu).
+- `build_engine.py → pro_cards_html()` bu bildirimi otomatik algılayıp `mk-app-mockup`
+  gibi 1920×1080 kartların kullandığı `pro-card` yerine, "Takip Et" rozetinde kanıtlanmış
+  `ig-follow-host` mekanizmasıyla monte ediyor.
+- Registry dosyasının içinde, asıl görünür içerik `class="clip"` ile işaretli bir sarmalayıcı
+  içinde olmalı (bkz. `instagram-follow.html` `#card` deseni) — bu işaret olmadan Stüdyo
+  canlı önizlemede içerik hiç boyanmıyor (2026-09'da tespit edilen kök sebep).
+- `rows[]` gibi dizi/nesne `copy` alanları `_patch_pro_config()` tarafından artık doğru
+  patch'leniyor (eskiden sessizce atlanıp bir önceki videonun sabit verisi kalıyordu —
+  düzeltildi, 2026-09).
+
 ## Agent nasıl kullanır
 
 `timeline.json`:
@@ -69,10 +96,29 @@ bandına binmez). Bitiş bannerinin (`YATIRIM TAVSİYESİ DEĞİL`) yerine geçm
     "start": 64.6,
     "dur": 7.0,
     "copy": {"value": 2.18, "suffix": "", "label": "MİLYAR TL", "caption": "KAP · 31 AĞUSTOS 2026", "max": 3}
+  },
+  {
+    "id": "scene-ornek",
+    "block": "mk-scene-break",
+    "start": 40.5,
+    "dur": 8.0,
+    "copy": {
+      "accent": "#f0b429",
+      "icon": "📈",
+      "heading": "KONU BAŞLIĞI",
+      "headingValue": "ANA RAKAM",
+      "badge": "KISA VURGU",
+      "rows": [
+        {"label": "Satır 1 etiketi", "value": "Satır 1 değeri"},
+        {"label": "Satır 2 etiketi", "value": "Satır 2 değeri"}
+      ],
+      "footnote": "ÖRNEK VERİDİR. YATIRIM TAVSİYESİ DEĞİLDİR."
+    }
   }
 ]
 ```
 
 Build: `build_composition.py` registry bloğunu `compositions/` altına bağlar.
 
-Yeni video paketlerken skill: klasik kartlar + bu listeden **konuya uyan 1–3** çeşit.
+Yeni video paketlerken skill: klasik kartlar + bu listeden **konuya uyan 1–3** çeşit +
+**1 adet `mk-scene-break`** (zorunlu, konuya özel).

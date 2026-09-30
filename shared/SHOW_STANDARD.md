@@ -16,8 +16,15 @@ Format: **9:16 · 1080×1920 · yüz önde · altyazı bandında kart · altyaz�
   - Altyazı: **`layout.caption.y`** (video bazlı, dashboard `/captions?id=…`'den ayarlanır)
   - Disclaimer: **en altta**, kart/altyazı bandının biraz altında (~y 1600–1650) — asla üst bantta değil.
   - Sağ ~150px IG rail boş. PIP **sol**. Kart max ~880-1000px (altyazı genişliğiyle uyumlu, `x:40`).
-- Kartlar: cam kit, video başına **1–3 özel/konuya-özgü kart**. Genel çeşitler için `shared/PRO_CARDS.md` registry'sini referans al ama **registry proCard (`data-composition-src`) olarak DEĞİL**, `cards.html` içine gömülü inline `.card-host > .card > .card-fx > .root` yapısı olarak yaz (registry proCard'lar Studio canlı önizlemede görünmüyor — bilinen sınırlama). `timeline.json` → `proCards[]` boş kalsın (`[]`). Captions sekmesi / Liquid Glass VFX yok.
-- **Full-frame karartma yok.**
+- Kartlar: cam kit, video başına **1–3 özel/konuya-özgü kart**. Genel çeşitler için `shared/PRO_CARDS.md` registry'sini referans al ama **registry proCard (`data-composition-src`) olarak DEĞİL**, `cards.html` içine gömülü inline `.card-host > .card > .card-fx > .root` yapısı olarak yaz — bu küçük glass kartlar için pratik ve hızlı yol budur. **İstisna: `mk-scene-break`** (tam ekran sahne kesme) registry proCard olarak (`timeline.json → proCards[]`) eklenir — bu mekanizma 2026-09'da kanıtlanmış şekilde çalışıyor (bkz. `shared/PRO_CARDS.md` → "Kural — her videoda mk-scene-break").
+- **Full-frame karartma yok** — `mk-scene-break` hariç: o bilinçli sert kesim, konuşmacı o sahne süresince tamamen kaybolur.
+
+### Sahne kesme kuralı (KİLİT — 2026-09, ZORUNLU)
+Her videoda, en güçlü karşılaştırma/istatistik anına **en az 1 tane `mk-scene-break`**
+eklenir — konuşmacı kaybolup tam ekran (1080×1920) adım-adım bir tablo gösterilir
+(başlık + rozet + noktalı bağlantı çizgisi + 2 veri satırı + dipnot). İçerik o videonun
+KENDİ konusuna göre yazılır, önceki videodan kopyalanmaz. Detay, mekanizma ve JSON
+örneği: `shared/PRO_CARDS.md`.
 
 ### Altyazı
 - **Montserrat Black karaoke**: kelimeler silik → konuşulunca accent (`#FACC15`/kırmızı/lime) → sonra beyaz. 4 köşe siyah outline. En fazla **2 satır**.
@@ -68,27 +75,16 @@ Look: `shared/`. Recipe: `shared/show-flow.json`.
 
 ## B) Konuya özel (her videoda YENİ yazılır)
 
-- Kart metinleri, sayılar, chapter etiketleri  
-- B-roll konusu + Labs prompt  
-- Punch / hero / IG zamanları  
-- Keyword listesi transcript’e göre genişler  
-
-Animasyon **stili kilitli**; içerik **serbest**.
-
 ### Motion graphics (`timeline.mg`)
-Kart değil — overlay efektler. Video’da **2–5** yeter.
-Tipler: `sparkline` | `stroke` | `sparks` | `flash` | `ticker` | `underline`
 
 ### Tip-explainer (`timeline.tipScenes`) — opsiyonel
-Max **2** sahne. Default: konuşmacı **tam ekran blur**, üstte örnek kart ~**3s** gelir geçer (`halfPip: false`).
-Eski yarım ekran için `halfPip: true`. Kind: `nodes` | `social` | `branches`.
-Yüzde `sparks` MG parıltı **kullanma**.
 
 ---
 
 ## C) Video başına 1 “özel an” (öneri havuzu)
 
-Her pakette **en fazla 1** büyük jest — tekrar edilirse ucuzlaşır.
+Her pakette **en fazla 1** büyük jest — tekrar edilirse ucuzlaşır. (`mk-scene-break` bunun
+dışında — o ayrı ve ZORUNLU, bkz. yukarıdaki "Sahne kesme kuralı".)
 
 | Özel an | Ne | Ne zaman |
 | --- | --- | --- |
@@ -99,6 +95,7 @@ Her pakette **en fazla 1** büyük jest — tekrar edilirse ucuzlaşır.
 | **Chart scrub** | Grafik üzerinde imleç + değer | tek hero sayı |
 | **Frozen frame + stamp** | Anlık freeze + “DİKKAT” mühür | kural / yasak cümlesi |
 | **Whip to B-roll** | (zaten var) ekstra abartılı 1 clip | görsel kanıt anı |
+| **`mk-scene-break`** | Tam ekran (1080×1920) adım-adım tablo, konuşmacı kaybolur | En güçlü karşılaştırma/istatistik anı — **ZORUNLU, her videoda** |
 
 **Drone önerisi (senin örneğin):**  
 Tek seferlik `timeline.json` → `"special": {"type":"drone","at":52.4,"dur":1.4}` — talking-head hafif küçülür, üstte chapter/kart sabit kalır, whoosh-long. Her videoda değil; ~2 dk’da bir kez.

@@ -16,6 +16,16 @@
         background: transparent;
         overflow: hidden;
       }
+      /* KİLİT (2026-09, GERÇEK tam ekran): önceki sürüm pro-card (1920x1080
+         iç sahne) mekanizmasını kullanıyordu — Stüdyo canlı önizlemede bunu
+         SADECE görünür karenin (sol-üst 1080x1080) İÇİNDE gösteriyor, geri
+         kalan alt ~840px hiç boyanmıyordu ("tam sayfa olmadı"). Kanıtlanmış
+         TAM EKRAN mekanizması instagram-follow.html'de kullanılan desendir:
+         host native 1080x1920 (dikey, gerçek video kanvasıyla birebir) VE
+         asıl görünür içerik class="clip" ile işaretlenmiş olmalı (bkz.
+         instagram-follow.html #card). Bu dosya artık o deseni birebir
+         izliyor; build_engine.py da data-width/height=1080/1920 gören her
+         registry öğesini otomatik olarak ig-follow-host ile monte ediyor. */
       #mk-sb-root {
         position: relative;
         width: 1080px;
@@ -24,17 +34,17 @@
         font-family: "Montserrat", "Inter", -apple-system, sans-serif;
         background:
           radial-gradient(circle, rgba(255, 255, 255, 0.055) 1.6px, transparent 1.6px) 0 0 / 46px 46px,
-          radial-gradient(120% 90% at 50% 8%, #262a45 0%, #14151f 55%, #0a0a10 100%);
+          radial-gradient(120% 60% at 50% 6%, #262a45 0%, #14151f 55%, #0a0a10 100%);
       }
       #mk-sb-head {
         position: absolute;
-        left: 90px;
-        top: 640px;
-        width: 900px;
+        left: 60px;
+        top: 220px;
+        width: 960px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 34px 42px;
+        padding: 30px 34px;
         border-radius: 26px;
         background: linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -44,11 +54,11 @@
       #mk-sb-head-left {
         display: flex;
         align-items: center;
-        gap: 22px;
+        gap: 20px;
       }
       #mk-sb-ico {
-        width: 66px;
-        height: 66px;
+        width: 64px;
+        height: 64px;
         border-radius: 18px;
         display: flex;
         align-items: center;
@@ -58,23 +68,23 @@
       }
       #mk-sb-heading {
         font-weight: 800;
-        font-size: 32px;
+        font-size: 29px;
         color: #f2f2f6;
         letter-spacing: 0.01em;
       }
       #mk-sb-headval {
         font-weight: 800;
-        font-size: 40px;
+        font-size: 36px;
         color: #ffffff;
       }
       #mk-sb-badge {
         position: absolute;
-        left: 90px;
-        top: 760px;
+        left: 60px;
+        top: 360px;
         padding: 12px 26px;
         border-radius: 999px;
         font-weight: 800;
-        font-size: 26px;
+        font-size: 24px;
         color: #14151f;
         background: var(--acc, #ff4d4d);
         box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4);
@@ -82,8 +92,8 @@
       }
       #mk-sb-line {
         position: absolute;
-        left: 128px;
-        top: 830px;
+        left: 96px;
+        top: 440px;
         width: 3px;
         height: 260px;
         background: repeating-linear-gradient(
@@ -98,9 +108,9 @@
       }
       #mk-sb-rows {
         position: absolute;
-        left: 90px;
-        top: 1080px;
-        width: 900px;
+        left: 60px;
+        top: 530px;
+        width: 960px;
         display: flex;
         flex-direction: column;
         gap: 22px;
@@ -109,7 +119,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 26px 36px;
+        padding: 28px 34px;
         border-radius: 20px;
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -118,63 +128,63 @@
       }
       .mk-sb-row-label {
         font-weight: 650;
-        font-size: 27px;
+        font-size: 25px;
         color: #d8d8e2;
       }
       .mk-sb-row-value {
         font-weight: 800;
-        font-size: 32px;
+        font-size: 30px;
         color: #ffffff;
       }
       #mk-sb-foot {
         position: absolute;
-        left: 0;
-        bottom: 120px;
-        width: 1080px;
-        text-align: center;
-        font-size: 21px;
+        left: 60px;
+        bottom: 140px;
+        width: 960px;
+        text-align: left;
+        font-size: 18px;
         font-weight: 650;
-        color: rgba(255, 255, 255, 0.55);
-        padding: 0 90px;
+        color: rgba(255, 255, 255, 0.5);
         opacity: 0;
       }
     </style>
   </head>
   <body>
-    <div id="mk-sb-root" data-composition-id="mk-scene-break" data-start="0" data-duration="8" data-width="1080" data-height="1920">
-      <div id="mk-sb-head">
-        <div id="mk-sb-head-left">
-          <div id="mk-sb-ico">📊</div>
-          <div id="mk-sb-heading"></div>
-        </div>
-        <div id="mk-sb-headval"></div>
-      </div>
-      <div id="mk-sb-badge"></div>
-      <div id="mk-sb-line"></div>
-      <div id="mk-sb-rows"></div>
-      <div id="mk-sb-foot"></div>
+    <div
+      id="mk-sb-root"
+      data-composition-id="mk-scene-break"
+      data-width="1080"
+      data-height="1920"
+      data-start="0"
+      data-duration="8"
+    >
       <div
-        id="mk-sb-drv"
+        id="mk-sb-clip"
         class="clip"
         data-start="0"
         data-duration="8"
         data-track-index="0"
-        style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
-      ></div>
+        style="position: absolute; left: 0; top: 0; width: 1080px; height: 1920px"
+      >
+        <div id="mk-sb-head">
+          <div id="mk-sb-head-left">
+            <div id="mk-sb-ico">📊</div>
+            <div id="mk-sb-heading"></div>
+          </div>
+          <div id="mk-sb-headval"></div>
+        </div>
+        <div id="mk-sb-badge"></div>
+        <div id="mk-sb-line"></div>
+        <div id="mk-sb-rows"></div>
+        <div id="mk-sb-foot"></div>
+      </div>
     </div>
     <script>
       (function () {
         window.__timelines = window.__timelines || {};
 
         /* ---- published parameters ----
-           Full-frame (1080x1920) cut-away "breakdown" scene: talking-head
-           is fully covered while a top summary card + colored result badge
-           + dotted connector + step-by-step data rows animate in, closing
-           on a persistent small disclaimer line. Mount this via proCards
-           with mountW:1080, mountH:1920 so it fills the real canvas
-           (unlike the small side-widgets which stay inside the 1920x1080
-           internal scene). Keep heading/rows tied to this video's own
-           numbers, never demo text. */
+           "Sahne kesme" kartı: timeline.json → proCards[].copy ile doldurulur. */
         var CONFIG = {
           accent: "#ff4d4d",
           icon: "📊",
@@ -212,8 +222,7 @@
           rowsEl.appendChild(d);
           return d;
         });
-        // connector spans down to just above the last row
-        var lineH = 90 + rowEls.length * 84;
+        var lineH = 80 + rowEls.length * 84;
         document.getElementById("mk-sb-line").style.height = lineH + "px";
 
         var tl = gsap.timeline({ paused: true });
@@ -221,9 +230,9 @@
         tl.to("#mk-sb-badge", { opacity: 1, duration: 0.4, ease: "back.out(2)" }, 0.65);
         tl.to("#mk-sb-line", { scaleY: 1, duration: 0.55, ease: "power1.inOut" }, 0.95);
         rowEls.forEach(function (el, i) {
-          tl.to(el, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 1.55 + i * 0.55);
+          tl.to(el, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 1.55 + i * 0.5);
         });
-        tl.to("#mk-sb-foot", { opacity: 1, duration: 0.5 }, 1.9 + rowEls.length * 0.55);
+        tl.to("#mk-sb-foot", { opacity: 1, duration: 0.5 }, 1.9 + rowEls.length * 0.5);
         tl.to(
           ["#mk-sb-head", "#mk-sb-badge", "#mk-sb-line", "#mk-sb-foot"].concat(rowEls),
           { opacity: 0, duration: 0.35, ease: "power2.in" },

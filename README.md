@@ -32,7 +32,8 @@ Aşağıdaki liste, bir videonun kaynak dosyadan Instagram'a hazır MP4'e kadar 
 - **Agent (ben):**
   1. `videos/<id>/transcripts/input-video.json`'ı okur, konudan (altın, gümüş, FED, petrol vb.) hangi sayıların/başlıkların kart olacağına karar verir.
   2. `shared/SHOW_STANDARD.md`'deki **kilitli kurallara** göre yazar — en önemlileri:
-     - Kartlar **`cards.html` içine gömülü** yazılır (`.card-host > .card > .card-fx > .root`), registry `proCard` olarak DEĞİL — registry proCard Studio canlı önizlemede görünmüyor.
+     - Kartlar **`cards.html` içine gömülü** yazılır (`.card-host > .card > .card-fx > .root`), registry `proCard` olarak DEĞİL — küçük glass kartlar için bu pratik yol.
+     - **İstisna — `mk-scene-break` (tam ekran sahne kesme) ZORUNLU, her videoda en az 1 tane:** `timeline.json → proCards[]` içine eklenir, konuya özel içerikle (bkz. `shared/PRO_CARDS.md`). Bu registry proCard kanıtlanmış mekanizmayla çalışıyor (2026-09'da düzeltildi).
      - Video başına **5–8 kart**, ilk 10 saniyede kart yok, kartlar arası en az ~6s boşluk.
      - **Punch (kamera zoom) ZORUNLU** — `timeline.json → punches[]` her videoda **3–5 tane**, hold 6–10s, scale 1.10–1.14, asla boş bırakılmaz.
      - **B-roll asla ilk sırada gelmez** — ilk b-roll'un `start` değeri **en az 20.0 saniye**.
@@ -211,6 +212,7 @@ git_guvenli_gonder.bat güvenli commit + push (sadece ortak motor)
 
 - Kart bandı altyazı ile aynı bölgede; yüz alanı (y 300–1100) boş kalır
 - Kartlar `cards.html` içine inline yazılır, registry proCard olarak değil
+- **`mk-scene-break` (tam ekran sahne kesme) her videoda ZORUNLU en az 1 tane** — konuya özel, `proCards[]` içinde
 - Her kart-host ekranda en fazla 3.0 saniye; ilk 10 saniyede kart yok
 - **Punch 3–5, asla boş değil**, hold 6–10s, scale 1.10–1.14
 - **B-roll ilk 20 saniyeden önce gelmez**, max 2×8s

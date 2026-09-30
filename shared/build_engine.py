@@ -125,6 +125,44 @@ def _patch_pro_config(html: str, copy: dict) -> str:
             html = re.sub(rf"({kpat}\s*:\s*)(true|false)", rf"\g<1>{lit}", html, count=1)
         elif isinstance(val, (int, float)):
             html = re.sub(rf"({kpat}\s*:\s*)(-?\d+(?:\.\d+)?)", rf"\g<1>{val}", html, count=1)
+        elif isinstance(val, (list, dict)):
+            # KİLİT (2026-09, dizi/nesne alan düzeltmesi): önceki kod sadece
+            # bool/sayı/string CONFIG alanlarını patch'liyordu; rows: [...]
+            # gibi dizi/nesne alanlar sessizce atlanıyor ve registry
+            # dosyasındaki sabit örnek veri (ör. mk-scene-break'in
+            # "Zirve (Mayıs)/15.200" satırları) HER videoda değişmeden
+            # kalıyordu. Şimdi dizi/nesne alanlar da JSON literal olarak
+            # yazılıyor; açılış "[" veya "{" ile onunla eşleşen kapanış
+            # (basit iç içe geçme desteğiyle) bulunup değiştiriliyor.
+            m = re.search(rf"{kpat}\s*:\s*", html)
+            if m:
+                open_ch = html[m.end()] if m.end() < len(html) else ""
+                close_ch = {"[": "]", "{": "}"}.get(open_ch)
+                if close_ch:
+                    depth = 0
+                    i = m.end()
+                    end_idx = None
+                    in_str = None
+                    while i < len(html):
+                        c = html[i]
+                        if in_str:
+                            if c == "\\":
+                                i += 1
+                            elif c == in_str:
+                                in_str = None
+                        elif c in "\"'":
+                            in_str = c
+                        elif c == open_ch:
+                            depth += 1
+                        elif c == close_ch:
+                            depth -= 1
+                            if depth == 0:
+                                end_idx = i + 1
+                                break
+                        i += 1
+                    if end_idx:
+                        lit = json.dumps(val, ensure_ascii=False)
+                        html = html[: m.end()] + lit + html[end_idx:]
         else:
             lit = json.dumps(str(val), ensure_ascii=False)
             html = re.sub(
@@ -160,9 +198,25 @@ def pro_cards_html():
         cid = re.sub(r"[^\w\-]+", "-", (p.get("id") or block).strip()) or f"pro{i}"
         local_name = f"pro-{cid}.html"
         local = dest / local_name
-        local.write_text(_patch_pro_config(src.read_text(encoding="utf-8"), p.get("copy") or {}), encoding="utf-8")
+        src_text = src.read_text(encoding="utf-8")
+        local.write_text(_patch_pro_config(src_text, p.get("copy") or {}), encoding="utf-8")
         start = float(p.get("start") or 0)
         dur = float(p.get("dur") or 7)
+        # KİLİT (2026-09, GERÇEK tam ekran sahne desteği): bir registry öğesi
+        # kendi kök elemanında data-width="1080" data-height="1920" (dikey,
+        # gerçek video kanvasıyla birebir) beyan ediyorsa — mk-scene-break
+        # gibi — bunu pro-card (1920x1080 yatay iç sahne, Stüdyo'da sadece
+        # sol-üst 1080x1080 karesi görünür) yerine KANITLANMIŞ ig-follow-host
+        # mekanizmasıyla (instagram-follow.html ile aynı desen: native
+        # 1080x1920 host + içeride class="clip" ile işaretli asıl görünür
+        # içerik) monte ediyoruz — bu şekilde tüm 1080x1920 çerçeve boyanır.
+        native_m = re.search(r'data-width="(\d+)"\s+data-height="(\d+)"', src_text)
+        native_w, native_h = (int(native_m.group(1)), int(native_m.group(2))) if native_m else (1920, 1080)
+        if native_w == 1080 and native_h == 1920:
+            bits.append(
+                f'''      <div class="clip ig-follow-host" id="pro-{cid}" data-composition-id="{escape(block)}" data-composition-src="../compositions/{local_name}" data-start="{q(start)}" data-duration="{q(dur)}" data-track-index="20" data-width="1080" data-height="1920" style="left:0;top:0;width:1080px;height:1920px;z-index:40;pointer-events:none;"></div>'''
+            )
+            continue
         # KİLİT (2026-09, pro-card görünmezlik düzeltmesi): registry blokları
         # kendi içinde sabit 1920x1080 (yatay) bir sahne varsayıyor ve asıl
         # görsel eleman (kart/ikon) o sahne üzerinde CONFIG.x/CONFIG.y ile
