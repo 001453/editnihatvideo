@@ -65,6 +65,7 @@ CARD_SFX = [tuple(x) for x in (timeline.get("cardSfx") or [])]
 MG = list(timeline.get("mg") or [])
 PRO_CARDS = list(timeline.get("proCards") or [])
 TIP_SCENES = list(timeline.get("tipScenes") or [])
+SCENE_BREAKS = list(timeline.get("sceneBreaks") or [])
 
 
 def shared_dir():
@@ -186,6 +187,37 @@ def pro_cards_html():
         # path relative to public/index.html → ../compositions/
         bits.append(
             f'''      <div class="clip pro-card" id="pro-{cid}" data-composition-id="{escape(block)}" data-composition-src="../compositions/{local_name}" data-start="{q(start)}" data-duration="{q(dur)}" data-track-index="11" data-width="1920" data-height="1080" style="left:{mount_left}px;top:{mount_top}px;width:1920px;height:1080px;z-index:12;pointer-events:none;"></div>'''
+        )
+    return "\n".join(bits)
+
+
+def scene_break_html_bits():
+    """Tam-ekran 'sahne kesme' — konuşan kişi tamamen kaybolup ayrı bir
+    1080x1920 grafik sahnesine SERT KESİM yapılır (rakip hesap örneğindeki
+    gibi). pro-card mekanizması (1920x1080 iç sahne varsayımı) Stüdyo'nun
+    canlı önizlemesinde bu boyutu override edemiyor — bu yüzden KANITLANMIŞ
+    ig-follow-host deseni (data-width/height=1080/1920, aynı .clip host)
+    yeniden kullanılıyor, sadece farklı içerik ile."""
+    if not SCENE_BREAKS:
+        return ""
+    reg = shared_dir() / "registry" / "compositions"
+    dest = ROOT / "compositions"
+    dest.mkdir(parents=True, exist_ok=True)
+    bits = []
+    for i, s in enumerate(SCENE_BREAKS):
+        block = (s.get("block") or "mk-scene-break").strip()
+        src = reg / f"{block}.html"
+        if not src.is_file():
+            print("scene-break yok:", block)
+            continue
+        sid = re.sub(r"[^\w\-]+", "-", (s.get("id") or f"scene{i}").strip()) or f"scene{i}"
+        local_name = f"scene-{sid}.html"
+        local = dest / local_name
+        local.write_text(_patch_pro_config(src.read_text(encoding="utf-8"), s.get("copy") or {}), encoding="utf-8")
+        start = float(s.get("start") or 0)
+        dur = float(s.get("dur") or 8)
+        bits.append(
+            f'''      <div class="clip ig-follow-host" id="scene-{sid}" data-composition-id="{escape(block)}" data-composition-src="../compositions/{local_name}" data-start="{q(start)}" data-duration="{q(dur)}" data-track-index="20" data-width="1080" data-height="1920" style="left:0;top:0;width:1080px;height:1920px;z-index:35;pointer-events:none;"></div>'''
         )
     return "\n".join(bits)
 
@@ -1825,6 +1857,7 @@ html_doc = f'''<!doctype html>
 {cards_html}
 {pro_cards_html()}
 {ig_html}
+{scene_break_html_bits()}
 {mg_html_bits()}
 {tip_html}
       <div id="caption-layer" style="position:absolute;inset:0;pointer-events:none;">

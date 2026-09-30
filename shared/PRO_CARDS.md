@@ -44,43 +44,9 @@ karartma yok.
 fiyat anı, `goldbar` fiziksel külçe anı, `vault` güvenli-liman/risk anı, `chart` trend anı).
 Emre'nin gear/uçak/ev gibi genel ikonları burada yok — hepsi finans/altın temalı.
 
-**KİLİT (2026-09, güncellendi: Nano Banana MCP — pexels/pixabay stok siteleri finans/altın
-temasına uygun içerik vermiyor, o yoldan vazgeçildi; b-roll yine Labs/manuel kalıyor. Görsel
-üretimi için odak **Google Gemini "Nano Banana" MCP** (`.cursor/mcp.json` → `nanobanana`,
-ücretsiz Google AI Studio key — günde ~500 görsel, ticari kullanım serbest, kart bilgisi
-istemiyor):**
-
-`mk-float-icon` isteğe bağlı `CONFIG.image` alanı destekliyor
-(`shared/registry/compositions/mk-float-icon.html`) — set edilince CSS gradyan küre/bar yerine
-gerçek üretilmiş bir PNG gösterir (aynı GSAP sway/in/out kalır, daha dar açıyla). Görseller
-artık **Nano Banana MCP** (`generate_image` tool) ile agent tarafından **otomatik** üretilir —
-elle indirme yok. Nano Banana native şeffaf PNG üretemiyor (RGB only, alpha yok), o yüzden 2
-adımlı akış: (1) agent objeyi düz **yeşil (#00FF00) zemin** üzerinde ürettirir — prompt'ta
-"transparent" kelimesi GEÇMEZ (Nano Banana bunu checkerboard desenine çeviriyor, işe yaramıyor);
-(2) `scripts/prep_icon_bg.py <ham_png> shared/registry/assets/icon-<isim>.png` ile yeşil zemin
-chroma-key ile şeffaflaştırılır (basit Pillow renk-anahtarı + kenar yumuşatma, ek model/indirme
-gerektirmez). Örnek prompt: *"3D realistic glossy gold/amber [coin | bank vault door | stacked
-gold bars | rising stock chart with amber glow], dramatic studio lighting, high detail, centered,
-floating in empty space, solid pure green background (#00FF00), no text, no watermark, product
-render style"*. Bunlar video-özel değil, show-locked ortak varlıklar: coin/vault/goldbar/chart
-için birer kez üretilip `shared/registry/assets/icon-<isim>.png` altına kaydedilir ve her
-videoda tekrar kullanılır (`instagram-follow.html`'in `assets/avatar.jpg`'i nasıl kullandığıyla
-aynı desen). Yeni bir ikon tipi gerekmedikçe her videoda yeniden üretilmez — önce
-`shared/registry/assets/` altında var mı diye bakılır. `timeline.json`'da
-`proCards[].copy.image` alanına dosya adını yaz (örn. `"assets/icon-goldbar.png"`); boş
-bırakılırsa eski CSS görünümüne düşer.
-
 `mk-mini-disclaimer`: outer `scale:1` ile kullan (iç `x:0,y:0` sabit — metin kendi doğal
 boyutunda kalır), outer `x:40,y:1520` civarı önerilir (bitiş bannerinin biraz üstü, altyazı
 bandına binmez). Bitiş bannerinin (`YATIRIM TAVSİYESİ DEĞİL`) yerine geçmez, ona ek.
-
-**KİLİT (2026-09, kullanıcı geri bildirimi):** Her videoda zaten zorunlu bir bitiş
-disclaimer banner'ı var (`card-disclaimer`, "YATIRIM TAVSİYESİ DEĞİL"). `mk-mini-disclaimer`'ı
-video başına seçilen 1-3 pro karttan biri olarak **kullanma** — aynı mesajı tekrarlamış
-oluyor, tekrar kalabalık/gereksiz görünüyor. Bunun yerine konuya uygun başka bir çeşit seç
-(`mk-float-icon`, `mk-app-mockup`, `mk-badge-stat`, `mk-widget-glow` vb.). `mk-mini-disclaimer`
-sadece kullanıcı açıkça özellikle isterse (örn. gerçekten ayrı bir simülasyon/veri sahnesi
-için ek uyarı istenirse) kullanılır, varsayılan rotasyonun parçası değildir.
 
 ## Kural (show)
 
@@ -90,22 +56,6 @@ için ek uyarı istenirse) kullanılır, varsayılan rotasyonun parçası değil
 4. 9:16 üst bant (~y 120–600); altyazı bandına binme.
 5. IG / b-roll exclusive pencerelerine koyma.
 6. Liquid Glass / iOS Home / full-screen VFX **yasak** (yüz + Anton bozulur).
-
-## KİLİT (2026-09, görünmezlik düzeltmesi — ÖNEMLİ)
-
-Registry blokları kendi içinde sabit **1920x1080 yatay** bir sahne varsayıyor;
-kartın/ikonun asıl görünür konumu o sahnede `CONFIG.x`/`CONFIG.y` ile verilir.
-Video ise **1080x1920 dikey**. Host artık ölçeksiz, sahnenin native boyutunda
-(1920x1080, left:0/top:0) monte ediliyor — bu yüzden **her `proCards[]`
-girdisinde `copy.x` ve `copy.y` MUTLAKA verilmeli**, doğrudan 1080 genişlikli
-dikey çerçeveye göre (örn. `x:310` kartı yatayda ortalar, `y:120-600` arası üst
-bant). Verilmezse registry'nin kendi varsayılanı (`x:~1300`) kullanılır ve kart
-1080'lik çerçevenin tamamen dışına düşüp **görünmez** olur — 2026-09'da
-0916/0918/0919/0927'de tam olarak bu yüzden kartlar ekranda hiç görünmüyordu
-(kod hiç şikayet etmiyordu, Stüdyo dosyayı tanıyordu ama görsel kanvas dışında
-kalıyordu). Ayrıca `_patch_pro_config` artık `\b` kelime-sınırı kullanıyor —
-eskiden kısa anahtar adları ("x","y") "max:"/"opacity:" gibi başka alanların
-içine yanlış eşleşip onları bozuyordu.
 
 ## Agent nasıl kullanır
 

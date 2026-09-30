@@ -1,0 +1,238 @@
+<!-- hyperframes-registry-item: mk-scene-break -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: transparent;
+        overflow: hidden;
+      }
+      #mk-sb-root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+        background:
+          radial-gradient(circle, rgba(255, 255, 255, 0.055) 1.6px, transparent 1.6px) 0 0 / 46px 46px,
+          radial-gradient(120% 90% at 50% 8%, #262a45 0%, #14151f 55%, #0a0a10 100%);
+      }
+      #mk-sb-head {
+        position: absolute;
+        left: 90px;
+        top: 640px;
+        width: 900px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 34px 42px;
+        border-radius: 26px;
+        background: linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 24px 54px rgba(0, 0, 0, 0.45);
+        opacity: 0;
+      }
+      #mk-sb-head-left {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+      }
+      #mk-sb-ico {
+        width: 66px;
+        height: 66px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(150deg, var(--acc, #ff4d4d), rgba(255, 255, 255, 0.15));
+        font-size: 30px;
+      }
+      #mk-sb-heading {
+        font-weight: 800;
+        font-size: 32px;
+        color: #f2f2f6;
+        letter-spacing: 0.01em;
+      }
+      #mk-sb-headval {
+        font-weight: 800;
+        font-size: 40px;
+        color: #ffffff;
+      }
+      #mk-sb-badge {
+        position: absolute;
+        left: 90px;
+        top: 760px;
+        padding: 12px 26px;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: 26px;
+        color: #14151f;
+        background: var(--acc, #ff4d4d);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4);
+        opacity: 0;
+      }
+      #mk-sb-line {
+        position: absolute;
+        left: 128px;
+        top: 830px;
+        width: 3px;
+        height: 260px;
+        background: repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.55) 0,
+          rgba(255, 255, 255, 0.55) 10px,
+          transparent 10px,
+          transparent 20px
+        );
+        transform-origin: top center;
+        transform: scaleY(0);
+      }
+      #mk-sb-rows {
+        position: absolute;
+        left: 90px;
+        top: 1080px;
+        width: 900px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+      .mk-sb-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 26px 36px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      .mk-sb-row-label {
+        font-weight: 650;
+        font-size: 27px;
+        color: #d8d8e2;
+      }
+      .mk-sb-row-value {
+        font-weight: 800;
+        font-size: 32px;
+        color: #ffffff;
+      }
+      #mk-sb-foot {
+        position: absolute;
+        left: 0;
+        bottom: 120px;
+        width: 1080px;
+        text-align: center;
+        font-size: 21px;
+        font-weight: 650;
+        color: rgba(255, 255, 255, 0.55);
+        padding: 0 90px;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mk-sb-root" data-composition-id="mk-scene-break" data-start="0" data-duration="8" data-width="1080" data-height="1920">
+      <div id="mk-sb-head">
+        <div id="mk-sb-head-left">
+          <div id="mk-sb-ico">📊</div>
+          <div id="mk-sb-heading"></div>
+        </div>
+        <div id="mk-sb-headval"></div>
+      </div>
+      <div id="mk-sb-badge"></div>
+      <div id="mk-sb-line"></div>
+      <div id="mk-sb-rows"></div>
+      <div id="mk-sb-foot"></div>
+      <div
+        id="mk-sb-drv"
+        class="clip"
+        data-start="0"
+        data-duration="8"
+        data-track-index="0"
+        style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+      ></div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+
+        /* ---- published parameters ----
+           Full-frame (1080x1920) cut-away "breakdown" scene: talking-head
+           is fully covered while a top summary card + colored result badge
+           + dotted connector + step-by-step data rows animate in, closing
+           on a persistent small disclaimer line. Mount this via proCards
+           with mountW:1080, mountH:1920 so it fills the real canvas
+           (unlike the small side-widgets which stay inside the 1920x1080
+           internal scene). Keep heading/rows tied to this video's own
+           numbers, never demo text. */
+        var CONFIG = {
+          accent: "#ff4d4d",
+          icon: "📊",
+          heading: "BİST100 ENDEKSİ",
+          headingValue: "15.200",
+          badge: "-%20",
+          rows: [
+            { label: "Zirve (Mayıs)", value: "15.200" },
+            { label: "Bugün", value: "12.900" },
+          ],
+          footnote: "ÖRNEK VERİDİR. YATIRIM TAVSİYESİ DEĞİLDİR.",
+        };
+
+        var DUR = 8;
+        var root = document.getElementById("mk-sb-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        document.getElementById("mk-sb-ico").textContent = CONFIG.icon;
+        document.getElementById("mk-sb-heading").textContent = CONFIG.heading;
+        document.getElementById("mk-sb-headval").textContent = CONFIG.headingValue;
+        document.getElementById("mk-sb-badge").textContent = CONFIG.badge;
+        document.getElementById("mk-sb-foot").textContent = CONFIG.footnote;
+
+        var rowsEl = document.getElementById("mk-sb-rows");
+        var rowEls = (CONFIG.rows || []).map(function (r) {
+          var d = document.createElement("div");
+          d.className = "mk-sb-row";
+          var l = document.createElement("div");
+          l.className = "mk-sb-row-label";
+          l.textContent = r.label;
+          var v = document.createElement("div");
+          v.className = "mk-sb-row-value";
+          v.textContent = r.value;
+          d.appendChild(l);
+          d.appendChild(v);
+          rowsEl.appendChild(d);
+          return d;
+        });
+        // connector spans down to just above the last row
+        var lineH = 90 + rowEls.length * 84;
+        document.getElementById("mk-sb-line").style.height = lineH + "px";
+
+        var tl = gsap.timeline({ paused: true });
+        tl.to("#mk-sb-head", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.15);
+        tl.to("#mk-sb-badge", { opacity: 1, duration: 0.4, ease: "back.out(2)" }, 0.65);
+        tl.to("#mk-sb-line", { scaleY: 1, duration: 0.55, ease: "power1.inOut" }, 0.95);
+        rowEls.forEach(function (el, i) {
+          tl.to(el, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 1.55 + i * 0.55);
+        });
+        tl.to("#mk-sb-foot", { opacity: 1, duration: 0.5 }, 1.9 + rowEls.length * 0.55);
+        tl.to(
+          ["#mk-sb-head", "#mk-sb-badge", "#mk-sb-line", "#mk-sb-foot"].concat(rowEls),
+          { opacity: 0, duration: 0.35, ease: "power2.in" },
+          DUR - 0.5
+        );
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+
+        window.__timelines["mk-scene-break"] = tl;
+      })();
+    </script>
+  </body>
+</html>
