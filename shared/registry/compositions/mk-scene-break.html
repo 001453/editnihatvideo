@@ -32,9 +32,25 @@
         height: 1920px;
         overflow: hidden;
         font-family: "Montserrat", "Inter", -apple-system, sans-serif;
-        background:
-          radial-gradient(circle, rgba(255, 255, 255, 0.055) 1.6px, transparent 1.6px) 0 0 / 46px 46px,
-          radial-gradient(120% 60% at 50% 6%, #262a45 0%, #14151f 55%, #0a0a10 100%);
+        /* KİLİT (2026-10, performans): önceki sürümde ince noktalı
+           tekrarlanan radial-gradient doku vardı ("background:
+           radial-gradient(circle,...) 0 0 / 46px 46px, ...") — Stüdyo
+           önizlemesinde "çok ağır / yavaş yükleniyor" şikayetine yol açtı.
+           Görsel katkısı küçüktü, render maliyeti büyüktü — kaldırıldı,
+           sade vignette gradient kaldı. */
+        background: radial-gradient(120% 60% at 50% 6%, #262a45 0%, #14151f 55%, #0a0a10 100%);
+        /* KİLİT (2026-10, KÖK SEBEP — "görselim gelmiyor, scene-break'ten
+           sonra düzeliyor" hatası): bu kök div opak bir arkaplan taşıyor ve
+           eskiden varsayılan olarak visibility:visible'dı — sayfa yüklenir
+           yüklenmez DOM'da duruyor, Stüdyo onu kendi [data-start,
+           data-duration] penceresinde henüz "sürmemiş" olsa bile ekranı
+           (ve altındaki #video-wrap'ı) baştan beri kaplıyordu. Sadece KENDİ
+           iç timeline'ı bir kere oynatılıp sonuna varınca (`tl.set(root,
+           {visibility:"hidden"}, DUR-0.02)`) gizleniyordu — yani "scene
+           kartı girip çıktıktan sonra görselim geri geliyor" tam olarak bu
+           yüzdendi. Düzeltme: kök varsayılan olarak gizli başlasın, kendi
+           timeline'ı başında (t=0) görünür yapsın, sonunda yine gizlesin. */
+        visibility: hidden;
       }
       #mk-sb-head {
         position: absolute;
@@ -104,7 +120,6 @@
           transparent 20px
         );
         transform-origin: top center;
-        transform: scaleY(0);
       }
       #mk-sb-rows {
         position: absolute;
@@ -226,9 +241,24 @@
         document.getElementById("mk-sb-line").style.height = lineH + "px";
 
         var tl = gsap.timeline({ paused: true });
+        /* KİLİT 2026-10 (v2 — ileri/geri scrub düzeltmesi): kök CSS'te
+           visibility:hidden ile başlıyor. GSAP, bu iç timeline'ın penceresi
+           DIŞINA (öncesine) kaydırıldığında yerel zamanı 0'a sabitler
+           (clamp) — "visible" komutu TAM 0 anında olursa, pencere öncesine
+           dönüldüğünde de 0'a sabitlenip yine görünür kalıyordu (bu yüzden
+           "sahneye gidip geri geldiğimde sorun tekrar oluyor" hatası oldu).
+           Çözüm: görünür yapma komutunu 0'dan hafifçe (1ms) SONRAYA al —
+           böylece 0'a sabitlenen "pencere öncesi" durumu CSS varsayılanı
+           (hidden) olarak kalır, pencere içindeyken fark edilmeyecek kadar
+           küçük bir gecikmeyle (1ms) görünür olur. */
+        tl.set(root, { visibility: "visible" }, 0.001);
         tl.to("#mk-sb-head", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.15);
         tl.to("#mk-sb-badge", { opacity: 1, duration: 0.4, ease: "back.out(2)" }, 0.65);
-        tl.to("#mk-sb-line", { scaleY: 1, duration: 0.55, ease: "power1.inOut" }, 0.95);
+        /* KİLİT 2026-10, Stüdyo lint hatası: CSS'te statik transform:scaleY(0)
+           ile GSAP scaleY tween'i birlikte kullanmak riskli (GSAP tüm
+           transform'u yeniden yazıp CSS'teki durumu siler) — tl.fromTo bu
+           kuraldan muaf, başlangıç durumunu kendi üstleniyor. */
+        tl.fromTo("#mk-sb-line", { scaleY: 0 }, { scaleY: 1, duration: 0.55, ease: "power1.inOut" }, 0.95);
         rowEls.forEach(function (el, i) {
           tl.to(el, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 1.55 + i * 0.5);
         });

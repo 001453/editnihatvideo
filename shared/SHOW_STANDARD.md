@@ -16,15 +16,20 @@ Format: **9:16 · 1080×1920 · yüz önde · altyazı bandında kart · altyaz�
   - Altyazı: **`layout.caption.y`** (video bazlı, dashboard `/captions?id=…`'den ayarlanır)
   - Disclaimer: **en altta**, kart/altyazı bandının biraz altında (~y 1600–1650) — asla üst bantta değil.
   - Sağ ~150px IG rail boş. PIP **sol**. Kart max ~880-1000px (altyazı genişliğiyle uyumlu, `x:40`).
-- Kartlar: cam kit, video başına **1–3 özel/konuya-özgü kart**. Genel çeşitler için `shared/PRO_CARDS.md` registry'sini referans al ama **registry proCard (`data-composition-src`) olarak DEĞİL**, `cards.html` içine gömülü inline `.card-host > .card > .card-fx > .root` yapısı olarak yaz — bu küçük glass kartlar için pratik ve hızlı yol budur. **İstisna: `mk-scene-break`** (tam ekran sahne kesme) registry proCard olarak (`timeline.json → proCards[]`) eklenir — bu mekanizma 2026-09'da kanıtlanmış şekilde çalışıyor (bkz. `shared/PRO_CARDS.md` → "Kural — her videoda mk-scene-break").
+- Kartlar: cam kit, video başına **standart 4 normal/konuya-özgü kart**. Genel çeşitler için `shared/PRO_CARDS.md` registry'sini referans al ama **registry proCard (`data-composition-src`) olarak DEĞİL**, `cards.html` içine gömülü inline `.card-host > .card > .card-fx > .root` yapısı olarak yaz — bu küçük glass kartlar için pratik ve hızlı yol budur. **İstisna: `mk-scene-break`** (tam ekran sahne kesme) registry proCard olarak (`timeline.json → proCards[]`) eklenir — bu mekanizma 2026-09'da kanıtlanmış şekilde çalışıyor (bkz. `shared/PRO_CARDS.md` → "Kural — her videoda mk-scene-break").
 - **Full-frame karartma yok** — `mk-scene-break` hariç: o bilinçli sert kesim, konuşmacı o sahne süresince tamamen kaybolur.
+- **Zaman çakışması yasak (KİLİT — 2026-10)**: pro kart (`mk-scene-break`) tam ekranı kapladığı
+  için o pencerede hiçbir normal kart / b-roll / IG banner aynı anda çalışmamalı — ikisi de
+  boşa gider, görünmez kalır. Normal kart + b-roll aynı anda olması sorun değil, sadece pro
+  kart başka bir şeyle çakışmasın.
 
-### Sahne kesme kuralı (KİLİT — 2026-09, ZORUNLU)
-Her videoda, en güçlü karşılaştırma/istatistik anına **en az 1 tane `mk-scene-break`**
-eklenir — konuşmacı kaybolup tam ekran (1080×1920) adım-adım bir tablo gösterilir
-(başlık + rozet + noktalı bağlantı çizgisi + 2 veri satırı + dipnot). İçerik o videonun
-KENDİ konusuna göre yazılır, önceki videodan kopyalanmaz. Detay, mekanizma ve JSON
-örneği: `shared/PRO_CARDS.md`.
+### Sahne kesme kuralı (KİLİT — 2026-09, ZORUNLU, sayı güncellendi 2026-10)
+Her videoda, iki güçlü karşılaştırma/istatistik anına **2 tane `mk-scene-break`**
+eklenir (önceki kural "en az 1" idi, 2026-10'da standart 2'ye çıkarıldı) — konuşmacı
+kaybolup tam ekran (1080×1920) adım-adım bir tablo gösterilir (başlık + rozet + noktalı
+bağlantı çizgisi + 2 veri satırı + dipnot). İçerik o videonun KENDİ konusuna göre yazılır,
+önceki videodan kopyalanmaz. İki sahne kesme birbiriyle ve broll/IG banner/normal kartlarla
+zaman çakışmamalı. Detay, mekanizma ve JSON örneği: `shared/PRO_CARDS.md`.
 
 ### Altyazı
 - **Montserrat Black karaoke**: kelimeler silik → konuşulunca accent (`#FACC15`/kırmızı/lime) → sonra beyaz. 4 köşe siyah outline. En fazla **2 satır**.
@@ -95,7 +100,7 @@ dışında — o ayrı ve ZORUNLU, bkz. yukarıdaki "Sahne kesme kuralı".)
 | **Chart scrub** | Grafik üzerinde imleç + değer | tek hero sayı |
 | **Frozen frame + stamp** | Anlık freeze + “DİKKAT” mühür | kural / yasak cümlesi |
 | **Whip to B-roll** | (zaten var) ekstra abartılı 1 clip | görsel kanıt anı |
-| **`mk-scene-break`** | Tam ekran (1080×1920) adım-adım tablo, konuşmacı kaybolur | En güçlü karşılaştırma/istatistik anı — **ZORUNLU, her videoda** |
+| **`mk-scene-break`** | Tam ekran (1080×1920) adım-adım tablo, konuşmacı kaybolur | En güçlü 2 karşılaştırma/istatistik anı — **ZORUNLU, her videoda 2 tane** |
 
 **Drone önerisi (senin örneğin):**  
 Tek seferlik `timeline.json` → `"special": {"type":"drone","at":52.4,"dur":1.4}` — talking-head hafif küçülür, üstte chapter/kart sabit kalır, whoosh-long. Her videoda değil; ~2 dk’da bir kez.

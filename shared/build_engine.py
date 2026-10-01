@@ -1056,7 +1056,12 @@ def ensure_ig_follow_composition():
         (ROOT / "public").mkdir(parents=True, exist_ok=True)
         (ROOT / "public" / "ig_avatar.png").write_bytes(av_src.read_bytes())
     base = src.read_text(encoding="utf-8")
-    base = base.replace("IG_AVATAR_SRC", "../public/ig_avatar.png")
+    # KİLİT 2026-10, Stüdyo lint hatası: "../" ile proje kökünün dışına
+    # taşan asset path'leri Stüdyo önizleme/render'da proje köküne göre
+    # çözülüyor (compositions/ klasörüne göre değil) — "../public/..." kökün
+    # BİR ÜSTÜNE çıkıp 404 veriyor. Kök-göreli "public/..." kullanılmalı.
+    base = base.replace("IG_AVATAR_SRC", "public/ig_avatar.png")
+    base = base.replace('src="../public/vendor/gsap.min.js"', 'src="public/vendor/gsap.min.js"')
     for ig in IG_BANNER:
         iid = re.sub(r"[^\w\-]+", "", str(ig.get("id") or "a")) or "a"
         cid = f"instagram-follow-{iid}"
@@ -1286,11 +1291,20 @@ for b in BROLL:
     # bandının üstüne, üst-sol köşeye çekildi. PIP artık üst-sol köşede, beyaz
     # kenarlık + gölgeyle net bir "kart" olarak ayrışıyor. Ölçek (0.30) DEĞİŞMEDİ —
     # broll'un görünür alanı küçülmüyor, sadece yüz kutusu farklı/daha net bir yere
-    # taşınıyor.)
+    # taşınıyor.
+    # KİLİT 2026-10, Stüdyo lint uyarısı: GSAP tween'de left/top gibi layout
+    # özellikleri KULLANMA — seek-by-frame capture motorunda integer piksele
+    # yuvarlanıp (roundProps) özellikle yavaş hareket/ease-out kuyruğunda
+    # takılma (stutter) yapıyor; transform (x/y/scale) sub-pixel enterpole
+    # edip her hızda pürüzsüz kalıyor. Önceki denemede (2026-09/10) left/top'a
+    # geçilmişti (b-roll görünmezlik şüphesiyle) — lint bunun YANLIŞ yön
+    # olduğunu gösterdi, transform'a (x/y/scale) geri dönüldü. PIP "en üste
+    # yapışıyor" şikayeti için y offset -632'den -520'ye küçültülmüş hali
+    # korundu.
     broll_js.append(f'''
           tl.fromTo("{cam}",{{opacity:0,x:100,scale:1.08}},{{opacity:1,x:0,scale:1,duration:0.42,ease:"expo.out",immediateRender:false}}, {s});
           tl.to("{cam}",{{opacity:0,x:-72,scale:1.04,duration:0.36,ease:"power2.in"}}, {e - 0.36:.2f});
-          tl.fromTo("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,boxShadow:"0 0 0 0 rgba(255,255,255,0)"}},{{scale:0.30,x:-338,y:-632,borderRadius:"36px",rotation:-1.0,boxShadow:"0 0 0 4px rgba(255,255,255,.85), 0 18px 40px rgba(0,0,0,.45)",duration:0.42,ease:"power3.inOut",immediateRender:false}}, {s});
+          tl.fromTo("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,boxShadow:"0 0 0 0 rgba(255,255,255,0)"}},{{scale:0.30,x:-338,y:-520,borderRadius:"36px",rotation:-1.0,boxShadow:"0 0 0 4px rgba(255,255,255,.85), 0 18px 40px rgba(0,0,0,.45)",duration:0.42,ease:"power3.inOut",immediateRender:false}}, {s});
           tl.to("#video-wrap",{{rotation:0,duration:0.22,ease:"power1.out"}}, {s + 0.42:.2f});
           tl.to("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,boxShadow:"0 0 0 0 rgba(255,255,255,0)",duration:0.42,ease:"power3.inOut"}}, {e - 0.42:.2f});
 ''')

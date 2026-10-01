@@ -33,8 +33,9 @@ Aşağıdaki liste, bir videonun kaynak dosyadan Instagram'a hazır MP4'e kadar 
   1. `videos/<id>/transcripts/input-video.json`'ı okur, konudan (altın, gümüş, FED, petrol vb.) hangi sayıların/başlıkların kart olacağına karar verir.
   2. `shared/SHOW_STANDARD.md`'deki **kilitli kurallara** göre yazar — en önemlileri:
      - Kartlar **`cards.html` içine gömülü** yazılır (`.card-host > .card > .card-fx > .root`), registry `proCard` olarak DEĞİL — küçük glass kartlar için bu pratik yol.
-     - **İstisna — `mk-scene-break` (tam ekran sahne kesme) ZORUNLU, her videoda en az 1 tane:** `timeline.json → proCards[]` içine eklenir, konuya özel içerikle (bkz. `shared/PRO_CARDS.md`). Bu registry proCard kanıtlanmış mekanizmayla çalışıyor (2026-09'da düzeltildi).
-     - Video başına **5–8 kart**, ilk 10 saniyede kart yok, kartlar arası en az ~6s boşluk.
+     - **İstisna — `mk-scene-break` (tam ekran sahne kesme) ZORUNLU, her videoda 2 tane** (2026-10'da 1'den 2'ye çıkarıldı): `timeline.json → proCards[]` içine eklenir, konuya özel içerikle (bkz. `shared/PRO_CARDS.md`). Bu registry proCard kanıtlanmış mekanizmayla çalışıyor (2026-09'da düzeltildi).
+     - Video başına **standart 4 normal kart + 2 pro kart (`mk-scene-break`)**, ilk 10 saniyede kart yok, kartlar arası en az ~6s boşluk.
+     - **Zaman çakışması yasak (2026-10):** pro kart tam ekran olduğu için o pencerede aynı anda normal kart/broll/IG banner olmamalı (normal kart + broll aynı anda olması sorun değil, sadece pro kart başka hiçbir şeyle çakışmasın).
      - **Punch (kamera zoom) ZORUNLU** — `timeline.json → punches[]` her videoda **3–5 tane**, hold 6–10s, scale 1.10–1.14, asla boş bırakılmaz.
      - **B-roll asla ilk sırada gelmez** — ilk b-roll'un `start` değeri **en az 20.0 saniye**.
      - Punch, hero, IG Follow (mid + end, 4.5s) zamanlarını videonun akışına göre dağıtır.
@@ -212,7 +213,8 @@ git_guvenli_gonder.bat güvenli commit + push (sadece ortak motor)
 
 - Kart bandı altyazı ile aynı bölgede; yüz alanı (y 300–1100) boş kalır
 - Kartlar `cards.html` içine inline yazılır, registry proCard olarak değil
-- **`mk-scene-break` (tam ekran sahne kesme) her videoda ZORUNLU en az 1 tane** — konuya özel, `proCards[]` içinde
+- **Standart: 4 normal kart + 2 `mk-scene-break` (tam ekran sahne kesme), ZORUNLU** — konuya özel, `proCards[]` içinde
+- **Pro kart hiçbir şeyle zaman çakışmasın** (normal kart/broll/IG banner) — tam ekran olduğu için altındakiler boşa gider
 - Her kart-host ekranda en fazla 3.0 saniye; ilk 10 saniyede kart yok
 - **Punch 3–5, asla boş değil**, hold 6–10s, scale 1.10–1.14
 - **B-roll ilk 20 saniyeden önce gelmez**, max 2×8s
