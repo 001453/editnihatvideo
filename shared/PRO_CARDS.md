@@ -29,7 +29,7 @@ Altyazı motoru **kilitli** (Montserrat Black social-hook, 2 satır). Kartlarda 
 | `mk-float-icon` | Yüzen altın/amber 3D obje (coin/chart/vault/goldbar) | gerçek broll yoksa, konuya uyan an (fiyat→coin, güvenli liman→vault, külçe→goldbar, trend→chart) |
 | `mk-app-mockup` | Sahte hesap kartı / app widget (`variant:"card"` veya `"app"`) | “hesabım”, bakiye, %değişim anlatılan an |
 | `mk-mini-disclaimer` | Küçük italik not, kart bandının dışında sürekli durabilir | simülasyon/veri sahnesinde ek uyarı (bitiş bannerinin yerine değil, ek) |
-| `mk-scene-break` | **Tam ekran (1080×1920) sahne kesme** — konuşan kişi tamamen kaybolur, adım-adım tablo (başlık kartı + rozet + noktalı bağlantı çizgisi + 2 veri satırı + dipnot) | Videonun en güçlü/karşılaştırmalı istatistik anları — **her videoda ZORUNLU 2 tane** (bkz. aşağıdaki Kural) |
+| `mk-scene-break` (+4 varyasyon) | **Tam ekran (1080×1920) sahne kesme** — konuşan kişi tamamen kaybolur. **5 görsel varyasyon havuzu** (KİLİT, 2026-10): `mk-scene-break` (classic — başlık kartı+rozet+noktalı çizgi+2 satır dikey liste), `mk-scene-break-split` (sol panel ikon+ana rakam / sağ panel 2 kutu liste), `mk-scene-break-ticker` (üstte rozet, ortada BÜYÜK tek rakam, altta 2 kutu yan yana), `mk-scene-break-grid` (2 kart yan yana, scoreboard), `mk-scene-break-pulse` (ortada pulse/radar halkalı ikon, altta dikey liste). Hepsi AYNI `copy` şemasını kullanır (`accent/icon/heading/headingValue/badge/rows[{label,value}]/footnote`) — sadece `block` adı değişir. | Videonun en güçlü/karşılaştırmalı istatistik anları — **her videoda ZORUNLU 2 tane, farklı varyasyon** (bkz. aşağıdaki Kural) |
 
 ### Bu 5'i nereden geldi
 
@@ -67,18 +67,56 @@ bandına binmez). Bitiş bannerinin (`YATIRIM TAVSİYESİ DEĞİL`) yerine geçm
    b-roll aynı anda olması sorun değil — o zaten standart kombinasyon; yasak olan pro-kart'ın
    başka bir şeyle çakışması.)
 
-## Kural — her videoda `mk-scene-break` (ZORUNLU, KİLİT — 2026-09, sayı güncellendi 2026-10)
+## Kural — her videoda `mk-scene-break` (ZORUNLU, KİLİT — 2026-09, sayı güncellendi 2026-10, varyasyon havuzu eklendi 2026-10)
 
 Rakip hesaptaki (@eemrebayirrr) "konuşmacı kaybolup tam ekran adım-adım tablo" sahnesi
 kanıtlanmış işleyen mekanizmayla eklendi. **Standart paket: her videoda konuya özel içerikle
-2 tane `mk-scene-break`** (önceki kural "en az 1" idi — 2026-10'da 2'ye çıkarıldı, videonun
+2 tane sahne kesme kartı** (önceki kural "en az 1" idi — 2026-10'da 2'ye çıkarıldı, videonun
 iki güçlü karşılaştırma/istatistik anına yerleştirilir, ör. biri ortada bir senaryo karşılaştırması
 — "rapor güçlü/zayıf gelirse" — biri videonun ana eşik/karar anında — "X seviyesi üstünde/altında").
-`timeline.json` → `proCards[]` içine iki ayrı `"block":"mk-scene-break"` girdisi olarak eklenir
-(aşağıdaki JSON örneğine bak, `id` her biri için farklı olmalı). Her video için `heading` /
-`headingValue` / `badge` / `rows[]` / `footnote` o videonun KENDİ konusuna göre yeniden yazılır —
-asla önceki videodan kopya bırakılmaz. İki pro kart birbiriyle de çakışmamalı, aralarında en az
-birkaç saniye boşluk bırak.
+
+**Varyasyon havuzu (KİLİT, 2026-10 — "her videoda farklı izlenim" talebi):** 5 görsel stil var —
+`mk-scene-break` (classic), `mk-scene-break-split`, `mk-scene-break-ticker`, `mk-scene-break-grid`,
+`mk-scene-break-pulse`. Her 5'i de **birebir aynı kritik mekanizmayı** taşır (aşağıdaki
+"Mekanizma" bölümü, visibility-gating + epsilon-timing fix) — sadece iç görsel düzen farklı.
+Kural: **bir videodaki 2 pro kart birbirinden FARKLI varyasyon olmalı** (asla aynı videoda 2x
+aynı stil), ve ardışık videolar da mümkünse farklı çift kullansın (ör. video A: classic+grid,
+video B: split+ticker, video C: pulse+classic, ...) — amaç izleyiciye her videoda farklı bir
+görsel izlenim vermek. Hangi varyasyon hangi içerik şekline uyuyor (kaba rehber):
+- **classic** → tek başlık + dikey 2 satır karşılaştırma (genel amaçlı, varsayılan)
+- **split** → "2 koz / 2 avantaj" gibi sol=özet-sağ=liste ayrımı olan içerik
+- **ticker** → tek büyük rakam/fiyat vurgusu + altında 2 kutu sonuç (eşik/hedef fiyat anları)
+- **grid** → 2 seçeneği yan yana kart olarak göstermek (örnek vaka / senaryo karşılaştırması)
+- **pulse** → dramatik/"dikkat" anı, tek ikon merkezde, altında liste (risk/alarm temalı)
+
+Her varyasyon zaten ekranda FARKLI bir **alanı** kaplıyor (sadece renk değil, yerleşim de
+değişsin istendi — 2026-10): classic içerik üstte-ortada (y~220-800) dikey akar, split
+tam-boy sol/sağ ikiye böler, ticker ortada-üstte (y~200-950) büyük rakamla ortalar, grid
+üstte-ortada (y~250-950) yan yana kartlar, pulse ortada (y~420-1250) halka+liste. Çift
+seçerken bu yüzden sadece "stil" değil "alan" da değişsin — ör. split (tam-boy) ile pulse
+(orta-blok) aynı videoda yan yana güzel kontrast olur.
+
+
+**Havuz 8 varyasyona genişletti (2026-10-05, "en az 7 farklı tasarım" isteği):** önceki 5'e (classic/split/ticker/grid/pulse) ek olarak 3 yeni — aynı `CONFIG` alanları (`accent,icon,heading,headingValue,badge,rows[],footnote`), aynı visibility-hidden mekanizması, sadece iç tasarım farklı:
+- `mk-scene-break-vs` → iki dev dikey sütun + ortada VS dairesi (tam boy y~300-1300). Gerçek KARŞILAŞTIRMA için (A vs B, önce/sonra).
+- `mk-scene-break-stack` → içerik ALT yarıda (y~700-1500): dev değer + yatay çubuk satırlar. "Şartlar / maddeler" için.
+- `mk-scene-break-steps` → sol dikey çizgi + numaralı adımlar (1 → 2), sol hizalı. Senaryo / sebep-sonuç akışı için.
+Seçim kuralı aynı: videodaki 2 pro kart FARKLI varyasyon, bir önceki videonun çiftini tekrarlama.
+
+**Hangi video hangi çifti kullandı (tekrar etmeyelim diye takip listesi):**
+- 1002: grid + ticker
+- 1003: split + pulse
+- 1004: özel rank-board videosu (pro-card çifti yok)
+- 1005: steps + stack (yeni havuz)
+- (yeni video paketlerken buraya eklenecek satır — bir önceki videonun çiftiyle AYNI ikiliyi
+  kullanma, mümkünse hiç kesişmeyen bir çift seç, ör. 1004 → classic + split değil de
+  classic + ticker gibi en az biri önceki çiftte olmayan bir kombinasyon.)
+
+`timeline.json` → `proCards[]` içine iki ayrı girdi olarak eklenir, her birinin `"block"` alanı
+yukarıdaki 5'ten FARKLI ikisi seçilir (aşağıdaki JSON örneğine bak, `id` her biri için de farklı
+olmalı). Her video için `heading` / `headingValue` / `badge` / `rows[]` / `footnote` o videonun
+KENDİ konusuna göre yeniden yazılır — asla önceki videodan kopya bırakılmaz. İki pro kart
+birbiriyle de çakışmamalı, aralarında en az birkaç saniye boşluk bırak.
 
 **Mekanizma (KANITLANMIŞ, 2026-09 — ekranda doğrulandı):**
 - Registry dosyası (`shared/registry/compositions/mk-scene-break.html`) kendi kök
@@ -146,6 +184,66 @@ birkaç saniye boşluk bırak.
 
 Build: `build_composition.py` registry bloğunu `compositions/` altına bağlar.
 
+## `mk-rank-board` — Özel format: "10'lu sıralama" videoları (KİLİT, 2026-10)
+
+Standart 4+2 kart akışına uymayan, "N hisseyi/ürünü sıralıyoruz" tipi tek seferlik liste
+videoları için. Kök şeffaf (`background:transparent`) — `mk-scene-break` gibi tam-ekran
+opak DEĞİL, konuşan kişi hiç kapanmaz, visibility-gating fix'ine gerek yok.
+
+**Konum:** ÜST alanda, proje banner'ının (y:220-340) ALTINDA küçük/kompakt tek sıra 10 halka
+(y~368-538) — alt-bant 5x2 ızgara DEĞİL, "üst alanda küçük bir sıralama".
+
+**Bu format videosunda BROLL KULLANILMAZ (KİLİT, 2026-10):** konuşan kişi baştan sona
+sürekli ekranda kalıyor (b-roll ile kesilmiyor) — `timeline.json` → `broll: []` boş
+bırakılır, `brollPending` da yazılmaz.
+
+**V5 — 3 AŞAMALI AKIŞ: GÖĞÜS AÇILIŞ → KENARA KAYMA → DOCK (KİLİT, 2026-10):** Büyük açılış
+üst sıradaki slotun kendi üstünde DEĞİL, ayrı bir "hero" katmanında olur, 3 aşamalı:
+(1) **`at` anında** hero GÖĞÜS HİZASINDA (`#mk-rb-hero`, merkez `CONFIG.heroX/heroY`, varsayılan
+540/1120) büyük belirir — logo (`logo` varsa) veya rank numarası + tam isim (`fullName`, ör.
+"TOFAŞ"); konuşmacı bu anda hareketsiz bekler. (2) **`at + CONFIG.introHold` saniye sonra**
+(varsayılan 0.9sn, konuşmacı anlatmaya başlayınca) hero KENARA kayıp küçülür (`CONFIG.sideX/
+sideY`, varsayılan 150/1120 — sol kenar, aynı yükseklik), isim etiketi kaybolur — konuşmacının
+yüzünü/vücudunu kapatmaz, sadece küçük bir hatırlatıcı olarak kenarda bekler. (3) **`dockAt`
+anında** ("...X numara" diyerek bitince) hero kenardan üst sıradaki kendi slotuna uçar (slotların
+ekran koordinatı sayfa yüklenirken bir kere ölçülüp hedef alınıyor — layout statik olduğu için
+güvenli), slot `revealed` class alır (rank 1 ekstra nabız atışıyla). Kenar bekleme ölçeği slotun
+kendi ölçeğiyle AYNI (94/220) tutuluyor — son uçuşta ek büyüklük sıçraması olmasın diye.
+`heroX/heroY/sideX/sideY/introHold` görsel konum/zamanlama tutmazsa SADECE bu sayılar
+güncellenir, kod değişmez. Video süresince `proCards[]`'a `"block":"mk-rank-board"` olarak
+eklenir, `start:0`, `dur:<videonun süresi>`. `copy`:
+```json
+{
+  "accent": "#f0b429",
+  "title": "SIRALAMA BAŞLIĞI",
+  "fadeOutAt": 999,
+  "heroX": 540,
+  "heroY": 1120,
+  "sideX": 150,
+  "sideY": 1120,
+  "introHold": 0.9,
+  "entries": [
+    {"rank": 9, "ticker": "TOASO", "fullName": "TOFAŞ", "logo": "public/logos/TOASO.png", "at": 0.0, "dockAt": 7.26},
+    {"rank": 1, "ticker": "PAGYO", "fullName": "PANORA GYO", "logo": "public/logos/PAGYO.png", "at": 108.44, "dockAt": 123.62}
+  ]
+}
+```
+`entries[].at` = BÜYÜK açılışın başladığı GERÇEK video saniyesi (transkript segment-başı —
+konuşmacı o hisseden bahsetmeye başladığı an). `entries[].dockAt` = konuşmanın "...X numara"
+diyerek BİTTİĞİ an (halka küçülüp slotuna akar) — eski V1'in tek `at` alanı artık `dockAt`'a
+denk gelir. Board `start:0` ile monte edildiği için local time = global video time, direkt
+transkript saniyesi yazılır. Halkalar ekranda sabit 10→1 sırayla (soldan sağa) dizilir (1
+numara en sağda, "final" hissi için).
+**Logo dosya kuralı (KİLİT):** `entries[].logo` = KÖK-GÖRELİ yol `public/logos/<TICKER>.png`
+(ASLA `../public/...` — Stüdyo `../` ile proje kökünün DIŞINA çıkıp 404 verir). Kullanıcı
+logoları broll gibi kendisi sağlayacak — dosya adı ticker ile eşleşmeli (ör. `TOASO.png`).
+Logo dosyası henüz yoksa/yüklenemezse `<img onerror>` otomatik rank numarasına düşer, akış
+bozulmaz — logo dosyaları eklenmeden de timeline.json'da yol önceden yazılabilir.
+`fadeOutAt`: disclaimer bannerından biraz önce (board kaybolsun, banner çakışmasın); yoksa 999.
+**UYARI:** CONFIG alan adı `entries` (eski ad `items` CSS `align-items` ile çakışıp
+patch'lenmiyordu — KİLİT, bu yüzden yeni registry bileşenlerinde CSS property'leriyle
+çakışabilecek kısa/genel kelimeler CONFIG alan adı olarak seçilmemeli).
+
 Yeni video paketlerken skill: **4 normal klasik kart** (bu listeden konuya uyan çeşitler) +
-**2 adet `mk-scene-break`** (zorunlu, konuya özel, birbirleriyle ve broll/IG banner/normal
-kartlarla zaman çakışması olmadan).
+**2 adet sahne kesme kartı, 5'li varyasyon havuzundan FARKLI iki `block` seçilerek** (zorunlu,
+konuya özel, birbirleriyle ve broll/IG banner/normal kartlarla zaman çakışması olmadan).

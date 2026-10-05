@@ -21,3 +21,7 @@ Claude outputs/
 _dash.err
 _dash.log
 videos/
+
+# gizli anahtar
+scripts/openai_key.txt
+.env

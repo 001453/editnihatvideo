@@ -1,0 +1,88 @@
+<!-- hyperframes-registry-item: mk-scene-break-vs -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* KİLİT (2026-10): visibility:hidden varsayılan + tl.set(...,0.001) görünür + DUR-0.02 gizle.
+         mk-scene-break.html ile BİREBİR aynı mekanizma — sadece iç tasarım değişir. */
+      #mk-sb-root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+        background: linear-gradient(180deg,#0b0b14 0%,#14101c 100%);
+        visibility: hidden;
+      }
+      #mk-sb-badge { position:absolute; left:50%; top:170px; transform:translateX(-50%); padding:12px 30px; border-radius:999px; font-weight:800; font-size:23px; color:#14151f; background:var(--acc,#ff4d4d); opacity:0; white-space:nowrap; }
+      #mk-sb-heading { position:absolute; left:60px; top:260px; width:960px; text-align:center; font-weight:800; font-size:46px; line-height:1.15; color:#fff; opacity:0; }
+      #mk-sb-headwrap { position:absolute; left:0; top:420px; width:1080px; text-align:center; opacity:0; }
+      #mk-sb-ico { font-size:52px; vertical-align:middle; margin-right:14px; }
+      #mk-sb-headval { font-weight:700; font-size:30px; letter-spacing:0.14em; color:var(--acc,#ff4d4d); }
+      #mk-sb-rows { position:absolute; left:50px; top:540px; width:980px; height:760px; display:flex; gap:24px; }
+      .mk-sb-row { flex:1; border-radius:28px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px 22px; text-align:center; opacity:0; }
+      .mk-sb-row:nth-child(1) { border-color:var(--acc,#ff4d4d); }
+      .mk-sb-row-label { font-weight:700; font-size:26px; color:#b9b9c6; margin-bottom:26px; }
+      .mk-sb-row-value { font-weight:800; font-size:44px; line-height:1.2; color:#fff; }
+      #mk-sb-vs { position:absolute; left:50%; top:830px; width:110px; height:110px; margin-left:-55px; border-radius:50%; background:var(--acc,#ff4d4d); color:#14151f; font-weight:900; font-size:38px; display:flex; align-items:center; justify-content:center; opacity:0; z-index:3; }
+      #mk-sb-foot { position:absolute; left:60px; bottom:160px; width:960px; text-align:center; font-size:18px; font-weight:650; color:rgba(255,255,255,0.5); opacity:0; }
+    </style>
+  </head>
+  <body>
+    <div id="mk-sb-root" data-composition-id="mk-scene-break-vs" data-width="1080" data-height="1920" data-start="0" data-duration="8">
+      <div id="mk-sb-clip" class="clip" data-start="0" data-duration="8" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-sb-badge"></div>
+        <div id="mk-sb-heading"></div>
+        <div id="mk-sb-headwrap"><span id="mk-sb-ico">📊</span><span id="mk-sb-headval"></span></div>
+        <div id="mk-sb-rows"></div>
+        <div id="mk-sb-vs">VS</div>
+        <div id="mk-sb-foot"></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#ff4d4d",
+          icon: "📊",
+          heading: "BİST100 ENDEKSİ",
+          headingValue: "15.200",
+          badge: "-%20",
+          rows: [
+            { label: "Zirve (Mayıs)", value: "15.200" },
+            { label: "Bugün", value: "12.900" }
+          ],
+          footnote: "ÖRNEK VERİDİR. YATIRIM TAVSİYESİ DEĞİLDİR."
+        };
+        var DUR = 8;
+        var root = document.getElementById("mk-sb-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        function T(id, v) { document.getElementById(id).textContent = v; }
+        T("mk-sb-ico", CONFIG.icon); T("mk-sb-heading", CONFIG.heading); T("mk-sb-badge", CONFIG.badge); T("mk-sb-foot", CONFIG.footnote);
+        var hv = document.getElementById("mk-sb-headval"); if (hv) hv.textContent = CONFIG.headingValue;
+        var rowsEl = document.getElementById("mk-sb-rows");
+        var rowEls = (CONFIG.rows || []).map(function (r, i) {
+          var d = document.createElement("div"); d.className = "mk-sb-row";
+          var l = document.createElement("div"); l.className = "mk-sb-row-label"; l.textContent = r.label;
+          var v = document.createElement("div"); v.className = "mk-sb-row-value"; v.textContent = r.value;
+          d.appendChild(l); d.appendChild(v);
+          rowsEl.appendChild(d); return d;
+        });
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.to("#mk-sb-badge", { opacity: 1, duration: 0.4, ease: "back.out(2)" }, 0.1);
+        tl.to("#mk-sb-heading", { opacity: 1, duration: 0.5 }, 0.35);
+        tl.to("#mk-sb-headwrap", { opacity: 1, duration: 0.5 }, 0.7);
+        rowEls.forEach(function (el, i) {
+          tl.fromTo(el, { opacity: 0, x: i === 0 ? -60 : 60 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 1.2 + i * 0.3);
+        });
+        tl.fromTo("#mk-sb-vs", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.4)" }, 1.9);
+        tl.to("#mk-sb-foot", { opacity: 1, duration: 0.5 }, 2.4);
+        tl.to(["#mk-sb-badge","#mk-sb-heading","#mk-sb-headwrap","#mk-sb-vs","#mk-sb-foot"].concat(rowEls), { opacity: 0, duration: 0.35, ease: "power2.in" }, DUR - 0.5);
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-scene-break-vs"] = tl;
+      })();
+    </script>
+  </body>
+</html>

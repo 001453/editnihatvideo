@@ -1,0 +1,104 @@
+<!-- hyperframes-registry-item: mk-scene-break-ticker -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* KİLİT (2026-10): bu kök varsayılan visibility:hidden ile başlar,
+         GSAP tl.set(...,0.001) ile görünür yapılır, DUR-0.02'de yine
+         gizlenir. Tam gerekçe: shared/PRO_CARDS.md "KİLİT (2026-10, KÖK
+         SEBEP)" bölümü. mk-scene-break.html ile BİREBİR aynı mekanizma —
+         burada değiştirme, sadece aşağıdaki iç tasarımı değiştir. */
+      #mk-sb-root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+        background: radial-gradient(130% 70% at 50% 0%, #1a1420 0%, #0a0a10 60%);
+        visibility: hidden;
+      }
+
+      #mk-sb-badge {
+        position: absolute; left: 50%; top: 200px; transform: translateX(-50%);
+        padding: 12px 30px; border-radius: 999px; font-weight: 800; font-size: 23px;
+        color: #14151f; background: var(--acc, #ff4d4d); opacity: 0; white-space: nowrap;
+      }
+      #mk-sb-heading {
+        position: absolute; left: 0; top: 330px; width: 1080px; text-align: center;
+        font-weight: 700; font-size: 26px; letter-spacing: 0.12em; color: #9a9ab0; opacity: 0;
+      }
+      #mk-sb-headwrap { position: absolute; left: 0; top: 400px; width: 1080px; text-align: center; opacity: 0; }
+      #mk-sb-ico { font-size: 58px; vertical-align: middle; margin-right: 18px; }
+      #mk-sb-headval { font-weight: 800; font-size: 128px; color: #ffffff; letter-spacing: -0.02em; }
+      #mk-sb-rows { position: absolute; left: 60px; top: 760px; width: 960px; display: flex; gap: 22px; }
+      .mk-sb-row {
+        flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px; padding: 32px 26px; text-align: center; opacity: 0; transform: scale(0.92);
+      }
+      .mk-sb-row-label { font-weight: 650; font-size: 21px; color: #b9b9c6; margin-bottom: 12px; }
+      .mk-sb-row-value { font-weight: 800; font-size: 32px; color: var(--acc, #ff4d4d); }
+      #mk-sb-foot { position: absolute; left: 60px; bottom: 140px; width: 960px; text-align: center; font-size: 18px; font-weight: 650; color: rgba(255,255,255,0.5); opacity: 0; }
+
+    </style>
+  </head>
+  <body>
+    <div id="mk-sb-root" data-composition-id="mk-scene-break-ticker" data-width="1080" data-height="1920" data-start="0" data-duration="8">
+      <div id="mk-sb-clip" class="clip" data-start="0" data-duration="8" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-sb-badge"></div>
+        <div id="mk-sb-heading"></div>
+        <div id="mk-sb-headwrap"><span id="mk-sb-ico">📊</span><span id="mk-sb-headval"></span></div>
+        <div id="mk-sb-rows"></div>
+        <div id="mk-sb-foot"></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#ff4d4d",
+          icon: "📊",
+          heading: "BİST100 ENDEKSİ",
+          headingValue: "15.200",
+          badge: "-%20",
+          rows: [
+            { label: "Zirve (Mayıs)", value: "15.200" },
+            { label: "Bugün", value: "12.900" }
+          ],
+          footnote: "ÖRNEK VERİDİR. YATIRIM TAVSİYESİ DEĞİLDİR."
+        };
+        var DUR = 8;
+        var root = document.getElementById("mk-sb-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        document.getElementById("mk-sb-ico").textContent = CONFIG.icon;
+        document.getElementById("mk-sb-heading").textContent = CONFIG.heading;
+        document.getElementById("mk-sb-headval").textContent = CONFIG.headingValue;
+        document.getElementById("mk-sb-badge").textContent = CONFIG.badge;
+        document.getElementById("mk-sb-foot").textContent = CONFIG.footnote;
+        var rowsEl = document.getElementById("mk-sb-rows");
+        var rowEls = (CONFIG.rows || []).map(function (r) {
+          var d = document.createElement("div"); d.className = "mk-sb-row";
+          var l = document.createElement("div"); l.className = "mk-sb-row-label"; l.textContent = r.label;
+          var v = document.createElement("div"); v.className = "mk-sb-row-value"; v.textContent = r.value;
+          d.appendChild(l); d.appendChild(v); rowsEl.appendChild(d); return d;
+        });
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.to("#mk-sb-badge", { opacity: 1, duration: 0.4, ease: "back.out(2)" }, 0.1);
+        tl.to("#mk-sb-heading", { opacity: 1, duration: 0.4 }, 0.4);
+        tl.fromTo("#mk-sb-headwrap", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.6)" }, 0.65);
+        rowEls.forEach(function (el, i) {
+          tl.to(el, { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 1.4 + i * 0.35);
+        });
+        tl.to("#mk-sb-foot", { opacity: 1, duration: 0.5 }, 1.8 + rowEls.length * 0.35);
+        tl.to(
+          ["#mk-sb-badge", "#mk-sb-heading", "#mk-sb-headwrap", "#mk-sb-foot"].concat(rowEls),
+          { opacity: 0, duration: 0.35, ease: "power2.in" },
+          DUR - 0.5
+        );
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-scene-break-ticker"] = tl;
+      })();
+    </script>
+  </body>
+</html>

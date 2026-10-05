@@ -1,0 +1,251 @@
+<!-- hyperframes-registry-item: mk-rank-board -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* KİLİT (2026-10): şeffaf kök — mk-scene-break'in opak tam-ekran riskine
+         girilmiyor, #video-wrap hiç kapanmaz, visibility-gating fix'ine
+         gerek yok (instagram-follow.html ile aynı mantık). */
+      #mk-rb-root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+        background: transparent;
+      }
+      /* Üst alan, proje banner'ının (y:220-340) ALTINDA — küçük/kompakt tek
+         sıra 10 halka. KİLİT (2026-10, v5 — 3 aşamalı akış): (1) göğüs
+         hizasında BÜYÜK açılış [#mk-rb-hero, CONFIG.heroX/heroY], konuşmacı
+         bekler; (2) kısa süre sonra (CONFIG.introHold) KENARA kayıp küçülür
+         [CONFIG.sideX/sideY] — konuşmacı anlatırken yüzünü/vücudunu kapatmaz;
+         (3) dockAt'ta kenardan üst sıradaki kendi slotuna uçar. */
+      #mk-rb-title {
+        position: absolute; left: 60px; top: 368px; width: 960px;
+        text-align: center; font-weight: 800; font-size: 19px;
+        letter-spacing: 0.08em; color: rgba(255,255,255,0.7); opacity: 0;
+      }
+      #mk-rb-row {
+        position: absolute; left: 60px; top: 408px; width: 960px; height: 144px;
+        display: flex; justify-content: space-between; align-items: flex-start;
+      }
+      .mk-rb-slot {
+        width: 94px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+        opacity: 0; transform: scale(0.6);
+        position: relative;
+      }
+      .mk-rb-circle {
+        width: 94px; height: 94px; border-radius: 50%;
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.22);
+        display: flex; align-items: center; justify-content: center; overflow: hidden;
+      }
+      .mk-rb-logo { width: 100%; height: 100%; object-fit: contain; padding: 10px; display: none; }
+      .mk-rb-num { font-weight: 800; font-size: 32px; color: rgba(255,255,255,0.5); }
+      .mk-rb-ticker { font-weight: 700; font-size: 13px; color: rgba(255,255,255,0); letter-spacing: 0.01em; text-align: center; }
+      .mk-rb-slot.revealed .mk-rb-circle { background: rgba(255,255,255,0.14); border-color: var(--acc, #f0b429); }
+      .mk-rb-slot.revealed .mk-rb-num { color: var(--acc, #f0b429); }
+      .mk-rb-slot.revealed .mk-rb-ticker { color: #ffffff; }
+      .mk-rb-slot.has-logo .mk-rb-num { display: none; }
+      .mk-rb-slot.has-logo .mk-rb-logo { display: block; }
+      .mk-rb-slot.winner .mk-rb-circle { background: linear-gradient(160deg, rgba(240,180,41,0.32), rgba(255,255,255,0.08)); box-shadow: 0 0 30px rgba(240,180,41,0.55); }
+      .mk-rb-slot.winner .mk-rb-num { color: #ffd76a; }
+
+      /* Göğüs hizası / kenar katmanı — konum CONFIG.heroX/heroY ve
+         CONFIG.sideX/sideY ile JS'ten inline style olarak set edilir
+         (heroX/heroY = büyük açılışın merkez noktası). */
+      #mk-rb-hero {
+        position: absolute; left: 540px; top: 1120px;
+        transform: translate(-50%, -50%) scale(0.6);
+        opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 16px;
+        pointer-events: none;
+      }
+      .mk-rb-hero-circle {
+        width: 220px; height: 220px; border-radius: 50%;
+        background: rgba(10,10,14,0.4); border: 2px solid rgba(255,255,255,0.28);
+        display: flex; align-items: center; justify-content: center; overflow: hidden;
+        box-shadow: 0 14px 44px rgba(0,0,0,0.5);
+      }
+      .mk-rb-hero-logo { width: 100%; height: 100%; object-fit: contain; padding: 24px; display: none; }
+      .mk-rb-hero-num { font-weight: 800; font-size: 68px; color: var(--acc, #f0b429); }
+      #mk-rb-hero.has-logo .mk-rb-hero-num { display: none; }
+      #mk-rb-hero.has-logo .mk-rb-hero-logo { display: block; }
+      .mk-rb-hero-name {
+        font-weight: 800; font-size: 32px; color: #ffffff; text-align: center;
+        text-shadow: 0 4px 18px rgba(0,0,0,0.65); white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mk-rb-root" data-composition-id="mk-rank-board" data-width="1080" data-height="1920" data-start="0" data-duration="180">
+      <div id="mk-rb-clip" class="clip" data-start="0" data-duration="180" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-rb-title"></div>
+        <div id="mk-rb-row"></div>
+        <div id="mk-rb-hero">
+          <div class="mk-rb-hero-circle">
+            <img class="mk-rb-hero-logo" />
+            <div class="mk-rb-hero-num"></div>
+          </div>
+          <div class="mk-rb-hero-name"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+
+        /* ---- published parameters ----
+           timeline.json -> proCards[].copy ile doldurulur ("block":"mk-rank-board").
+           entries[].at: GÖĞÜS HİZASINDAKİ büyük açılış anı — konuşmacının o
+           hisseden bahsetmeye başladığı GERÇEK video saniyesi (transkript
+           segment-başı); konuşmacı bu anda hareketsiz bekler.
+           entries[].dockAt: konuşmanın "...X numara" diyerek BİTTİĞİ an —
+           o ana kadar hero KENARDA küçük bekler, bu anda üst sıradaki kendi
+           slotuna uçar. İkisi de board data-start=0 ile monte edildiği için
+           local time = global video time, doğrudan transkript saniyesi
+           yazılabilir.
+           entries[].fullName: büyük açılışta gösterilen tam isim (ör. "TOFAŞ").
+           entries[].logo: varsa "public/logos/<TICKER>.png" KÖK-GÖRELİ yol
+           (ASLA "../public/..." — Stüdyo "../" ile proje kökünün dışına çıkıp
+           404 veriyor, KİLİT). Logo dosyası yoksa/yüklenemezse otomatik
+           rank numarasına düşer (<img onerror>).
+           CONFIG.heroX/heroY: göğüs hizası büyük açılışın MERKEZ noktası
+           (varsayılan 540,1120). CONFIG.sideX/sideY: konuşmacı anlatmaya
+           başlayınca logonun küçülüp beklediği KENAR nokta (varsayılan
+           150,1120 — sol kenar, aynı yükseklik). CONFIG.introHold: büyük
+           açılıştan ne kadar sonra kenara kayacağı, saniye (varsayılan 0.9).
+           Kayıt farklıysa (yüz/göğüs/kenar konumu değişirse) SADECE bu
+           sayılar güncellenir, kod değişmez. */
+        var CONFIG = {
+          accent: "#f0b429",
+          title: "TEMETTÜ SIRALAMASI",
+          fadeOutAt: 999,
+          heroX: 540,
+          heroY: 1120,
+          sideX: 150,
+          sideY: 1120,
+          introHold: 0.9,
+          entries: [
+            { rank: 1, ticker: "????", fullName: "", logo: "", at: 10, dockAt: 16 }
+          ]
+        };
+
+        var root = document.getElementById("mk-rb-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        document.getElementById("mk-rb-title").textContent = CONFIG.title;
+
+        var heroEl = document.getElementById("mk-rb-hero");
+        var heroLogoEl = heroEl.querySelector(".mk-rb-hero-logo");
+        var heroNumEl = heroEl.querySelector(".mk-rb-hero-num");
+        var heroNameEl = heroEl.querySelector(".mk-rb-hero-name");
+        var heroX = CONFIG.heroX || 540;
+        var heroY = CONFIG.heroY || 1120;
+        var sideX = CONFIG.sideX != null ? CONFIG.sideX : 150;
+        var sideY = CONFIG.sideY != null ? CONFIG.sideY : heroY;
+        var introHold = CONFIG.introHold != null ? CONFIG.introHold : 0.9;
+        heroEl.style.left = heroX + "px";
+        heroEl.style.top = heroY + "px";
+
+        var rowEl = document.getElementById("mk-rb-row");
+        var order = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+        var byRank = {};
+        (CONFIG.entries || []).forEach(function (it) { byRank[it.rank] = it; });
+
+        var slotEls = order.map(function (rank) {
+          var it = byRank[rank] || { rank: rank, ticker: "", fullName: "", logo: "", at: 999, dockAt: 999 };
+          var d = document.createElement("div");
+          d.className = "mk-rb-slot";
+          var c = document.createElement("div");
+          c.className = "mk-rb-circle";
+          var n = document.createElement("div");
+          n.className = "mk-rb-num";
+          n.textContent = rank;
+          c.appendChild(n);
+          if (it.logo) {
+            var img = document.createElement("img");
+            img.className = "mk-rb-logo";
+            img.src = it.logo;
+            img.onerror = function () { d.classList.remove("has-logo"); img.style.display = "none"; };
+            img.onload = function () { d.classList.add("has-logo"); };
+            c.appendChild(img);
+          }
+          var t = document.createElement("div");
+          t.className = "mk-rb-ticker";
+          t.textContent = it.ticker;
+          d.appendChild(c);
+          d.appendChild(t);
+          rowEl.appendChild(d);
+          return { el: d, circleEl: c, ticker: it.ticker, fullName: it.fullName, logo: it.logo, at: it.at, dockAt: it.dockAt, rank: rank };
+        });
+
+        // Slotların üst sıradaki SABİT hedef merkez koordinatları — layout
+        // zaten statik (flex, responsive değil), bu yüzden tek seferlik ölçüm
+        // yeterli; hero bu koordinatlara "uçarak" iniyor.
+        var rootRect = root.getBoundingClientRect();
+        slotEls.forEach(function (s) {
+          var r = s.circleEl.getBoundingClientRect();
+          s.targetCX = r.left + r.width / 2 - rootRect.left;
+          s.targetCY = r.top + r.height / 2 - rootRect.top;
+        });
+        // Kenar bekleme ölçeği = slot halkası ölçeğiyle AYNI (94/220) — böylece
+        // son uçuşta ek bir büyüklük sıçraması olmaz, sadece konum+opaklık değişir.
+        var DOCK_SCALE = 94 / 220;
+
+        var tl = gsap.timeline({ paused: true });
+        tl.to("#mk-rb-title", { opacity: 1, duration: 0.6 }, Math.max(0, (slotEls[0] ? slotEls[0].at : 10) - 2));
+        slotEls.forEach(function (s) {
+          var dockAt = s.dockAt != null ? s.dockAt : s.at + 6;
+          var sideAt = Math.min(s.at + introHold, dockAt - 0.2);
+
+          // 0) Hero içeriğini bu hisseye göre hazırla + isim etiketini resetle.
+          tl.call(function () {
+            heroEl.classList.toggle("has-logo", !!s.logo);
+            heroNameEl.textContent = s.fullName || s.ticker;
+            heroNumEl.textContent = s.rank;
+            if (s.logo) heroLogoEl.src = s.logo;
+            gsap.set(heroNameEl, { opacity: 1 });
+          }, null, Math.max(0, s.at - 0.05));
+
+          // 1) GÖĞÜS HİZASINDA büyük açılış: hero merkez noktasında belirir,
+          // konuşmacı bu anda hareketsiz bekler.
+          tl.fromTo(
+            heroEl,
+            { opacity: 0, scale: 0.6, x: 0, y: 0 },
+            { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" },
+            s.at
+          );
+
+          // 2) Konuşmacı anlatmaya başlayınca (kısa bekleme sonrası): hero
+          // KENARA kayar + küçülür, isim etiketi kaybolur — konuşmacıyı
+          // kapatmaz.
+          tl.to(
+            heroEl,
+            { x: sideX - heroX, y: sideY - heroY, scale: DOCK_SCALE, duration: 0.5, ease: "power2.inOut" },
+            sideAt
+          );
+          tl.to(heroNameEl, { opacity: 0, duration: 0.3 }, sideAt);
+
+          // 3) Konuşma "...X numara" diyerek bitince: hero kenardan üst
+          // sıradaki kendi slotuna uçar.
+          tl.to(
+            heroEl,
+            { x: s.targetCX - heroX, y: s.targetCY - heroY, opacity: 0, duration: 0.5, ease: "power2.inOut" },
+            dockAt
+          );
+          tl.to(s.el, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" }, dockAt + 0.35);
+          tl.call(function () {
+            s.el.classList.add("revealed");
+            if (s.rank === 1) s.el.classList.add("winner");
+          }, null, dockAt + 0.35);
+          if (s.rank === 1) {
+            tl.fromTo(s.el, { scale: 1.3 }, { scale: 1, duration: 0.6, ease: "elastic.out(1,0.5)" }, dockAt + 0.4);
+          }
+        });
+        var fadeAt = CONFIG.fadeOutAt || 999;
+        tl.to(["#mk-rb-title", "#mk-rb-row"], { opacity: 0, duration: 0.6 }, fadeAt);
+
+        window.__timelines["mk-rank-board"] = tl;
+      })();
+    </script>
+  </body>
+</html>

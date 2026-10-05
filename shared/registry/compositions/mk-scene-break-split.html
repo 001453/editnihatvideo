@@ -1,0 +1,113 @@
+<!-- hyperframes-registry-item: mk-scene-break-split -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* KİLİT (2026-10): bu kök varsayılan visibility:hidden ile başlar,
+         GSAP tl.set(...,0.001) ile görünür yapılır, DUR-0.02'de yine
+         gizlenir. Tam gerekçe: shared/PRO_CARDS.md "KİLİT (2026-10, KÖK
+         SEBEP)" bölümü. mk-scene-break.html ile BİREBİR aynı mekanizma —
+         burada değiştirme, sadece aşağıdaki iç tasarımı değiştir. */
+      #mk-sb-root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        font-family: "Montserrat", "Inter", -apple-system, sans-serif;
+        background: #0a0a10;
+        visibility: hidden;
+      }
+
+      #mk-sb-left {
+        position: absolute; left: 0; top: 0; width: 460px; height: 1920px;
+        background: linear-gradient(160deg, var(--acc, #ff4d4d) 0%, #14151f 70%);
+        display: flex; flex-direction: column; justify-content: center;
+        align-items: flex-start; padding: 0 50px; opacity: 0;
+      }
+      #mk-sb-ico { font-size: 64px; margin-bottom: 26px; }
+      #mk-sb-heading { font-weight: 800; font-size: 32px; color: #f2f2f6; line-height: 1.25; margin-bottom: 18px; }
+      #mk-sb-headval { font-weight: 800; font-size: 54px; color: #ffffff; line-height: 1.1; }
+      #mk-sb-right {
+        position: absolute; left: 460px; top: 0; width: 620px; height: 1920px;
+        background: #14151f; padding: 240px 50px 0 46px;
+      }
+      #mk-sb-badge {
+        display: inline-block; padding: 12px 26px; border-radius: 999px; font-weight: 800;
+        font-size: 22px; color: #14151f; background: var(--acc, #ff4d4d); margin-bottom: 40px; opacity: 0;
+      }
+      #mk-sb-rows { display: flex; flex-direction: column; gap: 22px; }
+      .mk-sb-row {
+        border-left: 5px solid var(--acc, #ff4d4d); background: rgba(255,255,255,0.06);
+        border-radius: 14px; padding: 26px 30px; opacity: 0; transform: translateX(24px);
+      }
+      .mk-sb-row-label { font-weight: 650; font-size: 22px; color: #b9b9c6; margin-bottom: 8px; }
+      .mk-sb-row-value { font-weight: 800; font-size: 28px; color: #ffffff; }
+      #mk-sb-foot { position: absolute; left: 506px; bottom: 140px; width: 530px; font-size: 17px; font-weight: 650; color: rgba(255,255,255,0.5); opacity: 0; }
+
+    </style>
+  </head>
+  <body>
+    <div id="mk-sb-root" data-composition-id="mk-scene-break-split" data-width="1080" data-height="1920" data-start="0" data-duration="8">
+      <div id="mk-sb-clip" class="clip" data-start="0" data-duration="8" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-sb-left">
+          <div id="mk-sb-ico">📊</div>
+          <div id="mk-sb-heading"></div>
+          <div id="mk-sb-headval"></div>
+        </div>
+        <div id="mk-sb-right">
+          <div id="mk-sb-badge"></div>
+          <div id="mk-sb-rows"></div>
+        </div>
+        <div id="mk-sb-foot"></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#ff4d4d",
+          icon: "📊",
+          heading: "BİST100 ENDEKSİ",
+          headingValue: "15.200",
+          badge: "-%20",
+          rows: [
+            { label: "Zirve (Mayıs)", value: "15.200" },
+            { label: "Bugün", value: "12.900" }
+          ],
+          footnote: "ÖRNEK VERİDİR. YATIRIM TAVSİYESİ DEĞİLDİR."
+        };
+        var DUR = 8;
+        var root = document.getElementById("mk-sb-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        document.getElementById("mk-sb-ico").textContent = CONFIG.icon;
+        document.getElementById("mk-sb-heading").textContent = CONFIG.heading;
+        document.getElementById("mk-sb-headval").textContent = CONFIG.headingValue;
+        document.getElementById("mk-sb-badge").textContent = CONFIG.badge;
+        document.getElementById("mk-sb-foot").textContent = CONFIG.footnote;
+        var rowsEl = document.getElementById("mk-sb-rows");
+        var rowEls = (CONFIG.rows || []).map(function (r) {
+          var d = document.createElement("div"); d.className = "mk-sb-row";
+          var l = document.createElement("div"); l.className = "mk-sb-row-label"; l.textContent = r.label;
+          var v = document.createElement("div"); v.className = "mk-sb-row-value"; v.textContent = r.value;
+          d.appendChild(l); d.appendChild(v); rowsEl.appendChild(d); return d;
+        });
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.to("#mk-sb-left", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.1);
+        tl.to("#mk-sb-badge", { opacity: 1, duration: 0.4, ease: "back.out(2)" }, 0.55);
+        rowEls.forEach(function (el, i) {
+          tl.to(el, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 1.0 + i * 0.5);
+        });
+        tl.to("#mk-sb-foot", { opacity: 1, duration: 0.5 }, 1.4 + rowEls.length * 0.5);
+        tl.to(
+          ["#mk-sb-left", "#mk-sb-badge", "#mk-sb-foot"].concat(rowEls),
+          { opacity: 0, duration: 0.35, ease: "power2.in" },
+          DUR - 0.5
+        );
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-scene-break-split"] = tl;
+      })();
+    </script>
+  </body>
+</html>

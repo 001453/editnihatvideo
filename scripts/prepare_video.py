@@ -89,6 +89,13 @@ def transcribe(dest: Path) -> Path:
     if out.exists() and out.stat().st_size > 100:
         print(f"transcript var, atlanıyor: {out}", flush=True)
         return out
+    try:
+        sys.path.insert(0, str(SCRIPTS))
+        from openai_transcribe import transcribe as _oa
+        if _oa(video, out):
+            return out
+    except Exception as e:
+        print(f"OpenAI atlandi: {e}", flush=True)
     if FREECUT_TX.exists() and FREECUT_PY.exists():
         run([
             str(FREECUT_PY),
