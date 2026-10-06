@@ -1,0 +1,97 @@
+<!DOCTYPE html><!-- hyperframes-registry-item: mk-strip -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* ALT BANT (2026-10-06): lt-* ilhamlı, haber şeridi DEĞİL. variant: neon | dark | pill. Maddeler sırayla yer değiştirir. Saydam kök, position:absolute, visibility:hidden varsayılan + tl.set(0.001) + DUR-0.02 gizle. */
+      #mk-st-root { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; visibility: hidden; font-family: "Montserrat","Inter",-apple-system,sans-serif; }
+      #mk-st-bar { position:absolute; height:104px; display:flex; align-items:center; opacity:0; }
+      #mk-st-tag { font-weight:900; font-size:22px; letter-spacing:0.08em; white-space:nowrap; }
+      #mk-st-body { position:relative; flex:1; height:100%; overflow:hidden; }
+      .mk-st-item { position:absolute; left:0; top:0; height:100%; display:flex; align-items:center; gap:14px; white-space:nowrap; opacity:0; }
+      .mk-st-k { font-weight:650; font-size:26px; color:#c8c8d4; }
+      .mk-st-v { font-weight:900; font-size:42px; color:#fff; }
+      /* neon */
+      .mk-st-neon { border-radius:18px; background:rgba(8,10,18,0.78); border:2px solid var(--acc); box-shadow:0 0 22px var(--acc), inset 0 0 18px rgba(255,255,255,0.04); padding:0 26px; gap:22px; }
+      .mk-st-neon #mk-st-tag { color:var(--acc); }
+      /* dark card */
+      .mk-st-dark { border-radius:14px; background:rgba(14,16,26,0.86); border-left:8px solid var(--acc); box-shadow:0 14px 40px rgba(0,0,0,0.4); padding:0 28px 0 24px; gap:22px; }
+      .mk-st-dark #mk-st-tag { color:#14151f; background:var(--acc); padding:8px 16px; border-radius:8px; }
+      /* pill */
+      .mk-st-pill { border-radius:999px; background:rgba(10,12,20,0.7); border:1px solid rgba(255,255,255,0.2); padding:0 36px 0 14px; gap:20px; }
+      .mk-st-pill #mk-st-tag { color:#14151f; background:var(--acc); padding:14px 22px; border-radius:999px; }
+    </style>
+  </head>
+  <body>
+    <div id="mk-st-root" data-composition-id="mk-strip" data-width="1080" data-height="1920" data-start="0" data-duration="8">
+      <div id="mk-st-clip" class="clip" data-start="0" data-duration="8" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-st-bar"><div id="mk-st-tag"></div><div id="mk-st-body"></div></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#38bdf8",
+          variant: "neon",
+          tag: "TÜPRAŞ",
+          entries: [{"label": "Nakit fazlası", "value": "130 milyar TL"}, {"label": "Takip seviyeleri", "value": "366 · 354 · 336"}, {"label": "2Ç kâr", "value": "46 milyar TL"}],
+          posX: 60,
+          posY: 1330,
+          barW: 960
+        };
+        var DUR = 8;
+        function shatter(el, tl, t0, o) {
+          o = o || {}; var cols = o.cols || 4, rows = o.rows || 3;
+          tl.time(Math.max(t0 - 0.02, 0), true);
+          var w = el.offsetWidth, h = el.offsetHeight, frags = [];
+          for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+            var f = el.cloneNode(true); f.removeAttribute("id");
+            [].forEach.call(f.querySelectorAll("[id]"), function (n) { n.removeAttribute("id"); });
+            f.style.clipPath = "inset(" + (r * h / rows) + "px " + (w - (c + 1) * w / cols) + "px " + (h - (r + 1) * h / rows) + "px " + (c * w / cols) + "px)";
+            f.style.transformOrigin = ((c + 0.5) * w / cols) + "px " + ((r + 0.5) * h / rows) + "px";
+            f.style.pointerEvents = "none"; f.style.opacity = "0";
+            el.parentNode.appendChild(f); frags.push({ f: f, c: c, r: r });
+          }
+          tl.time(0, true);
+          tl.set(el, { opacity: 0 }, t0);
+          frags.forEach(function (g, i) {
+            var dx = (g.c - (cols - 1) / 2) * 120 + ((i * 37) % 50 - 25), dy = (g.r - (rows - 1) / 2) * 50 - 80 + ((i * 53) % 40), rot = ((i * 29) % 90) - 45;
+            tl.set(g.f, { opacity: 0 }, 0);
+            tl.set(g.f, { opacity: 1 }, t0);
+            tl.to(g.f, { x: dx, y: dy + 420, rotation: rot, opacity: 0, duration: 0.8, ease: "power2.in" }, t0);
+          });
+        }
+
+        var root = document.getElementById("mk-st-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        var bar = document.getElementById("mk-st-bar");
+        bar.className = "mk-st-" + CONFIG.variant;
+        bar.style.left = CONFIG.posX + "px"; bar.style.top = CONFIG.posY + "px"; bar.style.width = CONFIG.barW + "px";
+        document.getElementById("mk-st-tag").textContent = CONFIG.tag;
+        var body = document.getElementById("mk-st-body");
+        var items = (CONFIG.entries || []).map(function (r) {
+          var it = document.createElement("div"); it.className = "mk-st-item";
+          var k = document.createElement("span"); k.className = "mk-st-k"; k.textContent = r.label;
+          var v = document.createElement("span"); v.className = "mk-st-v"; v.textContent = r.value;
+          it.appendChild(k); it.appendChild(v); body.appendChild(it); return it;
+        });
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.fromTo(bar, { opacity: 0, y: 50, scaleX: 0.92 }, { opacity: 1, y: 0, scaleX: 1, duration: 0.55, ease: "power3.out" }, 0.1);
+        var slot = (DUR - 1.5) / Math.max(items.length, 1);
+        items.forEach(function (it, i) {
+          var t0 = 0.7 + i * slot;
+          tl.fromTo(it, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, t0);
+          if (i < items.length - 1) tl.to(it, { opacity: 0, y: -28, duration: 0.3, ease: "power2.in" }, t0 + slot - 0.3);
+        });
+        shatter(bar, tl, DUR - 0.95, { cols: 6, rows: 2 });
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-strip"] = tl;
+      })();
+    </script>
+  </body>
+</html>

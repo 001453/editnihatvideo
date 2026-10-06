@@ -1,0 +1,99 @@
+<!DOCTYPE html><!-- hyperframes-registry-item: mk-flap-board -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* SAYI TABELASI (2026-10-06): rakamlar tabela gibi dönerek yerine oturur (split-flap/slot ilhamlı). Saydam kök, position:absolute, visibility:hidden varsayılan + tl.set(0.001) + DUR-0.02 gizle. */
+      #mk-fb-root { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; visibility: hidden; font-family: "Montserrat","Inter",-apple-system,sans-serif; }
+      #mk-fb-card { position:absolute; padding:22px 26px 24px; border-radius:24px; background:rgba(10,12,20,0.72); border:1px solid rgba(255,255,255,0.16); box-shadow:0 18px 50px rgba(0,0,0,0.38); opacity:0; }
+      #mk-fb-label { display:inline-block; font-weight:900; font-size:20px; letter-spacing:0.08em; color:#14151f; background:var(--acc,#f0b429); padding:7px 16px; border-radius:999px; margin-bottom:16px; }
+      .mk-fb-row { display:flex; align-items:center; justify-content:space-between; gap:26px; margin-top:12px; }
+      .mk-fb-rl { font-weight:650; font-size:22px; color:#c8c8d4; white-space:nowrap; }
+      .mk-fb-val { display:flex; gap:5px; }
+      .mk-fb-tile { position:relative; width:42px; height:64px; border-radius:8px; background:linear-gradient(180deg,#232638 0%,#232638 49%,#1a1c2a 51%,#1a1c2a 100%); overflow:hidden; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08); }
+      .mk-fb-tile.mk-fb-txt { width:auto; min-width:22px; padding:0 4px; background:none; box-shadow:none; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:34px; color:var(--acc,#f0b429); }
+      .mk-fb-col { position:absolute; left:0; top:0; width:100%; }
+      .mk-fb-d { height:64px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:42px; color:#fff; }
+    </style>
+  </head>
+  <body>
+    <div id="mk-fb-root" data-composition-id="mk-flap-board" data-width="1080" data-height="1920" data-start="0" data-duration="8">
+      <div id="mk-fb-clip" class="clip" data-start="0" data-duration="8" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-fb-card"><div id="mk-fb-label"></div><div id="mk-fb-rows"></div></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#f0b429",
+          label: "TÜPRAŞ SEVİYELERİ",
+          rows: [{"label": "İlk bölge", "value": "366"}, {"label": "Destek", "value": "354"}, {"label": "Kritik", "value": "336"}],
+          unit: "TL",
+          posX: 60,
+          posY: 300
+        };
+        var DUR = 8;
+        function shatter(el, tl, t0, o) {
+          o = o || {}; var cols = o.cols || 4, rows = o.rows || 3;
+          tl.time(Math.max(t0 - 0.02, 0), true);
+          var w = el.offsetWidth, h = el.offsetHeight, frags = [];
+          for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+            var f = el.cloneNode(true); f.removeAttribute("id");
+            [].forEach.call(f.querySelectorAll("[id]"), function (n) { n.removeAttribute("id"); });
+            f.style.clipPath = "inset(" + (r * h / rows) + "px " + (w - (c + 1) * w / cols) + "px " + (h - (r + 1) * h / rows) + "px " + (c * w / cols) + "px)";
+            f.style.transformOrigin = ((c + 0.5) * w / cols) + "px " + ((r + 0.5) * h / rows) + "px";
+            f.style.pointerEvents = "none"; f.style.opacity = "0";
+            el.parentNode.appendChild(f); frags.push({ f: f, c: c, r: r });
+          }
+          tl.time(0, true);
+          tl.set(el, { opacity: 0 }, t0);
+          frags.forEach(function (g, i) {
+            var dx = (g.c - (cols - 1) / 2) * 120 + ((i * 37) % 50 - 25), dy = (g.r - (rows - 1) / 2) * 50 - 80 + ((i * 53) % 40), rot = ((i * 29) % 90) - 45;
+            tl.set(g.f, { opacity: 0 }, 0);
+            tl.set(g.f, { opacity: 1 }, t0);
+            tl.to(g.f, { x: dx, y: dy + 420, rotation: rot, opacity: 0, duration: 0.8, ease: "power2.in" }, t0);
+          });
+        }
+
+        var root = document.getElementById("mk-fb-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        var card = document.getElementById("mk-fb-card");
+        card.style.left = CONFIG.posX + "px"; card.style.top = CONFIG.posY + "px";
+        document.getElementById("mk-fb-label").textContent = CONFIG.label;
+        var rowsEl = document.getElementById("mk-fb-rows");
+        var spins = [];
+        (CONFIG.rows || []).forEach(function (r, ri) {
+          var row = document.createElement("div"); row.className = "mk-fb-row";
+          var l = document.createElement("div"); l.className = "mk-fb-rl"; l.textContent = r.label;
+          var val = document.createElement("div"); val.className = "mk-fb-val";
+          String(r.value).split("").forEach(function (ch, ci) {
+            var tile = document.createElement("div");
+            if (/[0-9]/.test(ch)) {
+              tile.className = "mk-fb-tile";
+              var col = document.createElement("div"); col.className = "mk-fb-col";
+              for (var k = 0; k < 20; k++) { var d = document.createElement("div"); d.className = "mk-fb-d"; d.textContent = k % 10; col.appendChild(d); }
+              tile.appendChild(col);
+              var target = 10 + parseInt(ch, 10);
+              gsap.set(col, { y: -((target + 3 + ((ri + ci) % 3)) % 20) * 64 });
+              spins.push({ col: col, y: -target * 64, at: 0.7 + ri * 0.35 + ci * 0.15 });
+            } else { tile.className = "mk-fb-tile mk-fb-txt"; tile.textContent = ch; }
+            val.appendChild(tile);
+          });
+          if (CONFIG.unit) { var u = document.createElement("div"); u.className = "mk-fb-tile mk-fb-txt"; u.textContent = CONFIG.unit; val.appendChild(u); }
+          row.appendChild(l); row.appendChild(val); rowsEl.appendChild(row);
+        });
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.fromTo(card, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+        spins.forEach(function (s) { tl.to(s.col, { y: s.y, duration: 1.1, ease: "power3.out" }, s.at); });
+        shatter(card, tl, DUR - 0.95, { cols: 4, rows: 3 });
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-flap-board"] = tl;
+      })();
+    </script>
+  </body>
+</html>

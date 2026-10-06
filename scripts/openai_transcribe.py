@@ -1,7 +1,7 @@
 """OpenAI ile Turkce transkript (kelime zamanli). Anahtar: OPENAI_API_KEY ortam degiskeni
 veya scripts/openai_key.txt dosyasi. Cikti: {"words":[{type,text,start,end,speaker_id}]}"""
 from __future__ import annotations
-import json, os, subprocess, sys, uuid, urllib.request, tempfile
+import json, os, subprocess, sys, uuid, urllib.request, urllib.error, tempfile
 from pathlib import Path
 
 PROMPT = ("Türkçe finans videosu. Terimler: altın, gram altın, ons, Fed, faiz, enflasyon, "
@@ -19,12 +19,18 @@ def key() -> str:
 
 def transcribe(video: Path, out: Path) -> bool:
     k = key()
+    kf = Path(__file__).with_name("openai_key.txt")
     if not k:
-        print("OPENAI_API_KEY yok -> atlandi", flush=True)
+        print(f"OpenAI: anahtar YOK (aranan dosya: {kf}) -> atlandi", flush=True)
         return False
+    print(f"OpenAI: anahtar bulundu ({len(k)} karakter) -> transkript basliyor", flush=True)
     tmp = Path(tempfile.gettempdir()) / f"oa_{uuid.uuid4().hex}.mp3"
-    subprocess.run(["ffmpeg", "-y", "-i", str(video), "-vn", "-ac", "1", "-ar", "16000",
-                    "-b:a", "48k", str(tmp)], check=True, capture_output=True)
+    try:
+        subprocess.run(["ffmpeg", "-y", "-i", str(video), "-vn", "-ac", "1", "-ar", "16000",
+                        "-b:a", "48k", str(tmp)], check=True, capture_output=True)
+    except Exception as e:
+        print(f"OpenAI: ses cikarilamadi (ffmpeg): {e}", flush=True)
+        return False
     data = tmp.read_bytes()
     b = uuid.uuid4().hex
     parts = []
@@ -39,6 +45,12 @@ def transcribe(video: Path, out: Path) -> bool:
         "Content-Type": f"multipart/form-data; boundary={b}"})
     try:
         res = json.load(urllib.request.urlopen(req, timeout=600))
+    except urllib.error.HTTPError as e:
+        try:
+            body = e.read().decode("utf-8", "ignore")[:400]
+        except Exception:
+            body = ""
+        print(f"OpenAI hata {e.code}: {body}", flush=True); return False
     except Exception as e:
         print(f"OpenAI hata: {e}", flush=True); return False
     finally:

@@ -17,6 +17,14 @@ from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = Path(__file__).resolve().parent
+# Kart konumu sayfasinda surukleyerek tasinabilen pro bloklar: (genislik, yukseklik, x_ayarlanir_mi)
+PRO_MOVABLE = {
+    "mk-vert-stat": (330, 400, True), "mk-flow-ticker": (700, 380, True),
+    "mk-ring-stat": (330, 400, True), "mk-line-graph": (560, 300, True),
+    "mk-flap-board": (430, 330, True), "mk-strip": (960, 104, True),
+    "mk-compare": (920, 300, False), "mk-hook": (960, 260, False),
+}
+
 VIDEOS = ROOT / "videos"
 INBOX = ROOT / "_inbox"
 DASH = ROOT / "dashboard.html"
@@ -1125,7 +1133,7 @@ class Handler(BaseHTTPRequestHandler):
                     _tl = json.loads((VIDEOS / vid / "timeline.json").read_text(encoding="utf-8"))
                 except Exception:
                     _tl = {}
-                _MOV = {"mk-vert-stat": (330, 400, True), "mk-flow-ticker": (1080, 112, False)}
+                _MOV = PRO_MOVABLE
                 for pc in _tl.get("proCards") or []:
                     blk = pc.get("block")
                     if blk not in _MOV:
@@ -1156,9 +1164,10 @@ class Handler(BaseHTTPRequestHandler):
                 if not hit:
                     return self._json(404, {"error": "pro kart bulunamadi: " + cid})
                 cp = hit.setdefault("copy", {})
-                if hit.get("block") == "mk-vert-stat":
-                    cp["posX"] = max(0, min(1080 - 330, left))
-                cp["posY"] = max(0, min(1920 - 112, top))
+                _w, _h, _hx = PRO_MOVABLE.get(hit.get("block"), (330, 112, False))
+                if _hx:
+                    cp["posX"] = max(0, min(1080 - _w, left))
+                cp["posY"] = max(0, min(1920 - _h, top))
                 tpath.write_text(json.dumps(tl, ensure_ascii=False, indent=1), encoding="utf-8")
                 ok, msg = rebuild_video(vid)
                 if not ok:

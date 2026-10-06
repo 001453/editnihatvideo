@@ -1,0 +1,86 @@
+<!DOCTYPE html><!-- hyperframes-registry-item: mk-compare -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* KARŞILAŞTIRMA KARTI (2026-10-06): iki panel kenarlardan kayıp ortada buluşur, ortada fark rozeti. Saydam kök, position:absolute, visibility:hidden varsayılan + tl.set(0.001) + DUR-0.02 gizle. */
+      #mk-cp-root { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; visibility: hidden; font-family: "Montserrat","Inter",-apple-system,sans-serif; }
+      #mk-cp-wrap { position:absolute; left:80px; width:920px; height:300px; opacity:1; }
+      #mk-cp-title { position:absolute; left:0; top:-52px; font-weight:900; font-size:22px; letter-spacing:0.08em; color:#14151f; background:var(--acc,#f0b429); padding:8px 18px; border-radius:999px; opacity:0; }
+      .mk-cp-panel { position:absolute; top:0; width:380px; height:300px; border-radius:26px; padding:28px 26px; display:flex; flex-direction:column; justify-content:center; opacity:0; box-shadow:0 18px 50px rgba(0,0,0,0.38); }
+      #mk-cp-l { left:0; background:rgba(10,12,20,0.7); border:1px solid rgba(255,255,255,0.16); }
+      #mk-cp-r { right:0; background:rgba(10,12,20,0.82); border:2px solid var(--acc,#f0b429); }
+      .mk-cp-k { font-weight:650; font-size:26px; color:#c8c8d4; margin-bottom:10px; }
+      .mk-cp-v { font-weight:900; font-size:54px; color:#fff; line-height:1.05; }
+      #mk-cp-r .mk-cp-v { color:var(--acc,#f0b429); }
+      #mk-cp-delta { position:absolute; left:50%; top:50%; margin:-46px 0 0 -65px; width:130px; height:92px; border-radius:20px; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:900; font-size:34px; color:#14151f; background:var(--acc,#f0b429); box-shadow:0 10px 30px rgba(0,0,0,0.4); opacity:0; z-index:3; }
+    </style>
+  </head>
+  <body>
+    <div id="mk-cp-root" data-composition-id="mk-compare" data-width="1080" data-height="1920" data-start="0" data-duration="8">
+      <div id="mk-cp-clip" class="clip" data-start="0" data-duration="8" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-cp-wrap"><div id="mk-cp-title"></div><div id="mk-cp-l" class="mk-cp-panel"><div class="mk-cp-k" id="mk-cp-lk"></div><div class="mk-cp-v" id="mk-cp-lv"></div></div><div id="mk-cp-r" class="mk-cp-panel"><div class="mk-cp-k" id="mk-cp-rk"></div><div class="mk-cp-v" id="mk-cp-rv"></div></div><div id="mk-cp-delta"></div></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#f0b429",
+          title: "TÜPRAŞ 2. ÇEYREK KÂR",
+          leftLabel: "Beklenti",
+          leftValue: "31 milyar",
+          rightLabel: "Açıklanan",
+          rightValue: "46 milyar",
+          delta: "+%48",
+          posY: 760
+        };
+        var DUR = 8;
+        function shatter(el, tl, t0, o) {
+          o = o || {}; var cols = o.cols || 4, rows = o.rows || 3;
+          tl.time(Math.max(t0 - 0.02, 0), true);
+          var w = el.offsetWidth, h = el.offsetHeight, frags = [];
+          for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+            var f = el.cloneNode(true); f.removeAttribute("id");
+            [].forEach.call(f.querySelectorAll("[id]"), function (n) { n.removeAttribute("id"); });
+            f.style.clipPath = "inset(" + (r * h / rows) + "px " + (w - (c + 1) * w / cols) + "px " + (h - (r + 1) * h / rows) + "px " + (c * w / cols) + "px)";
+            f.style.transformOrigin = ((c + 0.5) * w / cols) + "px " + ((r + 0.5) * h / rows) + "px";
+            f.style.pointerEvents = "none"; f.style.opacity = "0";
+            el.parentNode.appendChild(f); frags.push({ f: f, c: c, r: r });
+          }
+          tl.time(0, true);
+          tl.set(el, { opacity: 0 }, t0);
+          frags.forEach(function (g, i) {
+            var dx = (g.c - (cols - 1) / 2) * 120 + ((i * 37) % 50 - 25), dy = (g.r - (rows - 1) / 2) * 50 - 80 + ((i * 53) % 40), rot = ((i * 29) % 90) - 45;
+            tl.set(g.f, { opacity: 0 }, 0);
+            tl.set(g.f, { opacity: 1 }, t0);
+            tl.to(g.f, { x: dx, y: dy + 420, rotation: rot, opacity: 0, duration: 0.8, ease: "power2.in" }, t0);
+          });
+        }
+
+        var root = document.getElementById("mk-cp-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        var wrap = document.getElementById("mk-cp-wrap"); wrap.style.top = CONFIG.posY + "px";
+        document.getElementById("mk-cp-title").textContent = CONFIG.title;
+        document.getElementById("mk-cp-lk").textContent = CONFIG.leftLabel;
+        document.getElementById("mk-cp-lv").textContent = CONFIG.leftValue;
+        document.getElementById("mk-cp-rk").textContent = CONFIG.rightLabel;
+        document.getElementById("mk-cp-rv").textContent = CONFIG.rightValue;
+        var dl = document.getElementById("mk-cp-delta"); dl.textContent = CONFIG.delta;
+        var L = document.getElementById("mk-cp-l"), R = document.getElementById("mk-cp-r");
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.fromTo("#mk-cp-title", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.1);
+        tl.fromTo(L, { opacity: 0, x: -520 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 0.25);
+        tl.fromTo(R, { opacity: 0, x: 520 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 0.55);
+        tl.fromTo(dl, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 1.2);
+        shatter(wrap, tl, DUR - 0.95, { cols: 6, rows: 3 });
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-compare"] = tl;
+      })();
+    </script>
+  </body>
+</html>

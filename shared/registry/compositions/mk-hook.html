@@ -1,0 +1,79 @@
+<!DOCTYPE html><!-- hyperframes-registry-item: mk-hook -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* AÇILIŞ KANCASI (2026-10-06): videonun ilk 2-3 sn'sinde konuyu özetleyen büyük başlık. Saydam kök, position:absolute, visibility:hidden varsayılan + tl.set(0.001) + DUR-0.02 gizle. Altyazıyı durdurmaz. */
+      #mk-hk-root { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; visibility: hidden; font-family: "Montserrat","Inter",-apple-system,sans-serif; }
+      #mk-hk-wrap { position:absolute; left:60px; width:960px; padding:30px 36px 32px; border-radius:30px; background:rgba(10,12,20,0.74); border:1px solid rgba(255,255,255,0.18); box-shadow:0 20px 60px rgba(0,0,0,0.42); opacity:0; }
+      #mk-hk-wrap::before { content:""; position:absolute; left:0; top:30px; bottom:30px; width:8px; border-radius:4px; background:var(--acc,#f0b429); }
+      #mk-hk-kick { display:inline-block; font-weight:900; font-size:24px; letter-spacing:0.09em; color:#14151f; background:var(--acc,#f0b429); padding:8px 18px; border-radius:999px; margin-bottom:16px; }
+      #mk-hk-title { font-weight:900; font-size:76px; line-height:1.06; color:#fff; text-transform:uppercase; }
+      #mk-hk-title em { font-style:normal; color:var(--acc,#f0b429); }
+      #mk-hk-sub { margin-top:14px; font-weight:650; font-size:30px; color:#c8c8d4; }
+    </style>
+  </head>
+  <body>
+    <div id="mk-hk-root" data-composition-id="mk-hook" data-width="1080" data-height="1920" data-start="0" data-duration="3">
+      <div id="mk-hk-clip" class="clip" data-start="0" data-duration="3" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-hk-wrap"><div id="mk-hk-kick"></div><div id="mk-hk-title"></div><div id="mk-hk-sub"></div></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#f0b429",
+          kicker: "TÜPRAŞ",
+          title: "366 SEVİYESİ NEDEN KRİTİK?",
+          hot: "366",
+          sub: "Bilançodan sonra 3 seviye takipte",
+          posY: 260
+        };
+        var DUR = 3;
+        function shatter(el, tl, t0, o) {
+          o = o || {}; var cols = o.cols || 4, rows = o.rows || 3;
+          tl.time(Math.max(t0 - 0.02, 0), true);
+          var w = el.offsetWidth, h = el.offsetHeight, frags = [];
+          for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+            var f = el.cloneNode(true); f.removeAttribute("id");
+            [].forEach.call(f.querySelectorAll("[id]"), function (n) { n.removeAttribute("id"); });
+            f.style.clipPath = "inset(" + (r * h / rows) + "px " + (w - (c + 1) * w / cols) + "px " + (h - (r + 1) * h / rows) + "px " + (c * w / cols) + "px)";
+            f.style.transformOrigin = ((c + 0.5) * w / cols) + "px " + ((r + 0.5) * h / rows) + "px";
+            f.style.pointerEvents = "none"; f.style.opacity = "0";
+            el.parentNode.appendChild(f); frags.push({ f: f, c: c, r: r });
+          }
+          tl.time(0, true);
+          tl.set(el, { opacity: 0 }, t0);
+          frags.forEach(function (g, i) {
+            var dx = (g.c - (cols - 1) / 2) * 120 + ((i * 37) % 50 - 25), dy = (g.r - (rows - 1) / 2) * 50 - 80 + ((i * 53) % 40), rot = ((i * 29) % 90) - 45;
+            tl.set(g.f, { opacity: 0 }, 0);
+            tl.set(g.f, { opacity: 1 }, t0);
+            tl.to(g.f, { x: dx, y: dy + 420, rotation: rot, opacity: 0, duration: 0.8, ease: "power2.in" }, t0);
+          });
+        }
+
+        var root = document.getElementById("mk-hk-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        var wrap = document.getElementById("mk-hk-wrap"); wrap.style.top = CONFIG.posY + "px";
+        document.getElementById("mk-hk-kick").textContent = CONFIG.kicker;
+        var tEl = document.getElementById("mk-hk-title");
+        var esc = function (x) { return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+        var html = esc(CONFIG.title);
+        if (CONFIG.hot) html = html.split(esc(CONFIG.hot)).join("<em>" + esc(CONFIG.hot) + "</em>");
+        tEl.innerHTML = html;
+        document.getElementById("mk-hk-sub").textContent = CONFIG.sub;
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.fromTo(wrap, { opacity: 0, y: 60, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 0.05);
+        tl.fromTo("#mk-hk-title", { letterSpacing: "0.06em" }, { letterSpacing: "0em", duration: 0.8, ease: "power2.out" }, 0.1);
+        shatter(wrap, tl, DUR - 0.95, { cols: 6, rows: 3 });
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-hook"] = tl;
+      })();
+    </script>
+  </body>
+</html>

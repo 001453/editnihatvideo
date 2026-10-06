@@ -1,0 +1,89 @@
+<!DOCTYPE html><!-- hyperframes-registry-item: mk-line-graph -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: transparent; overflow: hidden; }
+      /* ÇİZGİ GRAFİK KARTI (2026-10-06): fiyat çizgisi çizilerek gelir, son nokta + değer etiketi. Saydam kök, position:absolute (Stüdyo'da alta kaymasın), visibility:hidden varsayılan + tl.set(0.001) + DUR-0.02 gizle. */
+      #mk-lg-root { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; visibility: hidden; font-family: "Montserrat","Inter",-apple-system,sans-serif; }
+      #mk-lg-card { position:absolute; width:560px; padding:24px 28px 22px; border-radius:26px; background:rgba(10,12,20,0.68); border:1px solid rgba(255,255,255,0.16); box-shadow:0 18px 50px rgba(0,0,0,0.35); opacity:0; }
+      #mk-lg-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+      #mk-lg-label { font-weight:900; font-size:22px; letter-spacing:0.07em; color:var(--acc,#f0b429); }
+      #mk-lg-last { font-weight:900; font-size:44px; color:#fff; }
+      #mk-lg-svg { width:504px; height:200px; display:block; }
+      #mk-lg-cap { margin-top:8px; font-weight:650; font-size:20px; color:#c8c8d4; }
+    </style>
+  </head>
+  <body>
+    <div id="mk-lg-root" data-composition-id="mk-line-graph" data-width="1080" data-height="1920" data-start="0" data-duration="8">
+      <div id="mk-lg-clip" class="clip" data-start="0" data-duration="8" data-track-index="0" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+        <div id="mk-lg-card"><div id="mk-lg-top"><div id="mk-lg-label"></div><div id="mk-lg-last"></div></div><svg id="mk-lg-svg" viewBox="0 0 504 200"><line x1="0" y1="199" x2="504" y2="199" stroke="rgba(255,255,255,0.18)" stroke-width="2"/><path id="mk-lg-fill" d="" fill="var(--acc,#f0b429)" fill-opacity="0.16"/><path id="mk-lg-line" d="" fill="none" stroke="var(--acc,#f0b429)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle id="mk-lg-dot" r="9" fill="#fff" stroke="var(--acc,#f0b429)" stroke-width="5" opacity="0"/></svg><div id="mk-lg-cap"></div></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var CONFIG = {
+          accent: "#4ade80",
+          label: "TÜPRAŞ",
+          last: "366 TL",
+          points: [310, 322, 318, 335, 330, 348, 342, 360, 366],
+          caption: "Takip seviyesi: 366 · 354 · 336",
+          posX: 260,
+          posY: 300
+        };
+        var DUR = 8;
+        function shatter(el, tl, t0, o) {
+          o = o || {}; var cols = o.cols || 4, rows = o.rows || 3;
+          tl.time(Math.max(t0 - 0.02, 0), true);
+          var w = el.offsetWidth, h = el.offsetHeight, frags = [];
+          for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+            var f = el.cloneNode(true); f.removeAttribute("id");
+            [].forEach.call(f.querySelectorAll("[id]"), function (n) { n.removeAttribute("id"); });
+            f.style.clipPath = "inset(" + (r * h / rows) + "px " + (w - (c + 1) * w / cols) + "px " + (h - (r + 1) * h / rows) + "px " + (c * w / cols) + "px)";
+            f.style.transformOrigin = ((c + 0.5) * w / cols) + "px " + ((r + 0.5) * h / rows) + "px";
+            f.style.pointerEvents = "none"; f.style.opacity = "0";
+            el.parentNode.appendChild(f); frags.push({ f: f, c: c, r: r });
+          }
+          tl.time(0, true);
+          tl.set(el, { opacity: 0 }, t0);
+          frags.forEach(function (g, i) {
+            var dx = (g.c - (cols - 1) / 2) * 120 + ((i * 37) % 50 - 25), dy = (g.r - (rows - 1) / 2) * 50 - 80 + ((i * 53) % 40), rot = ((i * 29) % 90) - 45;
+            tl.set(g.f, { opacity: 0 }, 0);
+            tl.set(g.f, { opacity: 1 }, t0);
+            tl.to(g.f, { x: dx, y: dy + 420, rotation: rot, opacity: 0, duration: 0.8, ease: "power2.in" }, t0);
+          });
+        }
+
+        var root = document.getElementById("mk-lg-root");
+        root.style.setProperty("--acc", CONFIG.accent);
+        var card = document.getElementById("mk-lg-card");
+        card.style.left = CONFIG.posX + "px"; card.style.top = CONFIG.posY + "px";
+        document.getElementById("mk-lg-label").textContent = CONFIG.label;
+        document.getElementById("mk-lg-last").textContent = CONFIG.last;
+        document.getElementById("mk-lg-cap").textContent = CONFIG.caption;
+        var pts = CONFIG.points, mn = Math.min.apply(null, pts), mx = Math.max.apply(null, pts), rg = (mx - mn) || 1;
+        var xy = pts.map(function (v, i) { return [i * (504 / (pts.length - 1)), 180 - ((v - mn) / rg) * 160]; });
+        var d = xy.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+        var line = document.getElementById("mk-lg-line"); line.setAttribute("d", d);
+        document.getElementById("mk-lg-fill").setAttribute("d", d + " L504 199 L0 199 Z");
+        var dot = document.getElementById("mk-lg-dot"), lp = xy[xy.length - 1];
+        dot.setAttribute("cx", lp[0]); dot.setAttribute("cy", lp[1]);
+        var fill = document.getElementById("mk-lg-fill");
+        var len = 1400; line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+        var tl = gsap.timeline({ paused: true });
+        tl.set(root, { visibility: "visible" }, 0.001);
+        tl.fromTo(card, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+        tl.fromTo(fill, { opacity: 0 }, { opacity: 1, duration: 1.4, ease: "power1.out" }, 0.8);
+        tl.to(line, { strokeDashoffset: 0, duration: 1.6, ease: "power2.inOut" }, 0.7);
+        tl.to(dot, { opacity: 1, duration: 0.25 }, 2.25);
+        tl.fromTo("#mk-lg-last", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 2.2);
+        shatter(card, tl, DUR - 0.95, { cols: 5, rows: 3 });
+        tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+        window.__timelines["mk-line-graph"] = tl;
+      })();
+    </script>
+  </body>
+</html>

@@ -269,3 +269,44 @@ Bu akış standarttır, bozma:
 - **Her videoda farklı tasarım döngüsü (10'lu):** `shared/pro_rotation.json` — video no % 10 → renk (accent) + dikey kart konumu + akan kart konumu. `build_engine._apply_rotation` bunu otomatik uygular; `timeline.json` `proCards[].copy` içinde elle verilen accent/posX/posY HER ZAMAN önceliklidir.
 - Yeni videoda: sahne çiftini önceki videodakinden farklı seç, normal pro-tarz kartların konumunu rotasyondan al, ayrıca boş alana göre (yüz/altyazı üstü) gerekirse copy ile ez.
 - Konum ince ayarı: altyazı sayfası "📍 Kart konumu" (pro kartlar `pro:<id>`).
+
+## Katalogdan ilhamla yeni pro kartlar (2026-10-06, motorda render doğrulandı)
+Üçü de şeffaf kök, `position:absolute`, `posX/posY/accent` alır; `timeline.json` `proCards[]` içinde `block` adıyla çağrılır:
+- `mk-ring-stat` — sayarak gelen yüzde halkası. copy: `label, value(0-100), suffix, caption, posX, posY, accent`.
+- `mk-line-graph` — çizilerek gelen fiyat çizgisi. copy: `label, last, points[], caption, posX, posY, accent`.
+- `mk-hand-circle` — elle çizilmiş daire + ok + not (grafik/sayıyı işaretler). copy: `note, posX, posY (daire merkezi), boxW, boxH, accent`.
+Normal 4 kartın pro-tarz olan 2'si için `mk-vert-stat`, `mk-flow-ticker` ile birlikte bu üçü de havuzdadır; videoda farklı olanı seç.
+
+## KİLİT — kartlar transkripte göre yerleştirilir (2026-10-06, Nihat onayı)
+Pro kart / sahne / halka / çizgi grafik / el çizimi daire eklenirken zaman ve içerik RASTGELE seçilmez:
+- `transcripts/input-video.json` kelime zamanlarına bakılır; kart, konuşmacı o konuyu söylerken başlar (örn. "%30" denirken halka, seviyeler sayılırken çizgi grafik, vurgulanan kelimede el çizimi daire).
+- Kartın metni/sayıları o anda konuşulanla birebir aynı olur; yeni videoda önceki videonun metni asla kalmaz.
+- El çizimi daire altyazının vurgulanan kelimesini çevreler (posY ≈ altyazı bandı); kenarda taşmamalı.
+- Konumlar: yüz ve altyazıyı kapatmayan boş alan; sahne kartları arası ve diğer kartlarla en az birkaç sn boşluk.
+
+## Alt bant `mk-strip` (2026-10-06, adım 1) — haber şeridinin yerine
+copy: `variant (neon|dark|pill), tag, entries[{label,value}], accent, posX, posY, barW`. Maddeler sırayla yer değiştirir (kayan şerit değil). Rotasyon: video no % 3 → variant, renk ve posY döngüden gelir. `mk-flow-ticker` ile birlikte "akış/bant" havuzudur.
+
+## Sayı tabelası `mk-flap-board` (2026-10-06, adım 2)
+Rakamlar tabela gibi dönerek yerine oturur. copy: `label, rows[{label,value(rakam string)}], unit, accent, posX, posY`. Seviye/destek/direnç sayıları konuşulurken kullanılır (transkripte göre).
+
+## Parçalanma çıkışı + çarpma sesi (2026-10-06, Nihat isteği)
+`mk-vert-stat, mk-flow-ticker, mk-ring-stat, mk-line-graph, mk-flap-board, mk-strip` kartları bitişte `shatter()` ile parçalanıp düşer (kart içinden klonlanan parçalar). Ses: `shared/sfx/shatter.mp3` — motor (`SHATTER_BLOCKS`) kartın bitişine (start+dur-0.95) otomatik ekler; kapatmak için copy'ye `"noShatter": true`. Kartın iç süresi `dur` ile eşitlenir (motor `var DUR`'u dur'a göre yazar), bu yüzden `dur` kısa olsa bile parçalanma görünür. Sahne kartları ve el çizimi daire parçalanmaz.
+
+## KİLİT — kart anlatırken altyazı yok (2026-10-06, Nihat isteği)
+Pro kart / sahne / halka / grafik / tabela / bant ekrandayken o saniyelerin altyazısı gösterilmez; kart bitince altyazı devam eder (`card_windows()` pro kartları da kapsar). Muaf: `mk-hand-circle` (altyazıyı işaretler) ve `copy.noCaptionPause: true`. Bu yüzden kartı konuşmanın o konuyu anlattığı kısa kesite yerleştir ve süresini gereksiz uzatma (genelde 4–6 sn).
+
+## DÜZELTME (2026-10-06): `mk-hand-circle` (el çizimi daire) KULLANMA — Nihat beğenmedi, havuzdan çıkarıldı. Altyazı durdurma kuralında artık muaf kart yok (sadece copy.noCaptionPause:true ile tek tek).
+
+## Karşılaştırma kartı `mk-compare` (2026-10-06, adım 3)
+İki panel kenarlardan kayıp buluşur, ortada fark rozeti; bitişte parçalanır (ses otomatik). copy: `title, leftLabel, leftValue, rightLabel, rightValue, delta, posY, accent`. "Beklenti → açıklanan", "önceki → şimdi" gibi iki sayı konuşulurken, transkripte göre. Geniş (920px) olduğu için yüzü kapatmayan üst/alt boşluğa koy (posY ≈ 330 veya ≈ 1250).
+
+## B-roll geçişleri döngüsü (2026-10-06, 1007'de onaylandı)
+`build_engine._trans_js`: giriş {flash, whip, zoom, glitch} × çıkış {glitch, flash, whip, zoom}; seçim (video no + b-roll sırası) ile döner, aynı videoda b-roll'lar farklı çift alır. Parlama geçişleri `#trans-fx` beyaz katmanını ve kısık `sub-hit` sesini kullanır (sfx otomatik).
+
+## YENİ (hepsi): hook, sahne varyantları, planlayıcı
+- `mk-hook`: video açılış başlığı (0.1s, 3sn). Altyazıyı durdurmaz. copy: accent/kicker/title/hot/sub/posY.
+- Yeni tam ekran sahneler: `mk-scene-break-bigstat` (dev sayı), `mk-scene-break-trio` (kademeli kartlar). Mevcut grid ile dönüşümlü kullan.
+- Panel taşınabilir bloklar: vert-stat, flow-ticker, ring-stat, line-graph, flap-board, strip, compare, hook (dashboard_server PRO_MOVABLE).
+- Planlayıcı: `python scripts/plan_cards.py <id>` → `videos/<id>/CARD_PLAN.json` (taslak öneri; etiketler paketlemede düzeltilir).
+- OpenAI: anahtar varsa ve transcript'te `.openai` işareti yoksa eski transcript `input-video.eski-whisper.json` olur, OpenAI ile yeniden yapılır.

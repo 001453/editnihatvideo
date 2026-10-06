@@ -86,13 +86,25 @@ def transcribe(dest: Path) -> Path:
     video = dest / "public" / "input-video.mp4"
     out = dest / "transcripts" / "input-video.json"
     out.parent.mkdir(exist_ok=True)
-    if out.exists() and out.stat().st_size > 100:
+    marker = out.with_suffix(".openai")
+    have_key = False
+    try:
+        sys.path.insert(0, str(SCRIPTS))
+        from openai_transcribe import key as _oakey
+        have_key = bool(_oakey())
+    except Exception:
+        pass
+    if out.exists() and out.stat().st_size > 100 and (marker.exists() or not have_key):
         print(f"transcript var, atlanıyor: {out}", flush=True)
         return out
+    if out.exists() and have_key and not marker.exists():
+        print("Mevcut transkript OpenAI'dan degil -> OpenAI ile yeniden yapiliyor", flush=True)
+        out.replace(out.with_suffix(".eski-whisper.json"))
     try:
         sys.path.insert(0, str(SCRIPTS))
         from openai_transcribe import transcribe as _oa
         if _oa(video, out):
+            marker.write_text("openai", encoding="utf-8")
             return out
     except Exception as e:
         print(f"OpenAI atlandi: {e}", flush=True)

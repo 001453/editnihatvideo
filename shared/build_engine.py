@@ -193,6 +193,9 @@ def _apply_rotation(p, block):
         copy.setdefault("posX", r["vert"][0]); copy.setdefault("posY", r["vert"][1])
     if block == "mk-flow-ticker":
         copy.setdefault("posX", r["flow"][0]); copy.setdefault("posY", r["flow"][1])
+    if block == "mk-strip":
+        n = int(re.search(r"(\d+)\s*$", ROOT.name).group(1))
+        copy.setdefault("variant", ["neon", "dark", "pill"][n % 3]); copy.setdefault("posY", r["flow"][1])
     q = dict(p); q["copy"] = copy
     return q
 
@@ -220,7 +223,7 @@ def pro_cards_html():
         local_name = f"pro-{cid}.html"
         local = dest / local_name
         src_text = src.read_text(encoding="utf-8")
-        local.write_text(_patch_pro_config(src_text, p.get("copy") or {}).replace("mk-sb", f"mk-sb{i}").replace("{ position: relative; width: 1080px; height: 1920px;", "{ position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;").replace("position: relative; width: 1080px; height: 1920px; overflow", "position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow"), encoding="utf-8")
+        local.write_text(_patch_pro_config(src_text, p.get("copy") or {}).replace("mk-sb", f"mk-sb{i}").replace("var DUR = 8;", "var DUR = %s;" % (float(p.get("dur") or 7))).replace("{ position: relative; width: 1080px; height: 1920px;", "{ position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;").replace("position: relative; width: 1080px; height: 1920px; overflow", "position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow"), encoding="utf-8")
         start = float(p.get("start") or 0)
         dur = float(p.get("dur") or 7)
         # KİLİT (2026-09, GERÇEK tam ekran sahne desteği): bir registry öğesi
@@ -1158,6 +1161,13 @@ def card_windows():
         start = float(sm.group(1))
         dur = min(float(dm.group(1)) if dm else 4.0, CARD_MAX_DUR)
         out.append((start, start + dur))
+    # KİLİT (2026-10-06): pro kart / sahne kartı anlatım yaparken altyazı gelmez, bitince devam eder.
+    # Muaf: copy.noCaptionPause=true.
+    for _p in PRO_CARDS:
+        if (_p.get("copy") or {}).get("noCaptionPause") or _p.get("block")=="mk-hook":
+            continue
+        _s = float(_p.get("start") or 0)
+        out.append((_s, _s + float(_p.get("dur") or 7)))
     return out
 
 
@@ -1294,12 +1304,63 @@ for i, m in enumerate(MG):
     elif typ == "ticker":
         sfx_bits.append(sfx_el(f"sfx-mg-{mid}", "sfx/swoosh-up.mp3", at, 0.35, "0.09", 21))
 
+SHATTER_BLOCKS = {"mk-vert-stat", "mk-flow-ticker", "mk-ring-stat", "mk-line-graph", "mk-flap-board", "mk-strip", "mk-compare"}
+for _p in PRO_CARDS:
+    if (_p.get("block") or "") in SHATTER_BLOCKS and not (_p.get("copy") or {}).get("noShatter"):
+        _t = float(_p.get("start") or 0) + float(_p.get("dur") or 7) - 0.95
+        sfx_bits.append(sfx_el(f"sfx-shatter-{_p.get('id') or _p.get('block')}", "sfx/shatter.mp3", _t, 0.9, "0.22", 23))
+for _bi2, _b in enumerate(BROLL):
+    _tin, _tout = TRANS_IN[(_vn + _bi2) % 4], TRANS_OUT[(_vn + 2 * _bi2 + 1) % 4]
+    if _tin == "flash":
+        sfx_bits.append(sfx_el(f"sfx-trans-in-{_b['id']}", "sfx/sub-hit.mp3", _b["start"] - 0.02, 0.28, "0.13", 24))
+    if _tout == "flash":
+        sfx_bits.append(sfx_el(f"sfx-trans-out-{_b['id']}", "sfx/sub-hit.mp3", _b["start"] + _b["dur"] - 0.18, 0.28, "0.13", 24))
 sfx_html = "\n".join(sfx_bits)
 
 css = (shared_dir() / "composition.css").read_text(encoding="utf-8")
 
 broll_js = []
-for b in BROLL:
+TRANS_IN = ["flash", "whip", "zoom", "glitch"]
+TRANS_OUT = ["glitch", "flash", "whip", "zoom"]
+try:
+    _vn = int(re.search(r"(\d+)\s*$", ROOT.name).group(1))
+except Exception:
+    _vn = 0
+
+
+def _trans_js(cam, s, e, tin, tout):
+    """KİLİT (2026-10-06): b-roll giriş/çıkış geçişleri 10'lu döngüde (video no + b-roll sırası). Aynı videoda b-roll'lar farklı çift alır."""
+    L = []
+    if tin == "flash":
+        L.append(f'tl.fromTo("{cam}",{{opacity:0,x:0,scale:1.5,filter:"blur(14px)"}},{{opacity:1,x:0,scale:1,filter:"blur(0px)",duration:0.5,ease:"expo.out",immediateRender:false}}, {s});')
+        L.append(f'tl.fromTo("#trans-fx",{{opacity:0}},{{opacity:0.9,duration:0.08,ease:"power1.out",immediateRender:false}}, {s - 0.02:.2f});')
+        L.append(f'tl.to("#trans-fx",{{opacity:0,duration:0.3,ease:"power2.out"}}, {s + 0.08:.2f});')
+    elif tin == "whip":
+        L.append(f'tl.fromTo("{cam}",{{opacity:0,x:-420,scale:1.04,filter:"blur(18px)"}},{{opacity:1,x:0,scale:1,filter:"blur(0px)",duration:0.45,ease:"expo.out",immediateRender:false}}, {s});')
+    elif tin == "zoom":
+        L.append(f'tl.fromTo("{cam}",{{opacity:0,x:0,scale:0.7,filter:"blur(10px)"}},{{opacity:1,x:0,scale:1,filter:"blur(0px)",duration:0.5,ease:"back.out(1.6)",immediateRender:false}}, {s});')
+    else:  # glitch in
+        L.append(f'tl.fromTo("{cam}",{{opacity:0,x:30,scale:1}},{{opacity:0.7,x:-20,duration:0.06,immediateRender:false}}, {s});')
+        L.append(f'tl.to("{cam}",{{opacity:1,x:12,duration:0.06}}, {s + 0.06:.2f});')
+        L.append(f'tl.to("{cam}",{{opacity:0.8,x:-8,duration:0.06}}, {s + 0.12:.2f});')
+        L.append(f'tl.to("{cam}",{{opacity:1,x:0,duration:0.1}}, {s + 0.18:.2f});')
+    t0 = e - 0.36
+    if tout == "glitch":
+        for k, (x, o) in enumerate([(16, 0.7), (-22, 1), (10, 0.6), (-8, 1)]):
+            L.append(f'tl.set("{cam}",{{x:{x},opacity:{o}}}, {t0 + 0.06 * k:.2f});')
+        L.append(f'tl.to("{cam}",{{opacity:0,x:0,duration:0.18,ease:"power2.in"}}, {t0 + 0.18:.2f});')
+    elif tout == "flash":
+        L.append(f'tl.to("{cam}",{{opacity:0,duration:0.3,ease:"power2.in"}}, {e - 0.3:.2f});')
+        L.append(f'tl.fromTo("#trans-fx",{{opacity:0}},{{opacity:0.9,duration:0.08,ease:"power1.out",immediateRender:false}}, {e - 0.18:.2f});')
+        L.append(f'tl.to("#trans-fx",{{opacity:0,duration:0.3,ease:"power2.out"}}, {e - 0.08:.2f});')
+    elif tout == "whip":
+        L.append(f'tl.to("{cam}",{{opacity:0,x:420,filter:"blur(18px)",duration:0.4,ease:"power3.in"}}, {e - 0.4:.2f});')
+    else:  # zoom out
+        L.append(f'tl.to("{cam}",{{opacity:0,scale:1.5,filter:"blur(12px)",duration:0.4,ease:"power2.in"}}, {e - 0.4:.2f});')
+    return "\n          ".join(L)
+
+
+for _bi, b in enumerate(BROLL):
     s = b["start"]
     e = b["start"] + b["dur"]
     cam = f"#broll-{b['id']}-cam"
@@ -1323,8 +1384,7 @@ for b in BROLL:
     # yapışıyor" şikayeti için y offset -632'den -520'ye küçültülmüş hali
     # korundu.
     broll_js.append(f'''
-          tl.fromTo("{cam}",{{opacity:0,x:100,scale:1.08}},{{opacity:1,x:0,scale:1,duration:0.42,ease:"expo.out",immediateRender:false}}, {s});
-          tl.to("{cam}",{{opacity:0,x:-72,scale:1.04,duration:0.36,ease:"power2.in"}}, {e - 0.36:.2f});
+{_trans_js(cam, s, e, TRANS_IN[(_vn + _bi) % 4], TRANS_OUT[(_vn + 2 * _bi + 1) % 4])}
           tl.fromTo("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,boxShadow:"0 0 0 0 rgba(255,255,255,0)"}},{{scale:0.30,x:-338,y:-520,borderRadius:"36px",rotation:-1.0,boxShadow:"0 0 0 4px rgba(255,255,255,.85), 0 18px 40px rgba(0,0,0,.45)",duration:0.42,ease:"power3.inOut",immediateRender:false}}, {s});
           tl.to("#video-wrap",{{rotation:0,duration:0.22,ease:"power1.out"}}, {s + 0.42:.2f});
           tl.to("#video-wrap",{{scale:1,x:0,y:0,borderRadius:"0px",rotation:0,boxShadow:"0 0 0 0 rgba(255,255,255,0)",duration:0.42,ease:"power3.inOut"}}, {e - 0.42:.2f});
@@ -1933,6 +1993,7 @@ html_doc = f'''<!doctype html>
   </head>
   <body>
     <div id="stage" data-composition-id="talking-head-recut" data-start="0" data-duration="{DUR}" data-fps="{FPS}" data-width="1080" data-height="1920">
+      <div id="trans-fx" style="position:absolute;inset:0;z-index:6;background:#fff;opacity:0;pointer-events:none;"></div>
       <div id="broll-layer">
 {broll_html}
       </div>
