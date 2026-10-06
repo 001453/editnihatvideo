@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Kart konumu</title>
+<style>
+:root{--bg0:#0a0b0e;--bg1:#12141a;--line:#2a2f3a;--text:#f2f0ea;--muted:#9a9aaa;--gold:#e2b84a;--ok:#5dcc8a;--bad:#ff5c5c}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg0),var(--bg1));color:var(--text);font-family:"Segoe UI",system-ui,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:1.6rem;margin:0 0 6px}.lead{color:var(--muted);line-height:1.5;margin:0 0 16px}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+#stage{position:relative;width:330px;aspect-ratio:9/16;background:#000;border-radius:14px;overflow:hidden;border:1px solid var(--line);flex:none}
+#stage video{width:100%;height:100%;object-fit:cover;display:block}
+.box{position:absolute;border:2px dashed rgba(226,184,74,.5);background:rgba(226,184,74,.08);border-radius:8px;touch-action:none;cursor:pointer;font-size:10px;color:#1a1406}
+.box span{position:absolute;top:2px;left:4px;background:var(--gold);padding:1px 5px;border-radius:4px;font-weight:800}
+.box.sel{border:2px solid #fff;background:rgba(226,184,74,.28);cursor:grab;z-index:5}
+.box.dragging{cursor:grabbing}
+.panel{flex:1;min-width:280px}
+select,input{background:#0d0f14;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 11px;font-size:14px}
+input.num{width:92px}
+button{border:1px solid var(--line);background:#12151c;color:var(--text);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:650;cursor:pointer}
+button.primary{background:linear-gradient(180deg,#f0d06a,#c99620);color:#1a1406;border-color:#e2b84a}
+.pad{display:grid;grid-template-columns:56px 56px 56px;grid-template-rows:56px 56px;gap:8px;width:max-content;margin:12px 0}
+.pad button{width:56px;height:56px;font-size:22px;padding:0}.sp{visibility:hidden}
+.cards{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:#0d0f14;color:var(--gold);cursor:pointer;font-size:13px}
+.chip.on{background:var(--gold);color:#1a1406}
+.status{font-size:13px;color:var(--muted);margin-top:8px}.ok{color:var(--ok)}.err{color:var(--bad)}
+</style></head><body><div class="wrap">
+<h1>Kart konumu ayarla</h1>
+<p class="lead">Video seç → kartı seç → videonun üstünde <b>sürükle</b> ya da oklarla taşı. Bıraktıktan <b>2 saniye sonra kendiliğinden kaydolur ve videoya işlenir</b> (Studio'da Ctrl+F5 yeterli). Kart konumu punch/yakınlaştırmadan etkilenmez, tek konum yeter.</p>
+<div style="margin-bottom:14px"><select id="vid"></select> <a href="/" style="color:var(--gold);margin-left:12px">← Dashboard</a></div>
+<div class="row">
+ <div id="stage"><video id="pv" muted playsinline preload="metadata"></video></div>
+ <div class="panel">
+  <div class="cards" id="chips"></div>
+  <div>Yatay <input class="num" id="px" type="number" step="10"> · Dikey <input class="num" id="py" type="number" step="10"> <button class="primary" id="apply">Uygula</button></div>
+  <div class="pad"><button class="sp">·</button><button data-dy="-1">↑</button><button class="sp">·</button><button data-dx="-1">←</button><button data-dy="1">↓</button><button data-dx="1">→</button></div>
+  <div class="status" id="st"></div>
+ </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let cards=[], sel=null, timer=null, busy=false, dirty=false;
+const sc=()=>$('stage').clientWidth/1080;
+async function api(body){const r=await fetch('/api/card-layout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw new Error(j.error||'hata');return j}
+async function listVideos(){const r=await fetch('/api/videos');const j=await r.json();const s=$('vid');(j.videos||[]).filter(v=>v.has_video).forEach(v=>{const o=document.createElement('option');o.value=v.id;o.textContent=v.id;s.appendChild(o)});const q=new URLSearchParams(location.search).get('id');if(q)s.value=q}
+async function load(){const id=$('vid').value;if(!id)return;const j=await api({id,list:true});cards=j.cards;sel=cards.length?cards[0].id:null;
+ const v=$('pv');v.src='/media/'+encodeURIComponent(id)+'?t='+Date.now();v.load();render()}
+function cur(){return cards.find(c=>c.id===sel)}
+function render(){
+ $('chips').innerHTML='';cards.forEach(c=>{const b=document.createElement('div');b.className='chip'+(c.id===sel?' on':'');b.textContent=c.id.replace('card-','')+' · '+c.start.toFixed(1)+'sn';b.onclick=()=>{sel=c.id;if($('pv').readyState>0)$('pv').currentTime=c.start+0.8;render()};$('chips').appendChild(b)});
+ const st=$('stage');st.querySelectorAll('.box').forEach(e=>e.remove());
+ cards.forEach(c=>{const d=document.createElement('div');d.className='box'+(c.id===sel?' sel':'');d.dataset.id=c.id;d.innerHTML='<span>'+c.id.replace('card-','')+'</span>';
+  d.style.left=c.left*sc()+'px';d.style.top=c.top*sc()+'px';d.style.width=c.width*sc()+'px';d.style.height=c.height*sc()+'px';
+  d.onpointerdown=e=>startDrag(e,c,d);st.appendChild(d)});
+ const c=cur();if(c){$('px').value=c.left;$('py').value=c.top}
+}
+function startDrag(e,c,d){
+ if(c.id!==sel){sel=c.id;render();return}
+ e.preventDefault();d.setPointerCapture(e.pointerId);d.classList.add('dragging');
+ const x0=e.clientX,y0=e.clientY,l0=c.left,t0=c.top;
+ d.onpointermove=ev=>{c.left=Math.round(l0+(ev.clientX-x0)/sc());c.top=Math.round(t0+(ev.clientY-y0)/sc());d.style.left=c.left*sc()+'px';d.style.top=c.top*sc()+'px';$('px').value=c.left;$('py').value=c.top};
+ d.onpointerup=()=>{d.classList.remove('dragging');d.onpointermove=null;d.onpointerup=null;queue()};
+}
+function move(dx,dy){const c=cur();if(!c)return;c.left+=dx*20;c.top+=dy*20;render();queue()}
+function setAbs(){const c=cur();if(!c)return;c.left=Number($('px').value)||0;c.top=Number($('py').value)||0;render();queue()}
+function queue(){$('st').textContent='2 sn durursa kaydolur…';$('st').className='status';clearTimeout(timer);timer=setTimeout(save,2000)}
+async function save(){
+ const c=cur();if(!c)return;if(busy){dirty=true;return}busy=true;$('st').textContent='kaydediliyor ve videoya işleniyor…';
+ try{const j=await api({id:$('vid').value,cardId:c.id,left:c.left,top:c.top});$('st').textContent=(j.msg||'kaydedildi')+' ✓ — Studio\'da Ctrl+F5';$('st').className='status ok'}
+ catch(e){$('st').textContent='hata: '+e.message;$('st').className='status err'}
+ finally{busy=false;if(dirty){dirty=false;save()}}
+}
+document.querySelectorAll('.pad [data-dx],.pad [data-dy]').forEach(b=>b.onclick=()=>move(Number(b.dataset.dx||0),Number(b.dataset.dy||0)));
+$('apply').onclick=setAbs;$('vid').onchange=load;
+window.addEventListener('keydown',e=>{const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];if(!m||/INPUT|SELECT/.test(e.target.tagName))return;e.preventDefault();move(m[0],m[1])});
+listVideos().then(load);
+</script></div></body></html>

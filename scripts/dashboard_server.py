@@ -853,6 +853,11 @@ class Handler(BaseHTTPRequestHandler):
             if not CAPS_PAGE.exists():
                 return self._json(404, {"error": "captions.html yok"})
             return self._file(CAPS_PAGE)
+        if u.path in ("/cards-layout", "/cards_layout.html"):
+            page = ROOT / "cards_layout.html"
+            if not page.exists():
+                return self._json(404, {"error": "cards_layout.html yok"})
+            return self._file(page)
         if u.path.startswith("/api/status/"):
             vid = sanitize_id(u.path.split("/")[-1])
             job = dict(JOBS.get(vid) or {"id": vid, "status": "idle", "log": []})
@@ -1092,6 +1097,49 @@ class Handler(BaseHTTPRequestHandler):
                 if not ok:
                     return self._json(400, {"error": msg})
             return self._json(200, {"ok": True, "msg": msg, "fast": not do_rebuild})
+
+        if u.path == "/api/card-layout":
+            vid = sanitize_id(data.get("id") or "")
+            cpath = VIDEOS / vid / "cards.html" if vid else None
+            if not vid or not cpath.exists():
+                return self._json(404, {"error": "cards.html yok"})
+            html = cpath.read_text(encoding="utf-8")
+            host_re = re.compile(r'<div[^>]*\bid="(card-[^"]+)-host"[^>]*>')
+            def _num(tag, name):
+                m = re.search(name + r':\s*(-?[\d.]+)px', tag)
+                return float(m.group(1)) if m else 0.0
+            def _attr(tag, name):
+                m = re.search(name + r'="([^"]*)"', tag)
+                return m.group(1) if m else None
+            if data.get("list"):
+                out = []
+                for m in host_re.finditer(html):
+                    t = m.group(0)
+                    out.append({
+                        "id": m.group(1),
+                        "left": int(_num(t, "left")), "top": int(_num(t, "top")),
+                        "width": int(_num(t, "width")) or 880, "height": int(_num(t, "height")) or 220,
+                        "start": float(_attr(t, "data-start") or 0),
+                    })
+                return self._json(200, {"cards": out})
+            cid = (data.get("cardId") or "").strip()
+            try:
+                left = int(round(float(data.get("left"))))
+                top = int(round(float(data.get("top"))))
+            except Exception:
+                return self._json(400, {"error": "left/top sayi olmali"})
+            left = max(-200, min(1080, left)); top = max(0, min(1920, top))
+            m = re.search(r'<div[^>]*\bid="' + re.escape(cid) + r'-host"[^>]*>', html)
+            if not m:
+                return self._json(404, {"error": "kart bulunamadi: " + cid})
+            tag = m.group(0)
+            new_tag = re.sub(r'left:\s*-?[\d.]+px', f'left:{left}px', tag, count=1)
+            new_tag = re.sub(r'top:\s*-?[\d.]+px', f'top:{top}px', new_tag, count=1)
+            cpath.write_text(html.replace(tag, new_tag, 1), encoding="utf-8")
+            ok, msg = rebuild_video(vid)
+            if not ok:
+                return self._json(500, {"error": "kaydedildi ama rebuild hata: " + msg})
+            return self._json(200, {"ok": True, "msg": f"{cid} konumu kaydedildi ({left},{top}) ve videoya işlendi"})
 
         if u.path == "/api/sync-studio-cards":
             vid = sanitize_id(data.get("id") or "")

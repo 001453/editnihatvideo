@@ -50,6 +50,16 @@ Emre'nin gear/uçak/ev gibi genel ikonları burada yok — hepsi finans/altın t
 boyutunda kalır), outer `x:40,y:1520` civarı önerilir (bitiş bannerinin biraz üstü, altyazı
 bandına binmez). Bitiş bannerinin (`YATIRIM TAVSİYESİ DEĞİL`) yerine geçmez, ona ek.
 
+## Kural — 4 normal kartın 2'si de pro-tarz + her videoda FARKLI yerleşim (KİLİT, 2026-10-06, kullanıcı isteği)
+
+Yeni projelerden itibaren: 4 "normal" kartın **2'si klasik glass stats** kalır, **diğer 2'si pro registry bloğu**
+olur (`mk-progress-stat`, `number-wheel`, `animated-bar-chart`, `mk-callout-highlight` vb.; alttaki 2 sahne-geçişi
+pro kartı AYRI, onlara dokunma). Bu 2 pro-tarz kartın **yerleşimi/hareketi her videoda farklı** seçilir ve bir önceki
+videoyla aynı olmaz: bazen **dikey, uygun boş alanda** (alt yarıda dikey yığın/çubuk/adım), bazen **akan** (ticker/marquee
+şeridi, soldan sağa akış). Aynı videoda ikisi aynı yerleşimde olmaz. Konum ayarı altyazı sayfasındaki
+"📍 Kart konumu" bölümünden yapılır (`/api/card-layout`), Studio sürüklemesi kullanılmaz.
+Takip: 1006 → klasik 4 kart (bu kuraldan ÖNCE paketlendi). 1007 ve sonrası bu kurala göre; buraya yazılacak.
+
 ## Kural (show)
 
 1. Video başına **standart 4 normal kart + 2 pro kart** (bkz. aşağıdaki Kural — toplam
@@ -108,6 +118,7 @@ Seçim kuralı aynı: videodaki 2 pro kart FARKLI varyasyon, bir önceki videonu
 - 1003: split + pulse
 - 1004: özel rank-board videosu (pro-card çifti yok)
 - 1005: steps + stack (yeni havuz)
+- 1006: vs + classic
 - (yeni video paketlerken buraya eklenecek satır — bir önceki videonun çiftiyle AYNI ikiliyi
   kullanma, mümkünse hiç kesişmeyen bir çift seç, ör. 1004 → classic + split değil de
   classic + ticker gibi en az biri önceki çiftte olmayan bir kombinasyon.)
