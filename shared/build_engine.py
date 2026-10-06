@@ -177,6 +177,26 @@ def _patch_pro_config(html: str, copy: dict) -> str:
     return html
 
 
+def _apply_rotation(p, block):
+    """shared/pro_rotation.json: video no % 10 -> renk + konum; elle verilen copy değerleri önceliklidir."""
+    try:
+        m = re.search(r"(\d+)\s*$", ROOT.name)
+        pre = json.loads((shared_dir() / "pro_rotation.json").read_text(encoding="utf-8"))["presets"]
+        r = pre[int(m.group(1)) % len(pre)] if m else None
+    except Exception:
+        r = None
+    if not r:
+        return p
+    copy = dict(p.get("copy") or {})
+    copy.setdefault("accent", r["accent"])
+    if block == "mk-vert-stat":
+        copy.setdefault("posX", r["vert"][0]); copy.setdefault("posY", r["vert"][1])
+    if block == "mk-flow-ticker":
+        copy.setdefault("posX", r["flow"][0]); copy.setdefault("posY", r["flow"][1])
+    q = dict(p); q["copy"] = copy
+    return q
+
+
 def pro_cards_html():
     """Mount 1–3 curated registry blocks (shared/PRO_CARDS.md) into top band."""
     if not PRO_CARDS:
@@ -195,11 +215,12 @@ def pro_cards_html():
         if not src.is_file():
             print("pro card yok:", block)
             continue
+        p = _apply_rotation(p, block)
         cid = re.sub(r"[^\w\-]+", "-", (p.get("id") or block).strip()) or f"pro{i}"
         local_name = f"pro-{cid}.html"
         local = dest / local_name
         src_text = src.read_text(encoding="utf-8")
-        local.write_text(_patch_pro_config(src_text, p.get("copy") or {}), encoding="utf-8")
+        local.write_text(_patch_pro_config(src_text, p.get("copy") or {}).replace("mk-sb", f"mk-sb{i}").replace("{ position: relative; width: 1080px; height: 1920px;", "{ position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;").replace("position: relative; width: 1080px; height: 1920px; overflow", "position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow"), encoding="utf-8")
         start = float(p.get("start") or 0)
         dur = float(p.get("dur") or 7)
         # KİLİT (2026-09, GERÇEK tam ekran sahne desteği): bir registry öğesi
@@ -267,7 +288,7 @@ def scene_break_html_bits():
         sid = re.sub(r"[^\w\-]+", "-", (s.get("id") or f"scene{i}").strip()) or f"scene{i}"
         local_name = f"scene-{sid}.html"
         local = dest / local_name
-        local.write_text(_patch_pro_config(src.read_text(encoding="utf-8"), s.get("copy") or {}), encoding="utf-8")
+        local.write_text(_patch_pro_config(src.read_text(encoding="utf-8"), s.get("copy") or {}).replace("mk-sb", f"mk-sbs{i}").replace("position: relative; width: 1080px; height: 1920px; overflow", "position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow"), encoding="utf-8")
         start = float(s.get("start") or 0)
         dur = float(s.get("dur") or 8)
         bits.append(

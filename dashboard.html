@@ -187,7 +187,10 @@
         <div class="actions">
           <button class="primary" id="btnStudio">Önizlemeyi aç</button>
           <button type="button" id="btnRebuild2">Videoyu yeniden kur</button>
+          <a class="btn primary" id="btnCardsPage" href="/cards-layout" style="background:#1f9e52;color:#04220f;font-weight:700">📍 Kart konumu sayfası</a>
+          <button type="button" id="btnSaveCards">Studio'dan konum al</button>
         </div>
+        <p class="hint">Kartları Studio'da sürükleyince <b>buraya gel, yeşil butona bas</b>; sonra Studio'da Ctrl+F5.</p>
         <span class="status" id="stStudio"></span>
       </section>
 
@@ -294,6 +297,7 @@ async function takeFile(f){
 function updateCapsLink(){
   const id = vid() || '0909';
   $('btnCaps').href = '/captions?id=' + encodeURIComponent(id);
+  $('btnCardsPage').href = '/cards-layout?id=' + encodeURIComponent(id);
   $('renderCmd').textContent =
 `cd videos\\${id}
 $env:HYPERFRAMES_SKIP_SKILLS='1'
@@ -420,6 +424,16 @@ $('btnFixTr').onclick = async () => {
   const j = await postAction('fix-tr', { rebuild:true });
   if (j && j.ok) setStatus($('stCaps'), j.msg, 'ok');
   else if (j) setStatus($('stCaps'), j.error || j.msg || 'hata', 'err');
+};
+$('btnSaveCards').onclick = async () => {
+  const id = vid();
+  if (!id) { alert('Üstten Video ID seç / yaz'); return; }
+  setStatus($('stStudio'), 'kaydediliyor…', 'run');
+  try {
+    const r = await fetch('/api/sync-studio-cards', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id, rebuild:false }) });
+    const j = await r.json();
+    setStatus($('stStudio'), r.ok ? 'kart konumları kaydedildi ✓ — Studio\'da Ctrl+F5' : (j.error || 'hata'), r.ok ? 'ok' : 'err');
+  } catch(e) { setStatus($('stStudio'), 'hata: ' + e, 'err'); }
 };
 $('btnRebuild').onclick = $('btnRebuild2').onclick = async () => {
   const j = await postAction('rebuild');

@@ -1,0 +1,115 @@
+{
+ "_not": "Video no % 10 -> sıradaki tasarım. accent=renk, vert=[posX,posY] dikey kart, flow=[posX,posY] akan kartlar. timeline copy'de elle verilen değer her zaman önceliklidir.",
+ "presets": [
+  {
+   "accent": "#f0b429",
+   "vert": [
+    700,
+    430
+   ],
+   "flow": [
+    40,
+    1330
+   ]
+  },
+  {
+   "accent": "#4ade80",
+   "vert": [
+    40,
+    430
+   ],
+   "flow": [
+    380,
+    1260
+   ]
+  },
+  {
+   "accent": "#38bdf8",
+   "vert": [
+    700,
+    260
+   ],
+   "flow": [
+    40,
+    1200
+   ]
+  },
+  {
+   "accent": "#f472b6",
+   "vert": [
+    40,
+    300
+   ],
+   "flow": [
+    380,
+    1340
+   ]
+  },
+  {
+   "accent": "#fb923c",
+   "vert": [
+    700,
+    560
+   ],
+   "flow": [
+    200,
+    1280
+   ]
+  },
+  {
+   "accent": "#a78bfa",
+   "vert": [
+    40,
+    560
+   ],
+   "flow": [
+    40,
+    1360
+   ]
+  },
+  {
+   "accent": "#f87171",
+   "vert": [
+    700,
+    340
+   ],
+   "flow": [
+    380,
+    1200
+   ]
+  },
+  {
+   "accent": "#2dd4bf",
+   "vert": [
+    40,
+    380
+   ],
+   "flow": [
+    200,
+    1340
+   ]
+  },
+  {
+   "accent": "#facc15",
+   "vert": [
+    700,
+    480
+   ],
+   "flow": [
+    40,
+    1260
+   ]
+  },
+  {
+   "accent": "#60a5fa",
+   "vert": [
+    40,
+    480
+   ],
+   "flow": [
+    380,
+    1300
+   ]
+  }
+ ]
+}

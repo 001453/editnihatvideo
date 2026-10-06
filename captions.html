@@ -84,6 +84,19 @@
   .punchChip:hover{border-color:var(--gold);}
   .noVideo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     color:var(--muted);font-size:12.5px;text-align:center;padding:20px;}
+
+  #clSec{margin:6px 0 22px;padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.25)}
+  #clSec h2{margin:0 0 6px;font-size:1.2rem}
+  #clRow{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  #clStage{position:relative;width:300px;aspect-ratio:9/16;background:#000;border-radius:14px;overflow:hidden;border:1px solid var(--line);flex:none}
+  #clStage video{width:100%;height:100%;object-fit:cover;display:block}
+  .clbox{position:absolute;border:2px dashed rgba(93,204,138,.6);background:rgba(93,204,138,.10);border-radius:8px;touch-action:none;cursor:pointer}
+  .clbox span{position:absolute;top:2px;left:4px;background:var(--ok);color:#04220f;padding:1px 5px;border-radius:4px;font-weight:800;font-size:10px}
+  .clbox.sel{border:2px solid #fff;background:rgba(93,204,138,.30);cursor:grab;z-index:5}
+  .clchip{display:inline-block;margin:0 6px 6px 0;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#0d0f14;color:var(--ok);cursor:pointer;font-size:13px}
+  .clchip.on{background:var(--ok);color:#04220f}
+  #clPad{display:grid;grid-template-columns:56px 56px 56px;grid-template-rows:56px 56px;gap:8px;width:max-content;margin:12px 0}
+  #clPad button{width:56px;height:56px;font-size:22px;padding:0}
 </style>
 </head>
 <body>
@@ -134,6 +147,21 @@
       <button type="button" id="posReset" hidden title="Seçili satırları ortak konuma döndür">Seçilenleri sıfırla</button>
       <button type="button" id="nearReset" hidden title="Yakın (punch) konumunu otomatik hesaplamaya döndür">Yakını otomatiğe döndür</button>
       <span class="status" id="posStatus"></span>
+    </div>
+
+
+    <div id="clSec">
+      <h2>📍 Kart konumu</h2>
+      <p class="lead" style="margin:0 0 10px">Kartı seç → videonun üstünde <b>sürükle</b> ya da oklarla taşı. <b>2 saniye durunca kaydolur</b> ve videoya işlenir (Studio'da Ctrl+F5).</p>
+      <div id="clRow">
+        <div id="clStage"><video id="clVideo" muted playsinline preload="metadata"></video></div>
+        <div>
+          <div id="clChips"></div>
+          <div>Yatay <input class="num" id="clX" type="number" step="10" style="width:92px"> · Dikey <input class="num" id="clY" type="number" step="10" style="width:92px"> <button type="button" id="clApply" class="primary">Uygula</button></div>
+          <div id="clPad"><button type="button" class="sp">·</button><button type="button" data-dy="-1">↑</button><button type="button" class="sp">·</button><button type="button" data-dx="-1">←</button><button type="button" data-dy="1">↓</button><button type="button" data-dx="1">→</button></div>
+          <div class="status" id="clSt"></div>
+        </div>
+      </div>
     </div>
 
     <div class="bar">
@@ -811,6 +839,51 @@ $('saveBtn').onclick = async () => {
 };
 
 listVideos().then(()=>{ if($('vid').value) $('loadBtn').click(); });
+</script>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  let cards=[], sel=null, timer=null, busy=false, dirty=false, loadedFor=null;
+  const sc=()=>$('clStage').clientWidth/1080;
+  async function api(b){const r=await fetch('/api/card-layout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const j=await r.json();if(!r.ok)throw new Error(j.error||'hata');return j}
+  async function load(){
+    const id=$('vid').value; if(!id||id===loadedFor) return; loadedFor=id;
+    try{const j=await api({id,list:true});cards=j.cards||[];}catch(e){cards=[];$('clSt').textContent='kart listesi alınamadı: '+e.message;$('clSt').className='status err'}
+    sel=cards.length?cards[0].id:null;
+    const v=$('clVideo');v.src='/media/'+encodeURIComponent(id)+'?t='+Date.now();v.load();render();
+  }
+  const cur=()=>cards.find(c=>c.id===sel);
+  function render(){
+    const ch=$('clChips');ch.innerHTML='';
+    cards.forEach(c=>{const b=document.createElement('span');b.className='clchip'+(c.id===sel?' on':'');b.textContent=c.id.replace('card-','')+' · '+c.start.toFixed(1)+'sn';
+      b.onclick=()=>{sel=c.id;const v=$('clVideo');if(v.readyState>0)v.currentTime=c.start+0.8;render()};ch.appendChild(b)});
+    const st=$('clStage');st.querySelectorAll('.clbox').forEach(e=>e.remove());
+    cards.forEach(c=>{const d=document.createElement('div');d.className='clbox'+(c.id===sel?' sel':'');d.innerHTML='<span>'+c.id.replace('card-','')+'</span>';
+      d.style.left=c.left*sc()+'px';d.style.top=c.top*sc()+'px';d.style.width=c.width*sc()+'px';d.style.height=c.height*sc()+'px';
+      d.onpointerdown=e=>drag(e,c,d);st.appendChild(d)});
+    const c=cur();if(c){$('clX').value=c.left;$('clY').value=c.top}
+  }
+  function drag(e,c,d){
+    if(c.id!==sel){sel=c.id;render();return}
+    e.preventDefault();d.setPointerCapture(e.pointerId);
+    const x0=e.clientX,y0=e.clientY,l0=c.left,t0=c.top;
+    d.onpointermove=ev=>{c.left=Math.round(l0+(ev.clientX-x0)/sc());c.top=Math.round(t0+(ev.clientY-y0)/sc());d.style.left=c.left*sc()+'px';d.style.top=c.top*sc()+'px';$('clX').value=c.left;$('clY').value=c.top};
+    d.onpointerup=()=>{d.onpointermove=null;d.onpointerup=null;queue()};
+  }
+  function move(dx,dy){const c=cur();if(!c)return;c.left+=dx*20;c.top+=dy*20;render();queue()}
+  function queue(){$('clSt').textContent='2 sn durursa kaydolur…';$('clSt').className='status';clearTimeout(timer);timer=setTimeout(save,2000)}
+  async function save(){
+    const c=cur();if(!c)return;if(busy){dirty=true;return}busy=true;$('clSt').textContent='kaydediliyor ve videoya işleniyor…';
+    try{const j=await api({id:$('vid').value,cardId:c.id,left:c.left,top:c.top});$('clSt').textContent=(j.msg||'kaydedildi')+' ✓ — Studio\'da Ctrl+F5';$('clSt').className='status ok'}
+    catch(e){$('clSt').textContent='hata: '+e.message;$('clSt').className='status err'}
+    finally{busy=false;if(dirty){dirty=false;save()}}
+  }
+  document.querySelectorAll('#clPad [data-dx],#clPad [data-dy]').forEach(b=>b.onclick=()=>move(Number(b.dataset.dx||0),Number(b.dataset.dy||0)));
+  $('clApply').onclick=()=>{const c=cur();if(!c)return;c.left=Number($('clX').value)||0;c.top=Number($('clY').value)||0;render();queue()};
+  $('vid').addEventListener('change',()=>{loadedFor=null;load()});
+  const iv=setInterval(()=>{if($('vid').value){load();if(loadedFor)clearInterval(iv)}},600);
+})();
 </script>
 </body>
 </html>

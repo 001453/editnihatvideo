@@ -50,6 +50,16 @@ Emre'nin gear/uçak/ev gibi genel ikonları burada yok — hepsi finans/altın t
 boyutunda kalır), outer `x:40,y:1520` civarı önerilir (bitiş bannerinin biraz üstü, altyazı
 bandına binmez). Bitiş bannerinin (`YATIRIM TAVSİYESİ DEĞİL`) yerine geçmez, ona ek.
 
+## Kural — 4 normal kartın 2'si de pro-tarz + her videoda FARKLI yerleşim (KİLİT, 2026-10-06, kullanıcı isteği)
+
+Yeni projelerden itibaren: 4 "normal" kartın **2'si klasik glass stats** kalır, **diğer 2'si pro registry bloğu**
+olur (`mk-progress-stat`, `number-wheel`, `animated-bar-chart`, `mk-callout-highlight` vb.; alttaki 2 sahne-geçişi
+pro kartı AYRI, onlara dokunma). Bu 2 pro-tarz kartın **yerleşimi/hareketi her videoda farklı** seçilir ve bir önceki
+videoyla aynı olmaz: bazen **dikey, uygun boş alanda** (alt yarıda dikey yığın/çubuk/adım), bazen **akan** (ticker/marquee
+şeridi, soldan sağa akış). Aynı videoda ikisi aynı yerleşimde olmaz. Konum ayarı altyazı sayfasındaki
+"📍 Kart konumu" bölümünden yapılır (`/api/card-layout`), Studio sürüklemesi kullanılmaz.
+Takip: 1006 → klasik 4 kart (bu kuraldan ÖNCE paketlendi). 1007: dikey = `mk-vert-stat` (CONFIG: accent,badge,heading,headingValue,rows[],footnote,posX,posY — dar sütun, varsayılan sağ kenar x700,y430), akan = `mk-flow-ticker` (CONFIG: accent,label,entries[{label,value}],posY — sağdan sola akan şerit, varsayılan y1330). Yeni video: bir öncekiyle aynı yerleşimi kullanma (dikey için posX sol/sağ, y değiştir).
+
 ## Kural (show)
 
 1. Video başına **standart 4 normal kart + 2 pro kart** (bkz. aşağıdaki Kural — toplam
@@ -108,6 +118,8 @@ Seçim kuralı aynı: videodaki 2 pro kart FARKLI varyasyon, bir önceki videonu
 - 1003: split + pulse
 - 1004: özel rank-board videosu (pro-card çifti yok)
 - 1005: steps + stack (yeni havuz)
+- 1006: vs + classic
+- 1007: grid + split (sahne geçişi) · normal kart pro-tarz: `mk-vert-stat` (dikey, sağ kenar) + `mk-flow-ticker` (akan şerit)
 - (yeni video paketlerken buraya eklenecek satır — bir önceki videonun çiftiyle AYNI ikiliyi
   kullanma, mümkünse hiç kesişmeyen bir çift seç, ör. 1004 → classic + split değil de
   classic + ticker gibi en az biri önceki çiftte olmayan bir kombinasyon.)
@@ -247,3 +259,13 @@ patch'lenmiyordu — KİLİT, bu yüzden yeni registry bileşenlerinde CSS prope
 Yeni video paketlerken skill: **4 normal klasik kart** (bu listeden konuya uyan çeşitler) +
 **2 adet sahne kesme kartı, 5'li varyasyon havuzundan FARKLI iki `block` seçilerek** (zorunlu,
 konuya özel, birbirleriyle ve broll/IG banner/normal kartlarla zaman çakışması olmadan).
+
+## KİLİT DOĞRU AKIŞ (2026-10-06, 1007'de ekranda doğrulandı — Nihat: "her şey güzel")
+
+Bu akış standarttır, bozma:
+- 4 normal kartın 2'si klasik cam, 2'si pro-tarz (`mk-vert-stat` dikey boş alan, `mk-flow-ticker` çapraz akan kartlar — haber şeridi DEĞİL, Nihat beğenmedi).
+- 2 zorunlu sahne kartı (`mk-scene-break-*`) tam ekran; konuşmacıyı kaplar.
+- Tüm pro kök elemanları `position:absolute; left:0; top:0` (relative olursa Stüdyo'da alta kayar), her pro/sahne dosyasında `mk-sb` önekleri `build_engine` tarafından benzersiz yapılır (aynı id çakışması sahneleri bozuyordu).
+- **Her videoda farklı tasarım döngüsü (10'lu):** `shared/pro_rotation.json` — video no % 10 → renk (accent) + dikey kart konumu + akan kart konumu. `build_engine._apply_rotation` bunu otomatik uygular; `timeline.json` `proCards[].copy` içinde elle verilen accent/posX/posY HER ZAMAN önceliklidir.
+- Yeni videoda: sahne çiftini önceki videodakinden farklı seç, normal pro-tarz kartların konumunu rotasyondan al, ayrıca boş alana göre (yüz/altyazı üstü) gerekirse copy ile ez.
+- Konum ince ayarı: altyazı sayfası "📍 Kart konumu" (pro kartlar `pro:<id>`).
