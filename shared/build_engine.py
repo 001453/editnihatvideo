@@ -1304,6 +1304,12 @@ for i, m in enumerate(MG):
     elif typ == "ticker":
         sfx_bits.append(sfx_el(f"sfx-mg-{mid}", "sfx/swoosh-up.mp3", at, 0.35, "0.09", 21))
 
+try:
+    _vn = int(re.search(r"(\d+)\s*$", ROOT.name).group(1))
+except Exception:
+    _vn = 0
+TRANS_IN = ["flash", "whip", "zoom", "glitch"]
+TRANS_OUT = ["glitch", "flash", "whip", "zoom"]
 SHATTER_BLOCKS = {"mk-vert-stat", "mk-flow-ticker", "mk-ring-stat", "mk-line-graph", "mk-flap-board", "mk-strip", "mk-compare"}
 for _p in PRO_CARDS:
     if (_p.get("block") or "") in SHATTER_BLOCKS and not (_p.get("copy") or {}).get("noShatter"):
@@ -1320,12 +1326,6 @@ sfx_html = "\n".join(sfx_bits)
 css = (shared_dir() / "composition.css").read_text(encoding="utf-8")
 
 broll_js = []
-TRANS_IN = ["flash", "whip", "zoom", "glitch"]
-TRANS_OUT = ["glitch", "flash", "whip", "zoom"]
-try:
-    _vn = int(re.search(r"(\d+)\s*$", ROOT.name).group(1))
-except Exception:
-    _vn = 0
 
 
 def _trans_js(cam, s, e, tin, tout):

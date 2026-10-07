@@ -310,3 +310,6 @@ Pro kart / sahne / halka / grafik / tabela / bant ekrandayken o saniyelerin alty
 - Panel taşınabilir bloklar: vert-stat, flow-ticker, ring-stat, line-graph, flap-board, strip, compare, hook (dashboard_server PRO_MOVABLE).
 - Planlayıcı: `python scripts/plan_cards.py <id>` → `videos/<id>/CARD_PLAN.json` (taslak öneri; etiketler paketlemede düzeltilir).
 - OpenAI: anahtar varsa ve transcript'te `.openai` işareti yoksa eski transcript `input-video.eski-whisper.json` olur, OpenAI ile yeniden yapılır.
+
+## YÜZ BÖLGESİ KURALI (2026-10-07, 1008 geri bildirimi)
+Konuşmacının başı x≈400–790, y≈650–1100. Yan paneller (vert-stat, ring-stat, flap-board) SOLDA x=40 olmalı (en fazla x≈370'e kadar) ya da ÜST bantta (y+yükseklik ≤ ~640). Sağda x=700 sadece posY ≤ 240. Aynı video içinde paneller farklı yerlerde çıksın. Açılışta proje banner'ı (y220-340) zaten var → mk-hook KULLANMA (üst üste biniyor).
